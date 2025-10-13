@@ -76,6 +76,10 @@ It intelligently detects and extracts file paths from your code, providing compr
 
   Handles both Windows and Unix path formats with intelligent normalization and validation.
 
+- **Multi-language support**
+
+  Available in 13 languages: English, Chinese (Simplified), German, Spanish, French, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian, and Vietnamese.
+
 ## 🚀 More from the LE Family
 
 **Paths-LE** is part of a growing family of developer tools designed to make your workflow effortless:
