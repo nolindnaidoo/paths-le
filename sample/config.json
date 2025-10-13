@@ -1,0 +1,46 @@
+# Sample TOML configuration with paths
+[build]
+output_dir = "./dist"
+source_dir = "./src"
+assets_dir = "./assets"
+
+[server]
+static_files = "/var/www/html"
+log_file = "/var/log/app.log"
+config_path = "/etc/myapp/config.ini"
+
+[database]
+backup_path = "/backup/db"
+data_dir = "/data/mysql"
+
+[[paths]]
+path = "/home/user/documents"
+type = "user"
+
+[[paths]]
+path = "/usr/local/bin"
+type = "system"
+
+[[paths]]
+path = "/opt/applications"
+type = "system"
+
+[[paths]]
+path = "C:\\Program Files\\MyApp"
+type = "windows"
+
+[[paths]]
+path = "C:\\Users\\John\\Desktop"
+type = "windows"
+
+[[paths]]
+path = "./relative/path/here"
+type = "relative"
+
+[[paths]]
+path = "../parent/directory"
+type = "relative"
+
+[[paths]]
+path = "~/user/home/folder"
+type = "user"

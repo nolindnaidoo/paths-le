@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paths-LE Sample HTML</title>
+  
+  <!-- CSS links - relative and absolute paths -->
+  <link href="./styles/main.css" rel="stylesheet">
+  <link href="../css/theme.css" rel="stylesheet">
+  <link href="/assets/css/reset.css" rel="stylesheet">
+  <link href="https://cdn.example.com/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Favicon and manifest -->
+  <link icon="./images/favicon.ico" rel="icon">
+  <link manifest="./manifest.json" rel="manifest">
+  
+  <!-- External scripts -->
+  <script src="./js/app.js"></script>
+  <script src="../vendor/jquery.min.js"></script>
+  <script src="https://cdn.example.com/react.min.js"></script>
+</head>
+<body>
+  <!-- Images with various path formats -->
+  <img src="./images/logo.png" alt="Logo">
+  <img src="../assets/hero.jpg" alt="Hero Image">
+  <img src="/static/images/banner.png" alt="Banner">
+  <img src="https://cdn.example.com/image.jpg" alt="CDN Image">
+  
+  <!-- srcset for responsive images -->
+  <img srcset="./images/small.jpg 480w, ./images/large.jpg 800w" alt="Responsive">
+  <img srcset="./images/standard.jpg 1x, ./images/retina.jpg 2x" alt="Retina">
+  
+  <!-- Data URLs should be excluded -->
+  <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIi8+" alt="Inline SVG">
+  
+  <!-- Links -->
+  <a href="./page.html">Internal Page</a>
+  <a href="../about/index.html">About</a>
+  <a href="https://example.com">External</a>
+  <a href="javascript:void(0)">JS Link (excluded)</a>
+  
+  <!-- Forms -->
+  <form action="./submit.php" method="post">
+    <button type="submit">Submit</button>
+  </form>
+  
+  <form action="/api/contact" method="post">
+    <button formaction="./alternative.php">Alternative Action</button>
+  </form>
+  
+  <!-- Video with poster -->
+  <video poster="./images/video-thumbnail.jpg" controls>
+    <source src="./videos/sample.mp4" type="video/mp4">
+  </video>
+  
+  <!-- Background attribute (deprecated but still valid) -->
+  <body background="./images/background.jpg">
+  
+  <!-- Blockquote with cite -->
+  <blockquote cite="./articles/reference.html">
+    Sample quote with citation
+  </blockquote>
+  
+  <!-- Custom data attributes -->
+  <div data="./data/config.json"></div>
+  
+  <!-- Protocol-relative URLs -->
+  <script src="//cdn.example.com/library.js"></script>
+  <img src="//images.example.com/photo.jpg" alt="Protocol-relative">
+  
+  <!-- Inline scripts (for demonstration) -->
+  <script>
+    // JavaScript paths in HTML (won't be extracted from script content)
+    const config = './config.json';
+  </script>
+</body>
+</html>
+

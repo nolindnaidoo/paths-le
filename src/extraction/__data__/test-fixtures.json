@@ -1,0 +1,203 @@
+{
+	"json": {
+		"description": "JSON test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "{\n  \"config\": \"/etc/app/config.json\",\n  \"log\": \"./logs/app.log\",\n  \"data\": \"C:\\\\data\\\\app.db\"\n}",
+				"expected": [
+					"/etc/app/config.json",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "nested-objects",
+				"input": "{\n  \"paths\": {\n    \"config\": \"/home/user/.config/app.json\",\n    \"cache\": \"./cache/temp\"\n  },\n  \"urls\": [\n    \"https://api.example.com/v1/data\",\n    \"file:///usr/local/bin/app\"\n  ]\n}",
+				"expected": [
+					"/home/user/.config/app.json",
+					"./cache/temp",
+					"https://api.example.com/v1/data",
+					"file:///usr/local/bin/app"
+				]
+			},
+			{
+				"name": "mixed-types",
+				"input": "{\n  \"version\": \"1.0.0\",\n  \"path\": \"/usr/bin/app\",\n  \"relative\": \"../config/settings.yaml\",\n  \"windows\": \"D:\\\\Program Files\\\\App\\\\config.ini\"\n}",
+				"expected": [
+					"/usr/bin/app",
+					"../config/settings.yaml",
+					"D:\\Program Files\\App\\config.ini"
+				]
+			}
+		]
+	},
+	"yaml": {
+		"description": "YAML test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "config: /etc/app/config.yaml\nlog: ./logs/app.log\ndata: C:\\data\\app.db",
+				"expected": [
+					"/etc/app/config.yaml",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "nested-structure",
+				"input": "paths:\n  config: /home/user/.config/app.yaml\n  cache: ./cache/temp\nurls:\n  - https://api.example.com/v1/data\n  - file:///usr/local/bin/app",
+				"expected": [
+					"/home/user/.config/app.yaml",
+					"./cache/temp",
+					"https://api.example.com/v1/data",
+					"file:///usr/local/bin/app"
+				]
+			}
+		]
+	},
+	"javascript": {
+		"description": "JavaScript test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "string-literals",
+				"input": "const configPath = '/etc/app/config.json';\nconst logPath = './logs/app.log';\nconst dataPath = 'C:\\\\data\\\\app.db';",
+				"expected": [
+					"/etc/app/config.json",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "template-literals",
+				"input": "const configPath = `/etc/app/${env}/config.json`;\nconst logPath = `./logs/${appName}.log`;",
+				"expected": ["/etc/app/${env}/config.json", "./logs/${appName}.log"]
+			},
+			{
+				"name": "object-properties",
+				"input": "const paths = {\n  config: '/home/user/.config/app.json',\n  cache: './cache/temp',\n  data: 'C:\\\\data\\\\app.db'\n};",
+				"expected": [
+					"/home/user/.config/app.json",
+					"./cache/temp",
+					"C:\\data\\app.db"
+				]
+			}
+		]
+	},
+	"csv": {
+		"description": "CSV test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "Name,Path,Type\nconfig,/etc/app/config.json,file\nlog,./logs/app.log,file\ndata,C:\\data\\app.db,file",
+				"expected": [
+					"/etc/app/config.json",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "mixed-data",
+				"input": "ID,Name,Path,Status\n1,app,/usr/bin/app,active\n2,config,/home/user/.config/app.yaml,active\n3,cache,./cache/temp,inactive",
+				"expected": [
+					"/usr/bin/app",
+					"/home/user/.config/app.yaml",
+					"./cache/temp"
+				]
+			}
+		]
+	},
+	"toml": {
+		"description": "TOML test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "config = \"/etc/app/config.toml\"\nlog = \"./logs/app.log\"\ndata = \"C:\\\\data\\\\app.db\"",
+				"expected": [
+					"/etc/app/config.toml",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "nested-structure",
+				"input": "[paths]\nconfig = \"/home/user/.config/app.toml\"\ncache = \"./cache/temp\"\n\n[urls]\napi = \"https://api.example.com/v1/data\"\nfile = \"file:///usr/local/bin/app\"",
+				"expected": [
+					"/home/user/.config/app.toml",
+					"./cache/temp",
+					"https://api.example.com/v1/data",
+					"file:///usr/local/bin/app"
+				]
+			}
+		]
+	},
+	"dotenv": {
+		"description": "Environment file test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "CONFIG_PATH=/etc/app/config.env\nLOG_PATH=./logs/app.log\nDATA_PATH=C:\\\\data\\\\app.db",
+				"expected": [
+					"/etc/app/config.env",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "quoted-paths",
+				"input": "CONFIG_PATH=\"/home/user/.config/app.env\"\nLOG_PATH='./logs/app.log'\nDATA_PATH=\"C:\\\\data\\\\app.db\"",
+				"expected": [
+					"/home/user/.config/app.env",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			}
+		]
+	},
+	"log": {
+		"description": "Log file test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "2023-12-25 10:30:00 INFO Loading config from /etc/app/config.json\n2023-12-25 10:30:01 INFO Writing log to ./logs/app.log\n2023-12-25 10:30:02 INFO Database at C:\\data\\app.db",
+				"expected": [
+					"/etc/app/config.json",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "error-paths",
+				"input": "2023-12-25 10:30:00 ERROR Failed to read /home/user/.config/app.yaml\n2023-12-25 10:30:01 ERROR Cannot write to ./cache/temp\n2023-12-25 10:30:02 ERROR Database file C:\\data\\app.db is locked",
+				"expected": [
+					"/home/user/.config/app.yaml",
+					"./cache/temp",
+					"C:\\data\\app.db"
+				]
+			}
+		]
+	},
+	"ini": {
+		"description": "INI file test fixtures with expected path extractions",
+		"fixtures": [
+			{
+				"name": "simple-paths",
+				"input": "[paths]\nconfig = /etc/app/config.ini\nlog = ./logs/app.log\ndata = C:\\data\\app.db",
+				"expected": [
+					"/etc/app/config.ini",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			},
+			{
+				"name": "quoted-paths",
+				"input": "[paths]\nconfig = \"/home/user/.config/app.ini\"\nlog = './logs/app.log'\ndata = \"C:\\\\data\\\\app.db\"",
+				"expected": [
+					"/home/user/.config/app.ini",
+					"./logs/app.log",
+					"C:\\data\\app.db"
+				]
+			}
+		]
+	}
+}

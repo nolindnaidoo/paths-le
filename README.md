@@ -1,0 +1,444 @@
+<p align="center">
+  <img src="src/assets/images/icon.png" alt="Paths-LE Logo" width="96" height="96"/>
+</p>
+<h1 align="center">Paths-LE: Zero Hassle Path Extraction</h1>
+<p align="center">
+  <b>Instantly extract and analyze file paths from your codebase with precision</b><br/>
+  <i>JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and Environment files</i>
+  <br/>
+  <i>Designed for configuration management, dependency analysis, and path validation.</i>
+</p>
+
+<p align="center">
+  <!-- VS Code Marketplace -->
+  <a href="https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/nolindnaidoo.paths-le" alt="VSCode Marketplace Version" />
+  </a>
+  <!-- Open VSX -->
+  <a href="https://open-vsx.org/extension/nolindnaidoo/paths-le">
+    <img src="https://img.shields.io/open-vsx/v/nolindnaidoo/paths-le" alt="Open VSX Version" />
+  </a>
+  <!-- Build -->
+  <a href="https://github.com/nolindnaidoo/paths-le/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/nolindnaidoo/paths-le/ci.yml?branch=main" alt="Build Status" />
+  </a>
+  <!-- License -->
+  <a href="https://github.com/nolindnaidoo/paths-le/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/nolindnaidoo/paths-le" alt="MIT License" />
+  </a>
+</p>
+
+<p align="center">
+  <i>Tested on <b>Ubuntu</b>, <b>macOS</b>, and <b>Windows</b> for maximum compatibility.</i>
+</p>
+
+---
+
+<p align="center">
+  <img src="src/assets/images/preview.gif" alt="Path Extraction animation" style="max-width: 100%; height: auto;" />
+  <img src="src/assets/images/command-palette.png" alt="Command Palette" style="max-width: 80%; height: auto;" />
+</p>
+
+## 🙏 Thank You!
+
+Thank you for your interest in Paths-LE! If this extension has been helpful in managing your path extraction needs, please consider leaving a rating on [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le) and [Open VSX](https://open-vsx.org/extension/nolindnaidoo/paths-le). Your feedback helps other developers discover this tool and motivates continued development.
+
+⭐ **Interested in Paths-LE?** Star this repository to get notified when it's released!
+
+## ✅ Why Paths-LE
+
+**Modern applications reference files everywhere** — imports, exports, configuration files, asset paths, and resource references. Keeping track of all file paths across your codebase can be overwhelming.
+
+**Paths-LE makes path extraction effortless.**  
+It intelligently detects and extracts file paths from your code, providing comprehensive analysis and insights to help you manage file dependencies effectively.
+
+- **Complete path detection**
+
+  Automatically finds file paths in multiple formats: absolute paths, relative paths, Windows paths, and Unix paths.
+
+- **Smart analysis & insights**
+
+  Get detailed reports on path usage patterns, dependency analysis, and file reference distribution across your codebase.
+
+- **Dependency analysis support**
+
+  Perfect for analyzing imports, exports, and file references to identify missing files and circular dependencies.
+
+- **Comprehensive file format support**
+
+  Works with JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and Environment files using proven parsing libraries for reliable extraction.
+
+- **Smart path detection**
+
+  Intelligently filters package imports (like 'react' or 'lodash') from actual file paths in JavaScript/TypeScript.
+
+- **Cross-platform compatibility**
+
+  Handles both Windows and Unix path formats with intelligent normalization and validation.
+
+## 🚀 More from the LE Family
+
+**Paths-LE** is part of a growing family of developer tools designed to make your workflow effortless:
+
+- **Strings-LE** - Extract every user-visible string from JSON, YAML, CSV, TOML, INI, and .env files with zero hassle  
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.string-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/string-le)]
+
+- **EnvSync-LE** - Effortlessly detect, compare, and synchronize .env files across your workspace with visual diffs  
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.envsync-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/envsync-le)]
+
+- **Numbers-LE** - Extract and analyze numeric data from JSON, YAML, CSV, TOML, INI, and .env  
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.numbers-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/numbers-le)]
+
+- **Colors-LE** - Extract and analyze colors from CSS, SCSS, JavaScript, HTML, and more  
+  _Coming October 2025_
+
+- **Dates-LE** - Extract and analyze dates from logs, JSON, YAML, CSV, and temporal data  
+  _Coming October 2025_
+
+- **URLs-LE** - Extract and analyze URLs from HTML, Markdown, configs, and documentation  
+  _Coming October 2025_
+
+Each tool follows the same philosophy: **Zero Hassle, Maximum Productivity**.
+
+## 💡 Use Cases & Examples
+
+### JavaScript/TypeScript Import Analysis
+
+Extract and analyze import/require/export statements from JavaScript and TypeScript:
+
+```javascript
+// Extract from app.js or app.ts
+import React from './components/App' // ✅ Extracted
+import { Button } from './components/Button' // ✅ Extracted
+import lodash from 'lodash' // ❌ Excluded (package)
+const config = require('./config/settings') // ✅ Extracted
+const express = require('express') // ❌ Excluded (package)
+import module from 'https://cdn.example.com/module.js' // ✅ Extracted
+```
+
+**Smart filtering**: Package names are automatically excluded—only local file paths are extracted.
+
+---
+
+### HTML Asset Path Extraction
+
+Identify all asset references in HTML files:
+
+```html
+<!-- Extract from index.html -->
+<link href="./styles/main.css" rel="stylesheet" />
+<img src="./images/logo.png" alt="Logo" />
+<script src="../js/app.js"></script>
+<img srcset="./small.jpg 480w, ./large.jpg 800w" alt="Responsive" />
+<video poster="./images/thumbnail.jpg"></video>
+```
+
+Extracts from: `src`, `href`, `srcset`, `poster`, `action`, `data`, and more. Automatically excludes `data:` and `javascript:` URLs.
+
+---
+
+### CSS Path Extraction
+
+Extract paths from CSS stylesheets:
+
+```css
+/* Extract from styles.css */
+@import './reset.css';
+@import url('../vendor/normalize.css');
+
+body {
+  background: url('./images/background.jpg');
+}
+
+@font-face {
+  src: url('./fonts/custom-font.woff2') format('woff2'), url('./fonts/custom-font.woff') format('woff');
+}
+```
+
+Extracts from: `url()` and `@import` statements. Automatically excludes `data:` URLs.
+
+---
+
+### JSON Configuration Analysis
+
+Extract paths from JSON configuration files:
+
+```json
+{
+  "paths": {
+    "config": "/etc/app/config.json",
+    "logs": "./logs/application.log",
+    "data": "C:\\data\\app.db"
+  },
+  "files": ["./file1.txt", "../file2.txt"],
+  "urls": {
+    "api": "https://api.example.com/v1/data"
+  }
+}
+```
+
+Recursively extracts path-like strings from nested objects and arrays.
+
+---
+
+### TOML & Environment Files
+
+Extract file paths from configuration files:
+
+```toml
+# Extract from config.toml
+[paths]
+data_dir = "./data"
+log_file = "/var/log/app.log"
+backup_path = "C:\\backups\\app"
+```
+
+```bash
+# Extract from .env
+DATABASE_PATH=./data/app.db
+LOG_FILE=/var/log/app.log
+BACKUP_DIR=C:\backups
+```
+
+---
+
+### CSV Data Analysis
+
+Extract paths from CSV data files:
+
+```csv
+path,type,description
+./src/main.js,file,Main application file
+/var/log/app.log,file,Application log
+C:\Users\Name\data,dir,User data directory
+```
+
+---
+
+### Dependency Mapping & Validation
+
+- Map file dependencies across JavaScript/TypeScript projects
+- Identify missing or broken references in HTML/CSS
+- Validate configuration file paths
+- Analyze import patterns and detect circular dependencies
+
+## 🚀 Quick Start
+
+1. **Coming Soon** - Paths-LE will be available on VS Code Marketplace and Open VSX
+2. Open any supported file (`.js`, `.ts`, `.json`, `.html`, `.css`, `.toml`, `.csv`, `.env`)
+3. Run `Paths-LE: Extract Paths` (`Cmd+Alt+P` / `Ctrl+Alt+P`)
+4. Analyze or validate the extracted paths
+
+## ⚙️ Configuration
+
+- `paths-le.enabled` – Enable or disable the extension
+- `paths-le.extractAbsolute` – Extract absolute paths
+- `paths-le.extractRelative` – Extract relative paths
+- `paths-le.extractWindows` – Extract Windows paths
+- `paths-le.extractUnix` – Extract Unix paths
+- `paths-le.includeComments` – Include paths in comments
+- `paths-le.sortByFrequency` – Sort results by usage frequency
+- `paths-le.groupByFormat` – Group paths by format type
+- `paths-le.validatePaths` – Enable path validation
+
+## 📁 Supported File Types
+
+Paths-LE supports **9 file types** for path extraction:
+
+| File Type   | Extensions                    | What Gets Extracted                             |
+| ----------- | ----------------------------- | ----------------------------------------------- |
+| JavaScript  | `.js`, `.mjs`, `.cjs`         | `import`/`require`/`export` with local paths    |
+| TypeScript  | `.ts`, `.tsx`, `.mts`, `.cts` | `import`/`require`/`export` with local paths    |
+| JSON        | `.json`                       | Path-like strings (absolute, relative, URLs)    |
+| HTML        | `.html`                       | `src`, `href`, `data`, `action`, `poster`, etc. |
+| CSS         | `.css`, `.scss`, `.less`      | `url()` and `@import` paths                     |
+| TOML        | `.toml`                       | All string values that look like paths          |
+| CSV         | `.csv`                        | Path values in any column                       |
+| Environment | `.env`, `.env.local`          | Path values in environment variables            |
+| Log/Text    | `.log`, `.txt`                | Pre-extracted paths for analysis                |
+
+### Smart Features
+
+- **JavaScript/TypeScript**: Excludes npm package names—only extracts local file paths
+- **HTML**: Automatically excludes `data:` and `javascript:` URLs
+- **CSS**: Automatically excludes `data:` URLs
+- **All types**: Handles Windows (`C:\`) and Unix (`/`) paths, plus URLs
+
+---
+
+## 🌍 Language Support
+
+Available in multiple languages:
+
+- 🇬🇧 English (primary)
+- Additional localizations coming soon
+
+Paths-LE automatically displays in your VS Code language. All commands, settings, and messages are localized.
+
+## 🧩 System Requirements
+
+- **VS Code**: 1.85.0 or higher
+- **Node.js**: Not required (extension runs in VS Code's built-in runtime)
+- **Platform**: Windows, macOS, Linux
+- **Memory**: 50MB minimum, 200MB recommended for large files
+- **Storage**: 15MB for extension files
+
+## 🧩 Compatibility
+
+- Works in standard workspaces.
+- Limited support in virtual/untrusted workspaces.
+
+## 🔒 Privacy & Telemetry
+
+- Runs locally; no data is sent off your machine.
+- Optional local-only logs can be enabled with `paths-le.telemetryEnabled`.
+
+## ⚡ Performance
+
+Paths-LE is built for speed and efficiency across all file types:
+
+### Extraction Performance
+
+| Format         | Throughput      | Test Size   | Notes                             |
+| -------------- | --------------- | ----------- | --------------------------------- |
+| **DOTENV**     | 980K+ paths/sec | 10K entries | Environment files, .env configs   |
+| **CSV**        | 530K+ paths/sec | 10K rows    | Data exports, logs, spreadsheets  |
+| **TOML**       | Fast extraction | All sizes   | Configuration files, Rust configs |
+| **JSON**       | Fast recursive  | All sizes   | Nested object traversal           |
+| **JavaScript** | Fast regex      | All sizes   | Import/require pattern matching   |
+| **HTML/CSS**   | Fast line-scan  | All sizes   | Attribute and url() extraction    |
+
+_Benchmarked with realistic test data on Apple M1_
+
+### Performance Notes
+
+- **Memory Usage**: ~50MB base + minimal per-file overhead
+- **Large Files**: Handles files up to 10MB efficiently; 10-30MB with reduced throughput
+- **Path Validation**: When enabled, adds 20-30% processing time but ensures accuracy
+- **Cross-platform**: Windows/Unix path normalization with minimal overhead
+- **Smart filtering**: JavaScript/TypeScript package exclusion adds negligible overhead
+- **Hardware Requirements**: Minimum 4GB RAM, recommended 8GB+ for large files
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Extension not detecting paths**
+
+- Ensure file is saved and has a supported extension (`.js`, `.ts`, `.json`, `.html`, `.css`, `.toml`, `.csv`, `.env`)
+- Check that path formats are valid (absolute, relative, or Windows-style paths)
+- For JavaScript/TypeScript: Only local file paths are extracted (package names are excluded)
+- Try reloading VS Code window (`Ctrl/Cmd + Shift + P` → "Developer: Reload Window")
+
+**Performance issues with large files**
+
+- Files over 10MB may take longer to process
+- Consider using `paths-le.includeComments: false` to reduce processing time
+- Enable `paths-le.sortByFrequency: false` for faster extraction
+
+**Paths not appearing in results**
+
+- Verify the path format is supported (absolute, relative, Windows, Unix)
+- Check if `paths-le.extractAbsolute`, `paths-le.extractRelative`, etc. are enabled
+- Ensure paths are not inside comments if `paths-le.includeComments` is disabled
+- Check for proper path formatting and separators
+
+**Path validation issues**
+
+- Enable `paths-le.validatePaths: true` for path validation
+- Check that paths exist in the workspace
+- Verify path separators match your operating system
+- Some paths may be valid but not accessible from the current workspace
+
+**Cross-platform compatibility problems**
+
+- Check `paths-le.extractWindows` and `paths-le.extractUnix` settings
+- Ensure path normalization is working correctly
+- Verify that mixed path formats are handled properly
+- Some paths may be platform-specific and not valid on all systems
+
+**Extension crashes or freezes**
+
+- Check VS Code version compatibility (requires 1.85.0+)
+- Disable other path-related extensions temporarily
+- Check Output panel → "Paths-LE" for error messages
+
+### Getting Help
+
+- Check the [Issues](https://github.com/nolindnaidoo/paths-le/issues) page for known problems
+- Enable telemetry logging: `paths-le.telemetryEnabled: true`
+- Review logs in Output panel → "Paths-LE"
+
+## ❓ FAQ
+
+**Q: What types of paths are extracted?**
+A: Paths-LE extracts absolute paths (/usr/local/bin), relative paths (./src/components), Windows paths (C:\Users\Name), and Unix paths (/home/user).
+
+**Q: What file formats are supported?**
+A: Paths-LE supports JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and Environment files. Each format uses specialized extraction logic for reliable results.
+
+**Q: Why these formats?**
+A: These formats cover the most common use cases: web development (JS/TS/HTML/CSS), configuration (TOML/JSON/.env), and data analysis (CSV). Each uses proper parsing and pattern matching for accurate extraction.
+
+**Q: How does JavaScript/TypeScript extraction work?**
+A: Paths-LE extracts paths from `import`, `require`, `export`, and dynamic `import()` statements. Package names like 'react' or 'lodash' are automatically excluded—only local file paths (starting with `./`, `../`, `/`, or absolute paths) are extracted.
+
+**Q: How does path validation work?**
+A: When `paths-le.validatePaths: true` is enabled, Paths-LE checks if the extracted paths exist in your workspace and reports any missing or invalid paths.
+
+**Q: Can I group paths by format type?**
+A: Yes, enable `paths-le.groupByFormat: true` to organize results by path format (absolute, relative, Windows, Unix, etc.).
+
+**Q: Does Paths-LE work cross-platform?**
+A: Absolutely! Paths-LE handles both Windows and Unix path formats with intelligent normalization and validation.
+
+**Q: What's the largest file size supported?**
+A: Paths-LE can handle files up to 30MB, though performance may be reduced for very large files. Consider breaking large files into smaller chunks for better performance.
+
+## 📊 Test Coverage
+
+Paths-LE is rigorously tested with comprehensive test coverage across all modules:
+
+### Test Suite Breakdown
+
+| Module                | Tests | Coverage | Focus Area                      |
+| --------------------- | ----- | -------- | ------------------------------- |
+| **Extraction Core**   | 9     | 88%      | Main extraction logic           |
+| **Collection Logic**  | 19    | 95%      | Path collection & deduplication |
+| **JavaScript Format** | 13    | 93%      | Import/require/export patterns  |
+| **JSON Format**       | 13    | 97%      | Recursive path detection        |
+| **HTML Format**       | 22    | 90%      | Attribute extraction & srcset   |
+| **CSS Format**        | 16    | 93%      | url() and @import extraction    |
+| **CSV Format**        | 8     | 90%      | CSV parsing with quotes         |
+| **DOTENV Format**     | 11    | 78%      | Environment file parsing        |
+| **TOML Format**       | 9     | 94%      | TOML config parsing             |
+| **Path Validation**   | 27    | 76%      | Cross-platform path checks      |
+| **Analysis**          | 16    | 100%     | Path statistics & grouping      |
+| **Validation Utils**  | 16    | 66%      | Input sanitization              |
+| **Settings Schema**   | 36    | 100%     | Configuration validation        |
+| **Error Handling**    | 5     | 13%      | Error recovery (lightweight)    |
+
+### Performance Benchmarks (Internal)
+
+Real-world extraction speeds tested on **macOS (M1)**:
+
+- **CSV**: 530K paths/sec (10K rows, 988KB file, 30K paths extracted)
+- **DOTENV**: 980K paths/sec (10K entries, 427KB file, 10K paths extracted)
+- **JavaScript/TypeScript**: Fast pattern matching with package filtering
+- **JSON**: Efficient recursive traversal of nested structures
+- **HTML/CSS**: Fast line-by-line attribute and url() extraction
+
+### Running Tests Locally
+
+```bash
+npm run test              # Run all 220 tests
+npm run test:coverage     # Generate detailed coverage report
+npm run test:watch        # Watch mode for development
+```
+
+Coverage reports are generated in `coverage/` directory (open `coverage/index.html` for detailed view).
+
+---
+
+Copyright © 2025
+<a href="https://github.com/nolindnaidoo">@nolindnaidoo</a>. All rights reserved.

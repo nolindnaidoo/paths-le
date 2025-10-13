@@ -1,0 +1,20 @@
+/home/user/documents/file.txt
+/var/log/application.log
+/usr/local/bin/myapp
+/opt/software/config.ini
+C:\Program Files\MyApp\bin\app.exe
+C:\Users\John\Desktop\project
+./src/components/Button.tsx
+../assets/images/logo.png
+~/Downloads/archive.zip
+/tmp/temp-file.dat
+/etc/nginx/nginx.conf
+/var/www/html/index.html
+C:\Windows\System32\drivers
+/Library/Application Support/MyApp
+/Applications/VSCode.app
+./node_modules/package/index.js
+../build/output/main.js
+/dev/null
+/proc/cpuinfo
+/sys/class/net

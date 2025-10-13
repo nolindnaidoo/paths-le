@@ -1,0 +1,394 @@
+{
+	"name": "paths-le",
+	"publisher": "nolindnaidoo",
+	"displayName": "Paths-LE",
+	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
+	"version": "1.2.0",
+	"license": "MIT",
+	"author": {
+		"name": "Nolin D Naidoo",
+		"url": "https://github.com/nolindnaidoo"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nolindnaidoo/paths-le.git"
+	},
+	"bugs": {
+		"url": "https://github.com/nolindnaidoo/paths-le/issues"
+	},
+	"homepage": "https://github.com/nolindnaidoo/paths-le#readme",
+	"engines": {
+		"vscode": "^1.105.0",
+		"node": ">=20.0.0"
+	},
+	"categories": [
+		"Other",
+		"Programming Languages",
+		"Linters"
+	],
+	"keywords": [
+		"path",
+		"paths",
+		"file",
+		"directory",
+		"extract",
+		"extractor",
+		"extraction",
+		"analysis",
+		"validation",
+		"config",
+		"log",
+		"code",
+		"filesystem",
+		"permissions",
+		"accessibility",
+		"broken",
+		"invalid",
+		"patterns",
+		"depth",
+		"naming"
+	],
+	"icon": "src/assets/images/icon.png",
+	"main": "./dist/extension.js",
+	"activationEvents": [
+		"onLanguage:csv",
+		"onLanguage:toml",
+		"onLanguage:dotenv",
+		"onLanguage:env",
+		"onLanguage:javascript",
+		"onLanguage:javascriptreact",
+		"onLanguage:typescript",
+		"onLanguage:typescriptreact",
+		"onLanguage:json",
+		"onLanguage:jsonc",
+		"onLanguage:html",
+		"onLanguage:css",
+		"onLanguage:scss",
+		"onLanguage:less",
+		"onCommand:paths-le.extractPaths",
+		"onCommand:paths-le.postProcess.validate",
+		"onCommand:paths-le.postProcess.analyze",
+		"onCommand:paths-le.openSettings",
+		"onCommand:paths-le.help"
+	],
+	"capabilities": {
+		"virtualWorkspaces": {
+			"supported": "limited",
+			"description": "%manifest.capability.untrusted-workspaces.desc%"
+		},
+		"untrustedWorkspaces": {
+			"supported": "limited",
+			"description": "%manifest.capability.untrusted-workspaces.desc%"
+		}
+	},
+	"contributes": {
+		"commands": [
+			{
+				"command": "paths-le.extractPaths",
+				"title": "%manifest.command.extract.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.postProcess.validate",
+				"title": "%manifest.command.validate.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.postProcess.analyze",
+				"title": "%manifest.command.analyze.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.openSettings",
+				"title": "%manifest.command.settings.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.help",
+				"title": "%manifest.command.help.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.settings.export",
+				"title": "%manifest.command.settings.export.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.settings.import",
+				"title": "%manifest.command.settings.import.title%",
+				"category": "%manifest.command.category%"
+			},
+			{
+				"command": "paths-le.settings.reset",
+				"title": "%manifest.command.settings.reset.title%",
+				"category": "%manifest.command.category%"
+			}
+		],
+		"keybindings": [
+			{
+				"command": "paths-le.extractPaths",
+				"key": "ctrl+alt+p",
+				"mac": "cmd+alt+p",
+				"when": "editorTextFocus"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "paths-le.extractPaths",
+					"when": "resourceExtname in .csv || resourceExtname in .toml || resourceExtname in .env || resourceExtname in .js || resourceExtname in .jsx || resourceExtname in .ts || resourceExtname in .tsx || resourceExtname in .json || resourceExtname in .html || resourceExtname in .css || resourceExtname in .scss || resourceExtname in .less",
+					"group": "1_modification@1"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "paths-le.extractPaths"
+				},
+				{
+					"command": "paths-le.postProcess.validate"
+				},
+				{
+					"command": "paths-le.postProcess.analyze"
+				},
+				{
+					"command": "paths-le.openSettings"
+				},
+				{
+					"command": "paths-le.help"
+				},
+				{
+					"command": "paths-le.settings.export"
+				},
+				{
+					"command": "paths-le.settings.import"
+				},
+				{
+					"command": "paths-le.settings.reset"
+				}
+			]
+		},
+		"configuration": {
+			"title": "%manifest.settings.title%",
+			"properties": {
+				"paths-le.copyToClipboardEnabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.copy.clipboard.desc%"
+				},
+				"paths-le.dedupeEnabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.dedupe.desc%"
+				},
+				"paths-le.notificationsLevel": {
+					"type": "string",
+					"default": "silent",
+					"enum": [
+						"all",
+						"important",
+						"silent"
+					],
+					"enumDescriptions": [
+						"%manifest.settings.notifications.level.option.all%",
+						"%manifest.settings.notifications.level.option.important%",
+						"%manifest.settings.notifications.level.option.silent%"
+					],
+					"description": "%manifest.settings.notifications.level.desc%"
+				},
+				"paths-le.postProcess.openInNewFile": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.open.new-file.desc%"
+				},
+				"paths-le.openResultsSideBySide": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.open.side-by-side.desc%"
+				},
+				"paths-le.safety.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.safety.enabled.desc%"
+				},
+				"paths-le.safety.fileSizeWarnBytes": {
+					"type": "number",
+					"default": 1000000,
+					"minimum": 1000,
+					"description": "%manifest.settings.safety.warn.file-size.desc%"
+				},
+				"paths-le.safety.largeOutputLinesThreshold": {
+					"type": "number",
+					"default": 50000,
+					"minimum": 100,
+					"description": "%manifest.settings.safety.warn.large-output.desc%"
+				},
+				"paths-le.safety.manyDocumentsThreshold": {
+					"type": "number",
+					"default": 8,
+					"minimum": 1,
+					"description": "%manifest.settings.safety.warn.many-documents.desc%"
+				},
+				"paths-le.showParseErrors": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.parse-errors.desc%"
+				},
+				"paths-le.statusBar.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.statusbar.enabled.desc%"
+				},
+				"paths-le.telemetryEnabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.telemetry.desc%"
+				},
+				"paths-le.analysis.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.analysis.enabled.desc%"
+				},
+				"paths-le.analysis.includeValidation": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.analysis.includeValidation.desc%"
+				},
+				"paths-le.analysis.includePatterns": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.analysis.includePatterns.desc%"
+				},
+				"paths-le.validation.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.validation.enabled.desc%"
+				},
+				"paths-le.validation.checkExistence": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.validation.checkExistence.desc%"
+				},
+				"paths-le.validation.checkPermissions": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.validation.checkPermissions.desc%"
+				},
+				"paths-le.performance.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.performance.enabled.desc%"
+				},
+				"paths-le.performance.maxDuration": {
+					"type": "number",
+					"default": 5000,
+					"minimum": 1000,
+					"description": "%manifest.settings.performance.max-duration.desc%"
+				},
+				"paths-le.performance.maxMemoryUsage": {
+					"type": "number",
+					"default": 104857600,
+					"minimum": 1048576,
+					"description": "%manifest.settings.performance.max-memory.desc%"
+				},
+				"paths-le.performance.maxCpuUsage": {
+					"type": "number",
+					"default": 1000000,
+					"minimum": 100000,
+					"description": "%manifest.settings.performance.max-cpu.desc%"
+				},
+				"paths-le.performance.minThroughput": {
+					"type": "number",
+					"default": 1000,
+					"minimum": 100,
+					"description": "%manifest.settings.performance.min-throughput.desc%"
+				},
+				"paths-le.performance.maxCacheSize": {
+					"type": "number",
+					"default": 1000,
+					"minimum": 100,
+					"description": "%manifest.settings.performance.max-cache.desc%"
+				},
+				"paths-le.keyboard.shortcuts.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.keyboard.shortcuts.enabled.desc%"
+				},
+				"paths-le.keyboard.extractShortcut": {
+					"type": "string",
+					"default": "ctrl+alt+p",
+					"description": "%manifest.settings.keyboard.extract.shortcut.desc%"
+				},
+				"paths-le.keyboard.validateShortcut": {
+					"type": "string",
+					"default": "ctrl+alt+v",
+					"description": "%manifest.settings.keyboard.validate.shortcut.desc%"
+				},
+				"paths-le.keyboard.analyzeShortcut": {
+					"type": "string",
+					"default": "ctrl+alt+a",
+					"description": "%manifest.settings.keyboard.analyze.shortcut.desc%"
+				},
+				"paths-le.presets.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.presets.enabled.desc%"
+				},
+				"paths-le.presets.defaultPreset": {
+					"type": "string",
+					"default": "balanced",
+					"enum": [
+						"minimal",
+						"balanced",
+						"comprehensive",
+						"performance",
+						"validation"
+					],
+					"enumDescriptions": [
+						"%manifest.settings.presets.default.option.minimal%",
+						"%manifest.settings.presets.default.option.balanced%",
+						"%manifest.settings.presets.default.option.comprehensive%",
+						"%manifest.settings.presets.default.option.performance%",
+						"%manifest.settings.presets.default.option.validation%"
+					],
+					"description": "%manifest.settings.presets.default.desc%"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"build": "tsc -p ./",
+		"clean": "rm -rf dist coverage",
+		"clean:i18n": "node -e \"const fs=require('fs');fs.readdirSync('.').filter(f=>f.startsWith('package.nls.')&&f.endsWith('.json')&&f!=='package.nls.json').forEach(f=>fs.unlinkSync(f));try{fs.rmSync('vsix',{recursive:true})}catch(e){}\"",
+		"copy:i18n": "cp src/i18n/package.nls*.json .",
+		"watch": "tsc -watch -p ./",
+		"test": "vitest run --pool=threads",
+		"test:watch": "vitest --pool=threads",
+		"test:coverage": "vitest run --coverage --pool=threads",
+		"test:ui": "vitest --ui",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"vscode:prepublish": "npm run build && npm run copy:i18n",
+		"package": "npm run clean:i18n && mkdir -p release && npx vsce package --out release/${npm_package_name}-${npm_package_version}.vsix && npm run clean:i18n",
+		"package:ls": "vsce ls release/${npm_package_name}-${npm_package_version}.vsix --tree | cat",
+		"publish": "vsce publish"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@types/node": "^24.7.1",
+		"@types/vscode": "^1.105.0",
+		"@vscode/test-electron": "^2.3.0",
+		"@vscode/vsce": "^3.6.2",
+		"@vitest/coverage-v8": "^3.2.4",
+		"@vitest/ui": "^3.2.4",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4"
+	},
+	"dependencies": {
+		"vscode-nls": "^5.2.0",
+		"csv-parse": "^5.5.6",
+		"@iarna/toml": "^2.2.5",
+		"js-yaml": "^4.1.0",
+		"ini": "^4.1.1"
+	}
+}

@@ -1,0 +1,9 @@
+path,type,description
+/home/user/documents,directory,User documents folder
+/var/log/app.log,file,Application log file
+/usr/local/bin/myapp,file,Application binary
+./src/components/Button.tsx,file,React component
+../assets/images/logo.png,file,Logo image
+~/Downloads/archive.zip,file,Downloaded archive
+C:\Program Files\MyApp\bin\app.exe,file,Windows application
+C:\Users\John\Desktop\project,directory,Windows desktop folder

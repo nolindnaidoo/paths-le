@@ -1,0 +1,75 @@
+{
+  "name": "Paths-LE Sample Config",
+  "version": "1.0.0",
+  "description": "Sample JSON file with embedded file paths for testing",
+  
+  "paths": {
+    "config": "/etc/app/config.json",
+    "logs": "./logs/application.log",
+    "data": "./data/storage.db",
+    "cache": "../cache/temp",
+    "backup": "/var/backups/app"
+  },
+
+  "files": [
+    "/path/to/file1.txt",
+    "./relative/file2.txt",
+    "../parent/file3.txt",
+    "./assets/images/logo.png"
+  ],
+
+  "urls": {
+    "homepage": "https://example.com/page",
+    "api": "http://api.example.com/v1/data",
+    "cdn": "https://cdn.example.com/assets/bundle.js",
+    "localFile": "file:///home/user/documents/file.txt"
+  },
+
+  "windows": {
+    "program": "C:\\Program Files\\MyApp\\app.exe",
+    "data": "D:\\data\\application.db",
+    "userDir": "C:\\Users\\Developer\\Documents"
+  },
+
+  "assets": {
+    "images": [
+      "./images/hero.jpg",
+      "./images/thumbnail.png",
+      "../assets/icons/favicon.ico"
+    ],
+    "scripts": [
+      "./js/app.js",
+      "./js/vendor/bundle.js",
+      "https://cdn.example.com/jquery.min.js"
+    ],
+    "styles": [
+      "./css/main.css",
+      "./css/theme.css",
+      "../styles/reset.css"
+    ]
+  },
+
+  "nested": {
+    "level1": {
+      "level2": {
+        "level3": {
+          "deepPath": "/very/deep/nested/path.txt",
+          "relativePath": "./relative/deep/file.json"
+        }
+      }
+    }
+  },
+
+  "database": {
+    "sqlite": "./database/app.sqlite",
+    "backup": "/var/backups/database.db"
+  },
+
+  "nonPathStrings": {
+    "name": "MyApplication",
+    "version": "1.0.0",
+    "author": "Developer",
+    "description": "This is not a path"
+  }
+}
+

@@ -1,0 +1,133 @@
+/* Sample CSS file with url() and @import paths */
+/* Test Paths-LE extraction on this file! */
+
+/* Import statements - various formats */
+@import './reset.css';
+@import './theme.css';
+@import url('./variables.css');
+@import url('./typography.css');
+@import '../vendor/normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700');
+
+/* Background images - relative paths */
+body {
+  background: url('./images/background.jpg') no-repeat center;
+  background-image: url('./images/texture.png');
+}
+
+.hero {
+  background: url(./images/hero-bg.jpg);
+}
+
+.banner {
+  background-image: url('../assets/banner.png');
+}
+
+/* Background images - absolute paths */
+.header {
+  background: url('/static/images/header.jpg');
+}
+
+/* Background images - URLs */
+.cdn-background {
+  background: url('https://cdn.example.com/backgrounds/pattern.png');
+  background-image: url('http://example.com/images/texture.jpg');
+}
+
+/* Protocol-relative URLs */
+.protocol-relative {
+  background: url('//cdn.example.com/image.jpg');
+}
+
+/* Multiple backgrounds */
+.multi-bg {
+  background: url('./images/overlay.png') top left, url('./images/base.jpg') center;
+}
+
+/* Font faces */
+@font-face {
+  font-family: 'CustomFont';
+  src: url('./fonts/custom-font.woff2') format('woff2'),
+    url('./fonts/custom-font.woff') format('woff'),
+    url('./fonts/custom-font.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'AnotherFont';
+  src: url('../fonts/another.woff2');
+}
+
+/* Cursor property */
+.pointer {
+  cursor: url('./cursors/pointer.cur'), pointer;
+}
+
+.custom-cursor {
+  cursor: url('https://example.com/cursor.cur'), auto;
+}
+
+/* List style image */
+ul.custom-bullets {
+  list-style-image: url('./images/bullet.png');
+}
+
+/* Border image */
+.border-box {
+  border-image-source: url('./images/border.png');
+}
+
+/* Content property with url() */
+.icon::before {
+  content: url('./icons/arrow.svg');
+}
+
+/* Data URLs should be excluded */
+.inline-svg {
+  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIi8+');
+}
+
+/* Mask and clip-path */
+.masked {
+  mask-image: url('./images/mask.png');
+  -webkit-mask-image: url('./images/mask.png');
+}
+
+/* Multiple url() on same line */
+.multi {
+  background: url('./a.png'), url('./b.png'), url('./c.png');
+}
+
+/* url() with spaces (various formatting) */
+.spaces {
+  background: url('./images/spaced.jpg');
+  background-image: url('./images/spaced2.jpg');
+}
+
+/* Complex property values */
+.complex {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('./images/complex-bg.jpg');
+}
+
+/* Nested media queries */
+@media (min-width: 768px) {
+  .responsive {
+    background: url('./images/desktop.jpg');
+  }
+}
+
+@media (max-width: 767px) {
+  .responsive {
+    background: url('./images/mobile.jpg');
+  }
+}
+
+/* Animation keyframes with url() */
+@keyframes slide {
+  from {
+    background-image: url('./images/start.png');
+  }
+  to {
+    background-image: url('./images/end.png');
+  }
+}
