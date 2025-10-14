@@ -93,14 +93,17 @@ It intelligently detects and extracts file paths from your code, providing compr
 - **Numbers-LE** - Extract and analyze numeric data from JSON, YAML, CSV, TOML, INI, and .env  
   [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.numbers-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/numbers-le)]
 
-- **Colors-LE** - Extract and analyze colors from CSS, SCSS, JavaScript, HTML, and more  
-  _Coming October 2025_
+- **Scrape-LE** - Verify page reachability and detect anti-scraping measures before deploying scrapers  
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.scrape-le)]
 
-- **Dates-LE** - Extract and analyze dates from logs, JSON, YAML, CSV, and temporal data  
-  _Coming October 2025_
+- **Colors-LE** - Extract and analyze colors from CSS, HTML, JavaScript, and TypeScript  
+  _Coming Soon_
 
-- **URLs-LE** - Extract and analyze URLs from HTML, Markdown, configs, and documentation  
-  _Coming October 2025_
+- **Dates-LE** - Extract and analyze dates from logs, APIs, and temporal data  
+  _Coming Soon_
+
+- **URLs-LE** - Extract and analyze URLs from web content, APIs, and resources  
+  _Coming Soon_
 
 Each tool follows the same philosophy: **Zero Hassle, Maximum Productivity**.
 
