@@ -108,21 +108,6 @@
 				"command": "paths-le.help",
 				"title": "%manifest.command.help.title%",
 				"category": "%manifest.command.category%"
-			},
-			{
-				"command": "paths-le.settings.export",
-				"title": "%manifest.command.settings.export.title%",
-				"category": "%manifest.command.category%"
-			},
-			{
-				"command": "paths-le.settings.import",
-				"title": "%manifest.command.settings.import.title%",
-				"category": "%manifest.command.category%"
-			},
-			{
-				"command": "paths-le.settings.reset",
-				"title": "%manifest.command.settings.reset.title%",
-				"category": "%manifest.command.category%"
 			}
 		],
 		"keybindings": [
@@ -150,15 +135,6 @@
 				},
 				{
 					"command": "paths-le.help"
-				},
-				{
-					"command": "paths-le.settings.export"
-				},
-				{
-					"command": "paths-le.settings.import"
-				},
-				{
-					"command": "paths-le.settings.reset"
 				}
 			]
 		},
