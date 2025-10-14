@@ -108,3 +108,4 @@ dist/
 .env
 *.env.*
 !src/detection/__data__/*.env.*
+release/
