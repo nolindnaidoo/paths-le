@@ -35,7 +35,10 @@
 ---
 
 <p align="center">
-  <img src="src/assets/images/preview.gif" alt="Path Extraction animation" style="max-width: 100%; height: auto;" />
+  <img src="src/assets/images/demo.gif" alt="Paths-LE Demo" style="max-width: 100%; height: auto;" />
+</p>
+
+<p align="center">
   <img src="src/assets/images/command-palette.png" alt="Command Palette" style="max-width: 80%; height: auto;" />
 </p>
 
