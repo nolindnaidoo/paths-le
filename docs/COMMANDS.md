@@ -2,7 +2,7 @@
 
 ## Overview
 
-Paths-LE provides a comprehensive set of commands for extracting, analyzing, and validating file paths from various file formats. All commands are designed with developer empathy in mind, providing clear feedback and graceful error handling.
+Paths-LE provides **8 commands** for extracting, processing, and managing file paths from various file formats. All commands are designed with developer empathy in mind, providing clear feedback and graceful error handling.
 
 ## Core Commands
 
@@ -42,77 +42,134 @@ Extracted Paths (5 found):
 - Offers recovery suggestions for common issues
 - Continues processing despite individual path errors
 
-### 2. Analyze Paths (`paths-le.postProcess.analyze`)
+## Post-Processing Commands
 
-**Purpose**: Generate comprehensive analysis reports for extracted paths.
+### 2. Deduplicate Paths (`paths-le.postProcess.dedupe`)
+
+**Purpose**: Remove duplicate paths from the current document while preserving the original order.
 
 **Usage**:
 
-- **Command Palette**: `Paths-LE: Analyze Paths`
-- **Context Menu**: Available after extraction
+- **Command Palette**: `Paths-LE: Deduplicate Paths`
 
-**Analysis Features**:
+**Features**:
 
-- **Pattern Recognition**: Identifies common path patterns
-- **Depth Analysis**: Analyzes path depth and nesting
-- **Naming Analysis**: Analyzes naming conventions
-- **Validation Analysis**: Identifies invalid or broken paths
-- **Permission Analysis**: Analyzes permission patterns
+- Removes duplicate path entries while maintaining first occurrence
+- Preserves original path order
+- Works on any text document with paths (one per line)
+- Shows count of removed duplicates
+- Provides clear feedback on completion
 
-**Report Sections**:
-
-1. **Summary**: Overview of extracted paths
-2. **Patterns**: Identified path patterns
-3. **Validation**: Path validation results
-4. **Permissions**: Permission analysis
-5. **Recommendations**: Suggestions for improvement
-
-**Sample Report**:
+**Example**:
 
 ```
-Path Analysis Report
-===================
+Before:
+./src/app.js
+../config/settings.json
+./src/app.js
+./utils/helper.js
 
-Summary:
-- Total paths: 25
-- Valid paths: 22
-- Invalid paths: 3
-- Broken links: 1
-- Permission issues: 2
-
-Patterns:
-- Unix paths: 15 paths (60%)
-- Windows paths: 8 paths (32%)
-- Relative paths: 2 paths (8%)
-
-Validation:
-- Existence: 22/25 (88%)
-- Permissions: 20/25 (80%)
-- Accessibility: 23/25 (92%)
-
-Recommendations:
-- Fix broken symbolic links
-- Check file permissions
-- Use consistent path formats
+After:
+./src/app.js
+../config/settings.json
+./utils/helper.js
 ```
 
-### 3. Open Settings (`paths-le.openSettings`)
+### 3. Sort Paths (`paths-le.postProcess.sort`)
 
-**Purpose**: Open the Paths-LE configuration settings.
+**Purpose**: Sort paths in the current document with multiple sort modes.
+
+**Usage**:
+
+- **Command Palette**: `Paths-LE: Sort Paths`
+
+**Sort Modes**:
+
+1. **Alphabetical (A → Z)** - Sort paths as strings, A to Z
+2. **Alphabetical (Z → A)** - Sort paths as strings, Z to A
+3. **By Length (Short → Long)** - Sort by path length, shortest first
+4. **By Length (Long → Short)** - Sort by path length, longest first
+
+**Features**:
+
+- Interactive sort mode selection via quick pick
+- Works with any path format (Unix, Windows, relative, absolute)
+- Shows count of sorted paths
+- Provides clear feedback on completion
+
+**Example**:
+
+```
+Before:
+../config/settings.json
+./src/app.js
+./utils/helper.js
+
+After (Alphabetical A→Z):
+../config/settings.json
+./src/app.js
+./utils/helper.js
+```
+
+## Settings Commands
+
+### 4. Open Settings (`paths-le.openSettings`)
+
+**Purpose**: Quick access to Paths-LE settings in VS Code.
 
 **Usage**:
 
 - **Command Palette**: `Paths-LE: Open Settings`
-- **Settings UI**: VS Code Settings → Extensions → Paths-LE
 
-**Configuration Categories**:
+**Details**: Opens VS Code settings filtered to Paths-LE configuration options.
 
-- **Basic Settings**: Copy to clipboard, deduplication, notifications
-- **Safety Settings**: File size warnings, output limits
-- **Analysis Settings**: Pattern recognition, validation analysis
-- **Validation Settings**: Existence checks, permission checks
+### 5. Export Settings (`paths-le.settings.export`)
 
-### 4. Help (`paths-le.help`)
+**Purpose**: Export current Paths-LE settings to a JSON file.
+
+**Usage**:
+
+- **Command Palette**: `Paths-LE: Export Settings`
+
+**Features**:
+
+- Saves all Paths-LE configuration to a JSON file
+- Includes version and export timestamp
+- Useful for backing up configuration or sharing with team
+
+### 6. Import Settings (`paths-le.settings.import`)
+
+**Purpose**: Import Paths-LE settings from a previously exported JSON file.
+
+**Usage**:
+
+- **Command Palette**: `Paths-LE: Import Settings`
+
+**Features**:
+
+- Validates imported settings file format
+- Confirms before overwriting current settings
+- Provides clear success/failure feedback
+
+**Safety**: Shows confirmation dialog before applying imported settings.
+
+### 7. Reset Settings (`paths-le.settings.reset`)
+
+**Purpose**: Reset all Paths-LE settings to their default values.
+
+**Usage**:
+
+- **Command Palette**: `Paths-LE: Reset Settings`
+
+**Features**:
+
+- Resets all configuration to defaults
+- Shows confirmation dialog (cannot be undone)
+- Provides clear feedback on completion
+
+**Safety**: Requires explicit confirmation before resetting.
+
+### 8. Help & Troubleshooting (`paths-le.help`)
 
 **Purpose**: Display comprehensive help and troubleshooting information.
 
@@ -136,15 +193,16 @@ Recommendations:
 1. **Open File**: Open a file containing paths
 2. **Extract Paths**: Use `Extract Paths` command
 3. **Review Results**: Check extracted paths in new document
-4. **Analyze Paths**: Use `Analyze Paths` for detailed analysis (optional)
-5. **Configure Settings**: Use `Open Settings` to customize behavior
+4. **Deduplicate**: Use `Deduplicate Paths` to remove duplicates (optional)
+5. **Sort**: Use `Sort Paths` to organize paths (optional)
+6. **Configure Settings**: Use `Open Settings` to customize behavior
 
 ### Advanced Workflow
 
 1. **Extract Paths**: Extract paths from multiple files
 2. **Combine Results**: Merge results from different sources
-3. **Analyze Patterns**: Identify patterns across files
-4. **Generate Report**: Create comprehensive analysis report
+3. **Post-Process**: Deduplicate and sort combined results
+4. **Export Settings**: Save your configuration for reuse
 5. **Export Results**: Export results for further processing
 
 ## Command Dependencies

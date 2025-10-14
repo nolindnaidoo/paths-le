@@ -67,6 +67,8 @@
 		"onLanguage:scss",
 		"onLanguage:less",
 		"onCommand:paths-le.extractPaths",
+		"onCommand:paths-le.postProcess.dedupe",
+		"onCommand:paths-le.postProcess.sort",
 		"onCommand:paths-le.openSettings",
 		"onCommand:paths-le.help"
 	],

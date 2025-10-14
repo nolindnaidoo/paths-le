@@ -56,9 +56,13 @@ It intelligently detects and extracts file paths from your code, providing compr
 
   Automatically finds file paths in multiple formats: absolute paths, relative paths, Windows paths, and Unix paths.
 
-- **Smart analysis & insights**
+- **Powerful post-processing**
 
-  Get detailed reports on path usage patterns, dependency analysis, and file reference distribution across your codebase.
+  Deduplicate paths and sort with multiple modes (alphabetically or by length) for cleaner analysis results.
+
+- **Interactive sorting options**
+
+  Sort paths alphabetically (A→Z/Z→A) or by length (short→long/long→short) with user-friendly selection.
 
 - **Dependency analysis support**
 
@@ -234,7 +238,30 @@ C:\Users\Name\data,dir,User data directory
 1. Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le) or [Open VSX](https://open-vsx.org/extension/nolindnaidoo/paths-le)
 2. Open any supported file (`.js`, `.ts`, `.json`, `.html`, `.css`, `.toml`, `.csv`, `.env`)
 3. Run `Paths-LE: Extract Paths` (`Cmd+Alt+P` / `Ctrl+Alt+P`)
-4. Analyze or validate the extracted paths
+4. Use **Deduplicate Paths** or **Sort Paths** commands for post-processing
+
+## 📋 Available Commands
+
+Paths-LE provides **8 commands** accessible via Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
+
+### Core Extraction
+
+- **Extract Paths** (`Cmd/Ctrl+Alt+P`) - Extract all file paths from current document
+
+### Post-Processing
+
+- **Deduplicate Paths** - Remove duplicate path entries while preserving order
+- **Sort Paths** - Sort extracted paths with multiple modes:
+  - Alphabetical (A → Z)
+  - Alphabetical (Z → A)
+  - By Length (Short → Long)
+  - By Length (Long → Short)
+
+### Settings & Help
+
+- **Open Settings** - Quick access to extension settings
+- **Help & Troubleshooting** - Comprehensive in-editor documentation
+- **Export/Import/Reset Settings** - Manage extension configuration
 
 ## ⚙️ Configuration
 
