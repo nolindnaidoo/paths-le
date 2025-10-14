@@ -5,6 +5,13 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2025-10-14
+
+### Fixed
+
+- **VSCode engine version requirement** - Changed from `^1.105.0` to `^1.70.0` for better compatibility with current VSCode versions
+- **Added missing l10n field** - Added localization field to package.json for consistent manifest handling
+
 ## [1.2.2] - 2025-10-14
 
 ### Documentation

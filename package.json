@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"license": "MIT",
 	"author": {
 		"name": "Nolin D Naidoo",
@@ -18,7 +18,7 @@
 	},
 	"homepage": "https://github.com/nolindnaidoo/paths-le#readme",
 	"engines": {
-		"vscode": "^1.105.0",
+		"vscode": "^1.70.0",
 		"node": ">=20.0.0"
 	},
 	"categories": [
@@ -50,6 +50,7 @@
 	],
 	"icon": "src/assets/images/icon.png",
 	"main": "./dist/extension.js",
+	"l10n": "./package.nls.json",
 	"activationEvents": [
 		"onLanguage:csv",
 		"onLanguage:toml",
@@ -375,7 +376,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
 		"@types/node": "^24.7.1",
-		"@types/vscode": "^1.105.0",
+		"@types/vscode": "^1.70.0",
 		"@vscode/test-electron": "^2.3.0",
 		"@vscode/vsce": "^3.6.2",
 		"@vitest/coverage-v8": "^3.2.4",
