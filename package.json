@@ -166,11 +166,11 @@
 					],
 					"description": "%manifest.settings.notifications.level.desc%"
 				},
-				"paths-le.postProcess.openInNewFile": {
-					"type": "boolean",
-					"default": false,
-					"description": "%manifest.settings.open.new-file.desc%"
-				},
+			"paths-le.postProcess.openInNewFile": {
+				"type": "boolean",
+				"default": true,
+				"description": "%manifest.settings.open.new-file.desc%"
+			},
 				"paths-le.openResultsSideBySide": {
 					"type": "boolean",
 					"default": true,
