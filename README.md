@@ -268,6 +268,7 @@ Paths-LE provides **8 commands** accessible via Command Palette (`Ctrl+Shift+P` 
 Paths-LE has minimal configuration to keep things simple. Most settings are available in VS Code's settings UI under "Paths-LE".
 
 Key settings include:
+
 - Output format preferences (side-by-side, clipboard copy)
 - Safety warnings and thresholds for large files
 - Notification levels (silent, important, all)
