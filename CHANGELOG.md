@@ -5,6 +5,15 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2025-10-14
+
+### Documentation
+
+- Fixed test coverage section to remove vague "comprehensive coverage" claim
+- Updated to show accurate 38.74% overall coverage with 220 passing tests across 14 test suites
+- Individual module coverage ranges from 66-100% with excellent extraction testing
+- Aligns with honest documentation standard across the LE family
+
 ## [1.2.1] - 2025-10-13
 
 ### Fixed
@@ -76,6 +85,7 @@ This release dramatically expands Paths-LE's capabilities with full support for 
   - Updated test coverage table with accurate numbers
 
 - **Test Suite** - Expanded from 156 to 220 tests
+
   - Added 64 new tests for web development formats (JavaScript: 13, JSON: 13, HTML: 22, CSS: 16)
   - All 220 tests passing with excellent coverage
   - Overall coverage: 38.74% statements, 82.98% branches, 68.75% functions
@@ -83,12 +93,14 @@ This release dramatically expands Paths-LE's capabilities with full support for 
   - Updated test coverage documentation
 
 - **Internationalization** - Updated all 13 language files
+
   - Added translations for new file format descriptions
   - Added smart filtering messages (package filtering, data: URL filtering, javascript: URL filtering)
   - Updated extension descriptions to highlight new capabilities
   - Languages: English, Chinese (Simplified), German, Spanish, French, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian, Vietnamese
 
 - **Configuration** - Enhanced settings
+
   - Changed default for `paths-le.openResultsSideBySide` to `true` for better UX
   - Updated manifest description to reflect all supported formats
 
