@@ -3,7 +3,6 @@
 	"manifest.ext.description": "Extraction et analyse des chemins d'accès aux fichiers à partir de fichiers JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV et ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Extraire les chemins d'accès",
-	"manifest.command.analyze.title": "Analyser les chemins d'accès",
 	"manifest.command.settings.title": "Ouvrir les paramètres",
 	"manifest.command.settings.export.title": "Exporter les paramètres",
 	"manifest.command.settings.import.title": "Importer les paramètres",

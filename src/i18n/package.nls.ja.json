@@ -3,7 +3,6 @@
 	"manifest.ext.description": "JavaScript、TypeScript、JSON、HTML、CSS、TOML、CSV、ENVファイルからのファイルパス抽出と解析",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "パスの抽出",
-	"manifest.command.analyze.title": "パスの分析",
 	"manifest.command.settings.title": "設定を開く",
 	"manifest.command.settings.export.title": "設定をエクスポート",
 	"manifest.command.settings.import.title": "設定をインポート",

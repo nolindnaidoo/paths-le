@@ -5,6 +5,20 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.5] - 2025-10-14
+
+### Removed
+
+- **Analyze command** - Removed `paths-le.postProcess.analyze` command and all related functionality
+- **Analysis utilities** - Removed path analysis utilities (`src/utils/analysis.ts` and tests)
+- **i18n cleanup** - Removed analyze command i18n keys from 15 language files
+- **Command implementation** - Removed `src/commands/analyze.ts`
+
+### Changed
+
+- **Command count** - Reduced from 7 to 6 commands (Extract, Settings, Help, Export, Import, Reset)
+- **Simplified workflow** - Focused on core path extraction and settings management
+
 ## [1.2.4] - 2025-10-14
 
 ### Removed

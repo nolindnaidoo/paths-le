@@ -3,7 +3,6 @@
 	"manifest.ext.description": "Витяг та аналіз шляхів до файлів із файлів JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV та ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Витяг шляхів",
-	"manifest.command.analyze.title": "Аналіз шляхів",
 	"manifest.command.settings.title": "Відкрити налаштування",
 	"manifest.command.settings.export.title": "Експорт налаштувань",
 	"manifest.command.settings.import.title": "Імпорт налаштувань",
