@@ -97,13 +97,13 @@ It intelligently detects and extracts file paths from your code, providing compr
   [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.scrape-le)]
 
 - **Colors-LE** - Extract and analyze colors from CSS, HTML, JavaScript, and TypeScript  
-  _Coming Soon_
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.colors-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/colors-le)]
 
 - **Dates-LE** - Extract and analyze dates from logs, APIs, and temporal data  
-  _Coming Soon_
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.dates-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/dates-le)]
 
 - **URLs-LE** - Extract and analyze URLs from web content, APIs, and resources  
-  _Coming Soon_
+  [[VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.urls-le)] [[Open VSX](https://open-vsx.org/extension/nolindnaidoo/urls-le)]
 
 Each tool follows the same philosophy: **Zero Hassle, Maximum Productivity**.
 
@@ -231,7 +231,7 @@ C:\Users\Name\data,dir,User data directory
 
 ## 🚀 Quick Start
 
-1. **Coming Soon** - Paths-LE will be available on VS Code Marketplace and Open VSX
+1. Install from [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le) or [Open VSX](https://open-vsx.org/extension/nolindnaidoo/paths-le)
 2. Open any supported file (`.js`, `.ts`, `.json`, `.html`, `.css`, `.toml`, `.csv`, `.env`)
 3. Run `Paths-LE: Extract Paths` (`Cmd+Alt+P` / `Ctrl+Alt+P`)
 4. Analyze or validate the extracted paths
@@ -278,7 +278,7 @@ Paths-LE supports **9 file types** for path extraction:
 Available in multiple languages:
 
 - 🇬🇧 English (primary)
-- Additional localizations coming soon
+- Additional languages may be added in future releases based on user feedback
 
 Paths-LE automatically displays in your VS Code language. All commands, settings, and messages are localized.
 
