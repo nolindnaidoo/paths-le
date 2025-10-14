@@ -5,22 +5,32 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.6] - 2025-10-14
+## [1.3.0] - 2025-10-14
 
 ### Added
 
-- **Deduplicate command** - Added `paths-le.postProcess.dedupe` command to remove duplicate paths
-- **Sort command** - Added `paths-le.postProcess.sort` command with multiple sort modes:
+- **Command parity achievement** - Full parity with other LE extraction extensions
+- **Deduplicate command** - Added `paths-le.postProcess.dedupe` to remove duplicate paths while preserving order
+- **Sort command** - Added `paths-le.postProcess.sort` with 4 interactive sort modes:
   - Alphabetical (A → Z)
   - Alphabetical (Z → A)
   - By Length (Short → Long)
   - By Length (Long → Short)
-- **Interactive sorting** - User can choose sort order via quick pick menu
-- **i18n entries** - Added localized command titles for dedupe and sort
+- **Comprehensive documentation** - Added complete command list to README with examples
+- **Extended COMMANDS.md** - Full documentation for all post-processing commands
+- **i18n support** - Localized command titles for dedupe and sort
 
 ### Changed
 
-- **Command count** - Increased from 6 to 8 commands for full parity with other extraction extensions
+- **Infrastructure completion** - Fixed activation events and command registry for all commands
+- **Command count** - Stabilized at 8 commands (Extract, Dedupe, Sort, Help, Settings x4)
+- **Documentation updates** - Updated all docs to reflect command parity achievement
+
+### Removed
+
+- **Analyze command** - Removed unused `paths-le.postProcess.analyze` command
+- **Validate command** - Removed broken `paths-le.postProcess.validate` command
+- **Analysis utilities** - Removed path analysis utilities and related tests
 
 ## [1.2.5] - 2025-10-14
 
