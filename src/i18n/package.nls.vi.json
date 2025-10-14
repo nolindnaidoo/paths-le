@@ -3,6 +3,8 @@
 	"manifest.ext.description": "Trích xuất và phân tích đường dẫn tệp từ JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV và tệp ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Trích xuất đường dẫn",
+	"manifest.command.dedupe.title": "Deduplicate Paths",
+	"manifest.command.sort.title": "Sort Paths",
 	"manifest.command.settings.title": "Mở cài đặt",
 	"manifest.command.settings.export.title": "Xuất cài đặt",
 	"manifest.command.settings.import.title": "Nhập cài đặt",

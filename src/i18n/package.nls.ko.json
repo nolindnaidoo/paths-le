@@ -3,6 +3,8 @@
 	"manifest.ext.description": "JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV 및 ENV 파일에서 파일 경로 추출 및 분석",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "경로 추출",
+	"manifest.command.dedupe.title": "Deduplicate Paths",
+	"manifest.command.sort.title": "Sort Paths",
 	"manifest.command.settings.title": "설정 열기",
 	"manifest.command.settings.export.title": "설정 내보내기",
 	"manifest.command.settings.import.title": "설정 가져오기",

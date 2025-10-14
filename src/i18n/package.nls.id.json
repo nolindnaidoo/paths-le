@@ -3,6 +3,8 @@
 	"manifest.ext.description": "Ekstraksi dan analisis jalur file dari JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, dan file ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Ekstraksi Jalur",
+	"manifest.command.dedupe.title": "Deduplicate Paths",
+	"manifest.command.sort.title": "Sort Paths",
 	"manifest.command.settings.title": "Buka Pengaturan",
 	"manifest.command.settings.export.title": "Ekspor Pengaturan",
 	"manifest.command.settings.import.title": "Impor Pengaturan",

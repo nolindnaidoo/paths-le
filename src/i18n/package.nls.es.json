@@ -3,6 +3,8 @@
 	"manifest.ext.description": "Extracción y análisis de rutas de archivos desde archivos JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV y ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Extraer rutas",
+	"manifest.command.dedupe.title": "Deduplicate Paths",
+	"manifest.command.sort.title": "Sort Paths",
 	"manifest.command.settings.title": "Abrir configuración",
 	"manifest.command.settings.export.title": "Exportar configuración",
 	"manifest.command.settings.import.title": "Importar configuración",

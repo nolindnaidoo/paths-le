@@ -3,6 +3,8 @@
 	"manifest.ext.description": "Extrahieren und Analysieren von Dateipfaden aus JavaScript-, TypeScript-, JSON-, HTML-, CSS-, TOML-, CSV- und ENV-Dateien",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Pfade extrahieren",
+	"manifest.command.dedupe.title": "Deduplicate Paths",
+	"manifest.command.sort.title": "Sort Paths",
 	"manifest.command.settings.title": "Einstellungen öffnen",
 	"manifest.command.settings.export.title": "Einstellungen exportieren",
 	"manifest.command.settings.import.title": "Einstellungen importieren",

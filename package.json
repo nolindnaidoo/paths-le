@@ -313,16 +313,6 @@
 					"default": "ctrl+alt+p",
 					"description": "%manifest.settings.keyboard.extract.shortcut.desc%"
 				},
-				"paths-le.keyboard.validateShortcut": {
-					"type": "string",
-					"default": "ctrl+alt+v",
-					"description": "%manifest.settings.keyboard.validate.shortcut.desc%"
-				},
-				"paths-le.keyboard.analyzeShortcut": {
-					"type": "string",
-					"default": "ctrl+alt+a",
-					"description": "%manifest.settings.keyboard.analyze.shortcut.desc%"
-				},
 				"paths-le.presets.enabled": {
 					"type": "boolean",
 					"default": true,
