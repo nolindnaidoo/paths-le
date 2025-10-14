@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "否",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "启用键盘快捷键",
 	"manifest.settings.keyboard.extract.shortcut.desc": "提取路径快捷键",
-	"manifest.settings.keyboard.validate.shortcut.desc": "验证路径快捷键",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "分析路径快捷键",
 	"manifest.settings.presets.enabled.desc": "启用预设",
 	"manifest.settings.presets.default.desc": "默认预设",

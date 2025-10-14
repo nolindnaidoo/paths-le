@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Нет",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Включить горячие клавиши",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Горячая клавиша для извлечения путей",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Горячая клавиша для проверки путей",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Горячая клавиша для анализа путей",
 	"manifest.settings.presets.enabled.desc": "Включить предустановки",
 	"manifest.settings.presets.default.desc": "Использовать предустановку по умолчанию",

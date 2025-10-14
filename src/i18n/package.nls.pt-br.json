@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Não",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Ativar atalhos de teclado",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Atalho de teclado para extrair caminhos",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Atalho de teclado para validar caminhos",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Atalho de teclado para analisar caminhos",
 	"manifest.settings.presets.enabled.desc": "Ativar predefinições",
 	"manifest.settings.presets.default.desc": "Predefinição padrão a ser usada",

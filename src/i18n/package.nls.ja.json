@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "いいえ",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "キーボードショートカットを有効化",
 	"manifest.settings.keyboard.extract.shortcut.desc": "パス抽出のキーボードショートカット",
-	"manifest.settings.keyboard.validate.shortcut.desc": "パス検証のキーボードショートカット",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "パス分析のキーボードショートカット",
 	"manifest.settings.presets.enabled.desc": "プリセットを有効化",
 	"manifest.settings.presets.default.desc": "使用するデフォルトプリセット",

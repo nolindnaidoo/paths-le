@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "아니오",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "키보드 단축키 활성화",
 	"manifest.settings.keyboard.extract.shortcut.desc": "경로 추출용 키보드 단축키",
-	"manifest.settings.keyboard.validate.shortcut.desc": "경로 유효성 검사용 키보드 단축키",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "경로 분석용 키보드 단축키",
 	"manifest.settings.presets.enabled.desc": "사전 설정 활성화",
 	"manifest.settings.presets.default.desc": "사용할 기본 사전 설정",

@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "No",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Habilitar atajos de teclado",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Atajo de teclado para extraer rutas",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Atajo de teclado para validar rutas",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Atajo de teclado para analizar rutas",
 	"manifest.settings.presets.enabled.desc": "Habilitar preajustes",
 	"manifest.settings.presets.default.desc": "Preajuste predeterminado para usar",

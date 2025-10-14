@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Non",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Activer les raccourcis clavier",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Raccourci clavier pour extraire les chemins d'accès",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Raccourci clavier pour valider les chemins d'accès",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Raccourci clavier pour analyser les chemins d'accès",
 	"manifest.settings.presets.enabled.desc": "Activer les préréglages",
 	"manifest.settings.presets.default.desc": "Préréglage par défaut à utiliser",

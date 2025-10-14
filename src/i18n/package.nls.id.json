@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Tidak",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Aktifkan pintasan keyboard",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Pintasan keyboard untuk mengekstrak jalur",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Pintasan keyboard untuk memvalidasi jalur",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Pintasan keyboard untuk menganalisis jalur",
 	"manifest.settings.presets.enabled.desc": "Aktifkan preset",
 	"manifest.settings.presets.default.desc": "Preset default yang akan digunakan",

@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "No",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Enable keyboard shortcuts",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Keyboard shortcut for extracting paths",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Keyboard shortcut for validating paths",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Keyboard shortcut for analyzing paths",
 	"manifest.settings.presets.enabled.desc": "Enable presets",
 	"manifest.settings.presets.default.desc": "Default preset to use",

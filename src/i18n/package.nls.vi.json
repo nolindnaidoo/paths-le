@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Không",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Bật phím tắt bàn phím",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Phím tắt để trích xuất đường dẫn",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Phím tắt để kiểm tra đường dẫn",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Phím tắt để phân tích đường dẫn",
 	"manifest.settings.presets.enabled.desc": "Bật cài đặt sẵn",
 	"manifest.settings.presets.default.desc": "Cài đặt sẵn mặc định để sử dụng",

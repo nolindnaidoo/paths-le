@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Ні",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Увімкнути комбінації клавіш",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Комбінація клавіш для вилучення шляхів",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Комбінація клавіш для перевірки шляхів",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Комбінація клавіш для аналізу шляхів",
 	"manifest.settings.presets.enabled.desc": "Увімкнути пресети",
 	"manifest.settings.presets.default.desc": "Пресет за замовчуванням для використання",

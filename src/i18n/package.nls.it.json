@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "No",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Abilita scorciatoie da tastiera",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Scorciatoia da tastiera per estrarre i percorsi",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Scorciatoia da tastiera per convalidare i percorsi",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Scorciatoia da tastiera per analizzare i percorsi",
 	"manifest.settings.presets.enabled.desc": "Abilita preimpostazioni",
 	"manifest.settings.presets.default.desc": "Preimpostazione predefinita da utilizzare",

@@ -73,7 +73,6 @@
 	"runtime.confirmation.no": "Nein",
 	"manifest.settings.keyboard.shortcuts.enabled.desc": "Tastaturkürzel aktivieren",
 	"manifest.settings.keyboard.extract.shortcut.desc": "Tastaturkürzel zum Extrahieren von Pfaden",
-	"manifest.settings.keyboard.validate.shortcut.desc": "Tastaturkürzel zum Validieren von Pfaden",
 	"manifest.settings.keyboard.analyze.shortcut.desc": "Tastaturkürzel zum Analysieren von Pfaden",
 	"manifest.settings.presets.enabled.desc": "Voreinstellungen aktivieren",
 	"manifest.settings.presets.default.desc": "Zu verwendende Standardvoreinstellung",
