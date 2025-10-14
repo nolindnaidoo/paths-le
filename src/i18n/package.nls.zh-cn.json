@@ -3,7 +3,6 @@
 	"manifest.ext.description": "从JavaScript、TypeScript、JSON、HTML、CSS、TOML、CSV和ENV文件中提取并分析文件路径",
 	"manifest.command.category": "路径-LE",
 	"manifest.command.extract.title": "提取路径",
-	"manifest.command.validate.title": "验证路径",
 	"manifest.command.analyze.title": "分析路径",
 	"manifest.command.settings.title": "打开设置",
 	"manifest.command.settings.export.title": "导出设置",

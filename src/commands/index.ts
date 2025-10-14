@@ -8,7 +8,6 @@ import type { PerformanceMonitor } from '../utils/performance';
 import { registerAnalyzeCommand } from './analyze';
 import { registerExtractCommand } from './extract';
 import { registerHelpCommand } from './help';
-import { registerValidateCommand } from './validate';
 
 export function registerCommands(
 	context: vscode.ExtensionContext,
@@ -22,7 +21,6 @@ export function registerCommands(
 	}>,
 ): void {
 	registerExtractCommand(context, deps);
-	registerValidateCommand(context, deps);
 	registerAnalyzeCommand(context, deps);
 	registerHelpCommand(context, deps);
 }

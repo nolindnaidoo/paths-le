@@ -42,38 +42,7 @@ Extracted Paths (5 found):
 - Offers recovery suggestions for common issues
 - Continues processing despite individual path errors
 
-### 2. Validate Paths (`paths-le.postProcess.validate`)
-
-**Purpose**: Validate extracted paths for existence, permissions, and accessibility.
-
-**Usage**:
-
-- **Command Palette**: `Paths-LE: Validate Paths`
-- **Context Menu**: Available after extraction
-
-**Features**:
-
-- Checks if paths exist in the file system
-- Validates file and directory permissions
-- Checks path accessibility
-- Detects broken symbolic links
-- Provides detailed validation results
-
-**Validation Types**:
-
-- **Existence Check**: Verify paths exist
-- **Permission Check**: Check read/write/execute permissions
-- **Accessibility Check**: Verify path accessibility
-- **Format Check**: Validate path format and syntax
-
-**Configuration**:
-
-- Enable/disable specific validation types
-- Set validation timeouts
-- Configure permission checking
-- Custom validation rules
-
-### 3. Analyze Paths (`paths-le.postProcess.analyze`)
+### 2. Analyze Paths (`paths-le.postProcess.analyze`)
 
 **Purpose**: Generate comprehensive analysis reports for extracted paths.
 
@@ -127,7 +96,7 @@ Recommendations:
 - Use consistent path formats
 ```
 
-### 4. Open Settings (`paths-le.openSettings`)
+### 3. Open Settings (`paths-le.openSettings`)
 
 **Purpose**: Open the Paths-LE configuration settings.
 
@@ -143,7 +112,7 @@ Recommendations:
 - **Analysis Settings**: Pattern recognition, validation analysis
 - **Validation Settings**: Existence checks, permission checks
 
-### 5. Help (`paths-le.help`)
+### 4. Help (`paths-le.help`)
 
 **Purpose**: Display comprehensive help and troubleshooting information.
 
@@ -167,18 +136,16 @@ Recommendations:
 1. **Open File**: Open a file containing paths
 2. **Extract Paths**: Use `Extract Paths` command
 3. **Review Results**: Check extracted paths in new document
-4. **Validate Paths**: Use `Validate Paths` if needed
-5. **Analyze Paths**: Use `Analyze Paths` for detailed analysis
-6. **Configure Settings**: Use `Open Settings` to customize behavior
+4. **Analyze Paths**: Use `Analyze Paths` for detailed analysis (optional)
+5. **Configure Settings**: Use `Open Settings` to customize behavior
 
 ### Advanced Workflow
 
 1. **Extract Paths**: Extract paths from multiple files
 2. **Combine Results**: Merge results from different sources
-3. **Validate Paths**: Check path validity across files
-4. **Analyze Patterns**: Identify patterns across files
-5. **Generate Report**: Create comprehensive analysis report
-6. **Export Results**: Export results for further processing
+3. **Analyze Patterns**: Identify patterns across files
+4. **Generate Report**: Create comprehensive analysis report
+5. **Export Results**: Export results for further processing
 
 ## Command Dependencies
 

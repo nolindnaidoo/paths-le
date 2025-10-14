@@ -3,7 +3,6 @@
 	"manifest.ext.description": "Extracción y análisis de rutas de archivos desde archivos JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV y ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Extraer rutas",
-	"manifest.command.validate.title": "Validar rutas",
 	"manifest.command.analyze.title": "Analizar rutas",
 	"manifest.command.settings.title": "Abrir configuración",
 	"manifest.command.settings.export.title": "Exportar configuración",

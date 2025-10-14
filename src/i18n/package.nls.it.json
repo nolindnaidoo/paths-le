@@ -3,7 +3,6 @@
 	"manifest.ext.description": "Estrazione e analisi dei percorsi dei file da file JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV ed ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Estrai percorsi",
-	"manifest.command.validate.title": "Convalida percorsi",
 	"manifest.command.analyze.title": "Analizza percorsi",
 	"manifest.command.settings.title": "Apri impostazioni",
 	"manifest.command.settings.export.title": "Esporta impostazioni",

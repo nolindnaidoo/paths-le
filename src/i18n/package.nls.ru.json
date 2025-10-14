@@ -3,7 +3,6 @@
 	"manifest.ext.description": "Извлечение и анализ путей к файлам из файлов JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV и ENV",
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Извлечение путей",
-	"manifest.command.validate.title": "Проверка путей",
 	"manifest.command.analyze.title": "Анализ путей",
 	"manifest.command.settings.title": "Открыть настройки",
 	"manifest.command.settings.export.title": "Экспорт настроек",
