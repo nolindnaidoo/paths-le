@@ -265,15 +265,16 @@ Paths-LE provides **8 commands** accessible via Command Palette (`Ctrl+Shift+P` 
 
 ## ⚙️ Configuration
 
-- `paths-le.enabled` – Enable or disable the extension
-- `paths-le.extractAbsolute` – Extract absolute paths
-- `paths-le.extractRelative` – Extract relative paths
-- `paths-le.extractWindows` – Extract Windows paths
-- `paths-le.extractUnix` – Extract Unix paths
-- `paths-le.includeComments` – Include paths in comments
-- `paths-le.sortByFrequency` – Sort results by usage frequency
-- `paths-le.groupByFormat` – Group paths by format type
-- `paths-le.validatePaths` – Enable path validation
+Paths-LE has minimal configuration to keep things simple. Most settings are available in VS Code's settings UI under "Paths-LE".
+
+Key settings include:
+- Output format preferences (side-by-side, clipboard copy)
+- Safety warnings and thresholds for large files
+- Notification levels (silent, important, all)
+- Status bar visibility
+- Local telemetry logging for debugging
+
+For the complete list of available settings, open VS Code Settings and search for "paths-le".
 
 ## 📁 Supported File Types
 
@@ -311,7 +312,7 @@ Paths-LE automatically displays in your VS Code language. All commands, settings
 
 ## 🧩 System Requirements
 
-- **VS Code**: 1.85.0 or higher
+- **VS Code**: 1.70.0 or higher
 - **Node.js**: Not required (extension runs in VS Code's built-in runtime)
 - **Platform**: Windows, macOS, Linux
 - **Memory**: 50MB minimum, 200MB recommended for large files
@@ -367,33 +368,27 @@ _Benchmarked with realistic test data on Apple M1_
 **Performance issues with large files**
 
 - Files over 10MB may take longer to process
-- Consider using `paths-le.includeComments: false` to reduce processing time
-- Enable `paths-le.sortByFrequency: false` for faster extraction
+- Safety warnings will alert you when processing large files
+- Consider splitting very large files into smaller chunks for better performance
 
 **Paths not appearing in results**
 
 - Verify the path format is supported (absolute, relative, Windows, Unix)
-- Check if `paths-le.extractAbsolute`, `paths-le.extractRelative`, etc. are enabled
-- Ensure paths are not inside comments if `paths-le.includeComments` is disabled
+- Check that the file type is supported and paths are in expected locations
+- Ensure the file is saved with a supported extension
 - Check for proper path formatting and separators
+- Try reloading VS Code window
 
-**Path validation issues**
+**Cross-platform compatibility**
 
-- Enable `paths-le.validatePaths: true` for path validation
-- Check that paths exist in the workspace
-- Verify path separators match your operating system
-- Some paths may be valid but not accessible from the current workspace
-
-**Cross-platform compatibility problems**
-
-- Check `paths-le.extractWindows` and `paths-le.extractUnix` settings
-- Ensure path normalization is working correctly
-- Verify that mixed path formats are handled properly
+- Paths-LE handles both Windows and Unix path formats automatically
+- Mixed path formats in a single file are supported
 - Some paths may be platform-specific and not valid on all systems
+- Check Output panel → "Paths-LE" for any parsing warnings
 
 **Extension crashes or freezes**
 
-- Check VS Code version compatibility (requires 1.85.0+)
+- Check VS Code version compatibility (requires 1.70.0+)
 - Disable other path-related extensions temporarily
 - Check Output panel → "Paths-LE" for error messages
 
@@ -417,11 +412,8 @@ A: These formats cover the most common use cases: web development (JS/TS/HTML/CS
 **Q: How does JavaScript/TypeScript extraction work?**
 A: Paths-LE extracts paths from `import`, `require`, `export`, and dynamic `import()` statements. Package names like 'react' or 'lodash' are automatically excluded—only local file paths (starting with `./`, `../`, `/`, or absolute paths) are extracted.
 
-**Q: How does path validation work?**
-A: When `paths-le.validatePaths: true` is enabled, Paths-LE checks if the extracted paths exist in your workspace and reports any missing or invalid paths.
-
-**Q: Can I group paths by format type?**
-A: Yes, enable `paths-le.groupByFormat: true` to organize results by path format (absolute, relative, Windows, Unix, etc.).
+**Q: How does path extraction work?**
+A: Paths-LE uses format-specific parsers for each file type (JavaScript/TypeScript imports, HTML/CSS urls, JSON values, etc.) to reliably extract file paths while filtering out package names and URLs.
 
 **Q: Does Paths-LE work cross-platform?**
 A: Absolutely! Paths-LE handles both Windows and Unix path formats with intelligent normalization and validation.
