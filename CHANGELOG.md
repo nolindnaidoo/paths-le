@@ -5,18 +5,38 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.1] - 2025-01-27
+## [1.4.0] - 2025-01-27
 
 ### Added
 
-- **Portuguese (Brazil) localization** - Added complete pt-br language support for all user interface elements
-- **Enhanced internationalization** - Expanded language coverage to include Brazilian Portuguese for better accessibility
+- **Multi-language support achievement** - Added comprehensive localization for 12 additional languages
+- **German (de)** - Vollständige deutsche Lokalisierung für alle Benutzeroberflächen-Elemente
+- **Spanish (es)** - Soporte completo en español para comandos, configuraciones y mensajes
+- **French (fr)** - Localisation française complète pour l'interface utilisateur
+- **Indonesian (id)** - Dukungan bahasa Indonesia lengkap untuk semua fitur
+- **Italian (it)** - Localizzazione italiana completa per comandi e impostazioni
+- **Japanese (ja)** - コマンド、設定、メッセージの完全な日本語サポート
+- **Korean (ko)** - 모든 사용자 인터페이스 요소에 대한 완전한 한국어 지원
+- **Portuguese (Brazil) (pt-br)** - Suporte completo em português brasileiro
+- **Russian (ru)** - Полная локализация на русском языке для всех элементов интерфейса
+- **Ukrainian (uk)** - Повна локалізація українською мовою для всіх елементів інтерфейсу
+- **Vietnamese (vi)** - Hỗ trợ tiếng Việt đầy đủ cho tất cả các tính năng
+- **Chinese Simplified (zh-cn)** - 简体中文完整支持，包括命令、设置和消息
+
+### Changed
+
+- **Internationalization infrastructure** - Implemented vscode-nls with MessageFormat.file for robust localization
+- **User experience** - All commands, settings, and notifications now adapt to user's VS Code language preference
+- **Documentation** - Updated README to reflect multi-language support capabilities
+- **Marketplace discoverability** - Enhanced with localized descriptions and keywords
 
 ### Technical
 
-- Added comprehensive Portuguese (Brazil) localization file with 73+ translated strings
-- All commands, settings, notifications, and help content now available in Portuguese (Brazil)
-- Maintained 100% backward compatibility with existing functionality
+- Created comprehensive localization files for 12 languages with 73+ translated strings each
+- Implemented proper i18n patterns following VS Code extension best practices
+- All existing functionality works seamlessly across all supported languages
+- Maintained 100% backward compatibility with English-only installations
+- Localization covers: commands, settings, notifications, error messages, and help content
 
 ## [1.3.0] - 2025-10-14
 
