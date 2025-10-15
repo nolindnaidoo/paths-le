@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
-	"version": "1.4.0",
+	"version": "1.4.1",
 	"license": "MIT",
 	"author": {
 		"name": "Nolin D Naidoo",
@@ -129,6 +129,12 @@
 			"commandPalette": [
 				{
 					"command": "paths-le.extractPaths"
+				},
+				{
+					"command": "paths-le.postProcess.dedupe"
+				},
+				{
+					"command": "paths-le.postProcess.sort"
 				},
 				{
 					"command": "paths-le.openSettings"

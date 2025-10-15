@@ -5,6 +5,18 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-01-27
+
+### Fixed
+
+- **Command palette completeness** - Added missing `paths-le.postProcess.dedupe` and `paths-le.postProcess.sort` commands to command palette
+- **User experience** - All post-processing commands now accessible via command palette for consistent workflow
+
+### Technical
+
+- Fixed command palette inconsistency where dedupe and sort commands were defined but not accessible
+- Maintained 100% backward compatibility with existing installations
+
 ## [1.4.0] - 2025-01-27
 
 ### Added
