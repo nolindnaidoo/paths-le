@@ -42,6 +42,12 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": ["**/__performance__/**"],
+			"linter": {
+				"enabled": false
+			}
 		}
 	],
 	"javascript": {
