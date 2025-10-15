@@ -438,7 +438,7 @@ A: Paths-LE can handle files up to 30MB, though performance may be reduced for v
 
 ## 📊 Test Coverage
 
-- 220 passing tests across 14 test suites with 38.74% overall coverage
+- 204 passing tests across 13 test suites with 36.03% overall coverage
 - Individual module coverage ranges from 66-100% with excellent extraction testing
 - Tests powered by Vitest with V8 coverage
 - Runs quickly and locally: `npm run test` or `npm run test:coverage`
