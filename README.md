@@ -351,13 +351,12 @@ Paths-LE is built for speed and efficiency across all file types:
 
 | Format         | Throughput      | Test Size   | Notes                             |
 | -------------- | --------------- | ----------- | --------------------------------- |
-| **HTML**       | 3.1M paths/sec  | 150K lines  | Fast attribute extraction         |
-| **DOTENV**     | 917K paths/sec  | 15K entries | Environment files, .env configs   |
-| **TOML**       | 347K paths/sec  | 200K lines  | Configuration files, Rust configs |
-| **CSV**        | 0 paths/sec     | 500K rows   | Data exports, logs, spreadsheets  |
-| **JSON**       | 0 paths/sec     | 350K items  | Nested object traversal           |
-| **JavaScript** | 0 paths/sec     | 50K lines   | Import/require pattern matching   |
-| **HTML/CSS**   | Fast line-scan  | All sizes   | Attribute and url() extraction    |
+| **HTML**       | 2.3M paths/sec  | 12K lines   | Fast attribute extraction         |
+| **JSON**       | 1.1M paths/sec  | 5K items    | Nested object traversal           |
+| **DOTENV**     | 972K paths/sec  | 6K entries  | Environment files, .env configs   |
+| **CSV**        | 569K paths/sec  | 10K rows    | Data exports, logs, spreadsheets  |
+| **TOML**       | 299K paths/sec  | 6K lines    | Configuration files, Rust configs |
+| **JavaScript** | 0 paths/sec     | 2K lines    | Import/require pattern matching   |
 
 _Benchmarked with realistic test data on Apple M1_
 
@@ -468,12 +467,12 @@ A: Paths-LE can handle files up to 30MB, though performance may be reduced for v
 
 Real-world extraction speeds tested on **macOS (M1)**:
 
-- **HTML**: 3.1M paths/sec (150K lines, 7.3MB file, 150K paths extracted)
-- **DOTENV**: 917K paths/sec (15K entries, 0.6MB file, 15K paths extracted)
-- **TOML**: 347K paths/sec (200K lines, 8.2MB file, 200K paths extracted)
-- **CSV**: 0 paths/sec (500K rows, 48.2MB file, 0 paths extracted)
-- **JSON**: 0 paths/sec (350K items, 45.4MB file, 0 paths extracted)
-- **JavaScript**: 0 paths/sec (50K lines, 2.0MB file, 0 paths extracted)
+- **HTML**: 2.3M paths/sec (12K lines, 0.56MB file, 12K paths extracted)
+- **JSON**: 1.1M paths/sec (5K items, 0.62MB file, 15K paths extracted)
+- **DOTENV**: 972K paths/sec (6K entries, 0.23MB file, 6K paths extracted)
+- **CSV**: 569K paths/sec (10K rows, 0.89MB file, 30K paths extracted)
+- **TOML**: 299K paths/sec (6K lines, 0.23MB file, 6K paths extracted)
+- **JavaScript**: 0 paths/sec (2K lines, 0.07MB file, 0 paths extracted)
 
 ### Running Tests Locally
 
