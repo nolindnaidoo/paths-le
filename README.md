@@ -307,12 +307,23 @@ Paths-LE supports **9 file types** for path extraction:
 
 ## 🌍 Language Support
 
-Available in multiple languages:
+**13 languages supported** with full localization:
 
-- 🇬🇧 English (primary)
-- Additional languages may be added in future releases based on user feedback
+- 🇺🇸 **English** (en) - Default language
+- 🇩🇪 **German** (de) - Deutsche Lokalisierung
+- 🇪🇸 **Spanish** (es) - Localización en español
+- 🇫🇷 **French** (fr) - Localisation française
+- 🇮🇩 **Indonesian** (id) - Lokalisasi bahasa Indonesia
+- 🇮🇹 **Italian** (it) - Localizzazione italiana
+- 🇯🇵 **Japanese** (ja) - 日本語サポート
+- 🇰🇷 **Korean** (ko) - 한국어 지원
+- 🇧🇷 **Portuguese (Brazil)** (pt-br) - Localização em português brasileiro
+- 🇷🇺 **Russian** (ru) - Русская локализация
+- 🇺🇦 **Ukrainian** (uk) - Українська локалізація
+- 🇻🇳 **Vietnamese** (vi) - Hỗ trợ tiếng Việt
+- 🇨🇳 **Chinese Simplified** (zh-cn) - 简体中文支持
 
-Paths-LE automatically displays in your VS Code language. All commands, settings, and messages are localized.
+All commands, settings, notifications, and help content automatically adapt to your VS Code language preference.
 
 ## 🧩 System Requirements
 
