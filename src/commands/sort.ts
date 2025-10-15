@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import * as nls from 'vscode-nls';
+
+const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 export function registerSortCommand(context: vscode.ExtensionContext): void {
 	const command = vscode.commands.registerCommand(
@@ -6,19 +9,50 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showWarningMessage('No active editor found');
+				vscode.window.showWarningMessage(
+					localize('runtime.sort.no-editor', 'No active editor found'),
+				);
 				return;
 			}
 
 			// Prompt user for sort order
 			const sortOrder = await vscode.window.showQuickPick(
 				[
-					{ label: 'Alphabetical (A → Z)', value: 'asc' },
-					{ label: 'Alphabetical (Z → A)', value: 'desc' },
-					{ label: 'By Length (Short → Long)', value: 'length-asc' },
-					{ label: 'By Length (Long → Short)', value: 'length-desc' },
+					{
+						label: localize(
+							'runtime.sort.pick.alpha-asc',
+							'Alphabetical (A → Z)',
+						),
+						value: 'asc',
+					},
+					{
+						label: localize(
+							'runtime.sort.pick.alpha-desc',
+							'Alphabetical (Z → A)',
+						),
+						value: 'desc',
+					},
+					{
+						label: localize(
+							'runtime.sort.pick.length-asc',
+							'By Length (Short → Long)',
+						),
+						value: 'length-asc',
+					},
+					{
+						label: localize(
+							'runtime.sort.pick.length-desc',
+							'By Length (Long → Short)',
+						),
+						value: 'length-desc',
+					},
 				],
-				{ placeHolder: 'Select sort order' },
+				{
+					placeHolder: localize(
+						'runtime.sort.pick.placeholder',
+						'Select sort order',
+					),
+				},
 			);
 
 			if (!sortOrder) {
@@ -61,12 +95,24 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 				await vscode.workspace.applyEdit(edit);
 
 				vscode.window.showInformationMessage(
-					`Sorted ${sorted.length} paths (${sortOrder.label})`,
+					localize(
+						'runtime.sort.success',
+						'Sorted {0} paths ({1})',
+						sorted.length,
+						sortOrder.label,
+					),
 				);
 			} catch (error) {
 				const message =
-					error instanceof Error ? error.message : 'Unknown error occurred';
-				vscode.window.showErrorMessage(`Sorting failed: ${message}`);
+					error instanceof Error
+						? error.message
+						: localize(
+								'runtime.error.unknown-fallback',
+								'Unknown error occurred',
+							);
+				vscode.window.showErrorMessage(
+					localize('runtime.sort.error', 'Sorting failed: {0}', message),
+				);
 			}
 		},
 	);
