@@ -109,3 +109,4 @@ dist/
 *.env.*
 !src/detection/__data__/*.env.*
 release/
+src/extraction/__performance__/
