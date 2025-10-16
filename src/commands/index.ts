@@ -5,6 +5,7 @@ import type { StatusBar } from '../ui/statusBar';
 import type { ErrorHandler } from '../utils/errorHandling';
 import type { Localizer } from '../utils/localization';
 import type { PerformanceMonitor } from '../utils/performance';
+import { registerCreateTestFixtureCommand } from './createTestFixture';
 import { registerDedupeCommand } from './dedupe';
 import { registerExtractCommand } from './extract';
 import { registerHelpCommand } from './help';
@@ -25,4 +26,5 @@ export function registerCommands(
 	registerDedupeCommand(context);
 	registerSortCommand(context);
 	registerHelpCommand(context, deps);
+	registerCreateTestFixtureCommand(context);
 }

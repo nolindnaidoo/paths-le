@@ -152,7 +152,7 @@ C:\Users\Name\data,dir,User data directory
 
 ## 📋 Available Commands
 
-Paths-LE provides **8 commands** accessible via Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
+Paths-LE provides **9 commands** accessible via Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`):
 
 ### Core Extraction
 
@@ -172,6 +172,7 @@ Paths-LE provides **8 commands** accessible via Command Palette (`Ctrl+Shift+P` 
 - **Open Settings** - Quick access to extension settings
 - **Help & Troubleshooting** - Comprehensive in-editor documentation
 - **Export/Import/Reset Settings** - Manage extension configuration
+- **Create Test Fixture** - Generate a complete test environment for canonical path resolution
 
 ## ⚙️ Configuration
 
@@ -321,7 +322,14 @@ Coverage reports are generated in `coverage/` directory (open `coverage/index.ht
 
 ### Testing Canonical Path Resolution
 
-For testing the new monorepo and symlink features:
+**For Extension Users** (easiest method):
+
+1. Open Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+2. Run `Paths-LE: Create Test Fixture`
+3. Select a folder where you want to create the test environment
+4. Follow the prompts to open the generated test workspace
+
+**For Developers** (from repository):
 
 ```bash
 # 1. Setup test environment
@@ -330,12 +338,9 @@ cd test-fixtures/monorepo-test
 
 # 2. Open test workspace
 code workspace.code-workspace
-
-# 3. Install extension and test
-code --install-extension release/paths-le-1.6.0.vsix
 ```
 
-See [`test-fixtures/monorepo-test/README.md`](test-fixtures/monorepo-test/README.md) for comprehensive testing guide.
+The test fixture includes a complete monorepo with symlinks, cross-package imports, and comprehensive documentation for testing all canonical path resolution features.
 
 ---
 

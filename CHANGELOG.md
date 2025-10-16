@@ -5,6 +5,22 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-10-16
+
+### Added
+
+- **🧪 Create Test Fixture Command** - New command accessible to all extension users
+  - `Paths-LE: Create Test Fixture` in Command Palette
+  - Generates complete monorepo test environment with symlinks
+  - Includes cross-package imports, workspace configuration, and documentation
+  - No need to clone repository - works for marketplace users
+  - Interactive setup with progress indicators and workspace opening
+
+### Improved
+
+- **📚 Enhanced Testing Documentation** - Updated README with user-friendly testing instructions
+- **🎯 Better Accessibility** - Test fixture now available to all users, not just developers
+
 ## [1.6.0] - 2025-10-16
 
 ### Added

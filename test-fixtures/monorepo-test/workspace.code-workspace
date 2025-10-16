@@ -5,7 +5,7 @@
       "path": "./packages/frontend"
     },
     {
-      "name": "Backend", 
+      "name": "Backend",
       "path": "./packages/backend"
     },
     {

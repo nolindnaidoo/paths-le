@@ -49,6 +49,7 @@ code workspace.code-workspace
 ### 3. Test Canonical Resolution
 
 1. **Install the extension** (if not already installed):
+
    ```bash
    cd ../../  # Back to paths-le root
    code --install-extension release/paths-le-1.6.0.vsix
@@ -61,56 +62,69 @@ code workspace.code-workspace
 ## 🧪 Test Scenarios
 
 ### Scenario A: Cross-Package Imports
+
 **File**: `packages/frontend/src/main.js`
 
 **Test**: Extract paths from cross-package imports
+
 ```javascript
-import { utils } from '../../shared/src/utils.js';
-import { api } from '../../../packages/backend/src/api.js';
+import { utils } from '../../shared/src/utils.js'
+import { api } from '../../../packages/backend/src/api.js'
 ```
 
 **Expected Results**:
+
 - With canonical resolution: Resolves relative to correct workspace folders
 - Should handle complex relative paths across package boundaries
 
 ### Scenario B: Symlink Resolution
+
 **File**: `packages/frontend/src/symlink-test.js`
 
 **Test**: Extract paths that go through symlinks
+
 ```javascript
-import utils from './utils-link.js';  // Symlink to ../../shared/src/utils.js
+import utils from './utils-link.js' // Symlink to ../../shared/src/utils.js
 ```
 
 **Expected Results**:
+
 - `resolveSymlinks: true` → Shows canonical path to actual file
 - `resolveSymlinks: false` → Shows symlink path as-is
 
 ### Scenario C: Directory Symlinks
+
 **File**: `packages/frontend/src/symlink-test.js`
 
 **Test**: Import through symlinked directory
+
 ```javascript
-import shared from '../shared-link/src/helpers.js';  // Via directory symlink
+import shared from '../shared-link/src/helpers.js' // Via directory symlink
 ```
 
 **Expected Results**:
+
 - Should resolve through the symlinked directory to actual file
 
 ### Scenario D: Workspace-Relative Paths
+
 **File**: `packages/frontend/src/main.js`
 
 **Test**: Workspace-relative path references
+
 ```javascript
-const sharedUtil = 'packages/shared/src/helpers.js';
+const sharedUtil = 'packages/shared/src/helpers.js'
 ```
 
 **Expected Results**:
+
 - With workspace resolution: Resolves relative to workspace root
 - Should work correctly in multi-root workspace environment
 
 ## ⚙️ Configuration Testing
 
 ### Test Configuration A: Full Canonical Resolution
+
 ```json
 {
   "paths-le.resolution.resolveSymlinks": true,
@@ -119,6 +133,7 @@ const sharedUtil = 'packages/shared/src/helpers.js';
 ```
 
 ### Test Configuration B: Symlinks Only
+
 ```json
 {
   "paths-le.resolution.resolveSymlinks": true,
@@ -127,6 +142,7 @@ const sharedUtil = 'packages/shared/src/helpers.js';
 ```
 
 ### Test Configuration C: Workspace Only
+
 ```json
 {
   "paths-le.resolution.resolveSymlinks": false,
@@ -135,6 +151,7 @@ const sharedUtil = 'packages/shared/src/helpers.js';
 ```
 
 ### Test Configuration D: Traditional Mode
+
 ```json
 {
   "paths-le.resolution.resolveSymlinks": false,
@@ -145,21 +162,25 @@ const sharedUtil = 'packages/shared/src/helpers.js';
 ## 🔍 What to Verify
 
 ### ✅ Symlink Resolution
+
 1. **File symlinks**: `utils-link.js` → `../../shared/src/utils.js`
 2. **Directory symlinks**: `shared-link/` → `../shared/`
 3. **Nested symlinks**: Paths through symlinked directories
 
 ### ✅ Workspace Resolution
+
 1. **Multi-root workspace**: Each package as separate workspace folder
 2. **Cross-package references**: Imports between frontend/backend/shared
 3. **Relative path handling**: Complex `../../` paths across packages
 
 ### ✅ Error Handling
+
 1. **Broken symlinks**: Create and test broken symlinks
 2. **Permission errors**: Test with restricted permissions
 3. **Non-existent paths**: References to missing files
 
 ### ✅ Performance
+
 1. **Caching**: Extract same paths multiple times (should be faster on repeat)
 2. **Large files**: Test with files containing many path references
 3. **Deep nesting**: Complex directory structures
@@ -167,6 +188,7 @@ const sharedUtil = 'packages/shared/src/helpers.js';
 ## 🛠️ Manual Testing Steps
 
 ### Step 1: Basic Functionality
+
 ```bash
 # 1. Open the workspace
 code test-fixtures/monorepo-test/workspace.code-workspace
@@ -179,12 +201,14 @@ code test-fixtures/monorepo-test/workspace.code-workspace
 ```
 
 ### Step 2: Compare Resolution Modes
+
 1. Enable canonical resolution in VS Code settings
 2. Extract paths → Note results
-3. Disable canonical resolution in settings  
+3. Disable canonical resolution in settings
 4. Extract paths → Compare results
 
 ### Step 3: Symlink-Specific Test
+
 1. Open `packages/frontend/src/symlink-test.js`
 2. Extract paths with canonical resolution ON
 3. Should see resolved symlink targets
@@ -194,12 +218,14 @@ code test-fixtures/monorepo-test/workspace.code-workspace
 ## 🐛 Expected Behaviors
 
 ### ✅ Success Cases
+
 - Symlinks resolve to canonical paths when enabled
 - Cross-package imports work correctly in multi-root workspace
 - Performance remains fast with LRU caching
 - Graceful fallback on resolution errors
 
 ### ⚠️ Edge Cases
+
 - Broken symlinks → Use original path
 - Circular symlinks → Detect and handle gracefully
 - Permission denied → Fallback to original path
@@ -208,6 +234,7 @@ code test-fixtures/monorepo-test/workspace.code-workspace
 ## 🔧 Troubleshooting
 
 ### Symlinks Not Working?
+
 ```bash
 # Recreate symlinks
 cd test-fixtures/monorepo-test
@@ -215,11 +242,13 @@ cd test-fixtures/monorepo-test
 ```
 
 ### VS Code Not Recognizing Workspace?
+
 - Ensure you opened `workspace.code-workspace` file
 - Check that all workspace folders exist
 - Reload VS Code window
 
 ### Extension Not Working?
+
 ```bash
 # Reinstall extension
 cd ../../  # Back to paths-le root
@@ -227,6 +256,7 @@ code --install-extension release/paths-le-1.6.0.vsix --force
 ```
 
 ### Debug Information
+
 1. Enable telemetry: `"paths-le.telemetryEnabled": true`
 2. Open VS Code Developer Tools (Help → Toggle Developer Tools)
 3. Check console for Paths-LE logs
@@ -234,6 +264,7 @@ code --install-extension release/paths-le-1.6.0.vsix --force
 ## 📊 Performance Testing
 
 ### Create Large Test File
+
 ```bash
 cd test-fixtures/monorepo-test
 node -e "
@@ -247,6 +278,7 @@ fs.writeFileSync('packages/frontend/src/large-test.js', paths.join('\\n'));
 ```
 
 ### Test Extraction Performance
+
 - Should complete in < 1 second with caching
 - Second extraction should be faster (cache hit)
 

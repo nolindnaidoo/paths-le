@@ -10,6 +10,7 @@
   "manifest.command.settings.import.title": "Import Settings",
   "manifest.command.settings.reset.title": "Reset Settings",
   "manifest.command.help.title": "Help & Troubleshooting",
+  "manifest.command.createTestFixture.title": "Create Test Fixture",
   "manifest.settings.title": "Paths-LE Settings",
   "manifest.settings.copy.clipboard.desc": "Copy extracted paths to clipboard",
   "manifest.settings.dedupe.desc": "Remove duplicate paths",
