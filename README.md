@@ -319,6 +319,24 @@ bun run test:watch        # Watch mode for development
 
 Coverage reports are generated in `coverage/` directory (open `coverage/index.html` for detailed view).
 
+### Testing Canonical Path Resolution
+
+For testing the new monorepo and symlink features:
+
+```bash
+# 1. Setup test environment
+cd test-fixtures/monorepo-test
+./setup-symlinks.sh
+
+# 2. Open test workspace
+code workspace.code-workspace
+
+# 3. Install extension and test
+code --install-extension release/paths-le-1.6.0.vsix
+```
+
+See [`test-fixtures/monorepo-test/README.md`](test-fixtures/monorepo-test/README.md) for comprehensive testing guide.
+
 ---
 
 Copyright © 2025

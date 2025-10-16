@@ -1,0 +1,13 @@
+{
+  "apiEndpoint": "http://localhost:3000/api",
+  "staticAssets": "./assets/",
+  "sharedLibrary": "../../shared/src/utils.js",
+  "buildScript": "../../../tools/build-scripts/webpack.config.js",
+  "paths": {
+    "components": "./components/",
+    "styles": "./styles/",
+    "images": "../assets/images/",
+    "shared": "packages/shared/src/",
+    "backend": "packages/backend/src/"
+  }
+}

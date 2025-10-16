@@ -1,0 +1,24 @@
+{
+  "folders": [
+    {
+      "name": "Frontend",
+      "path": "./packages/frontend"
+    },
+    {
+      "name": "Backend", 
+      "path": "./packages/backend"
+    },
+    {
+      "name": "Shared",
+      "path": "./packages/shared"
+    },
+    {
+      "name": "Tools",
+      "path": "./tools"
+    }
+  ],
+  "settings": {
+    "paths-le.resolution.resolveSymlinks": true,
+    "paths-le.resolution.resolveWorkspaceRelative": true
+  }
+}
