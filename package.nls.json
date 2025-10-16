@@ -48,6 +48,8 @@
   "manifest.settings.presets.default.option.comprehensive": "Comprehensive preset",
   "manifest.settings.presets.default.option.performance": "Performance preset",
   "manifest.settings.presets.default.option.validation": "Validation preset",
+  "manifest.settings.resolution.symlinks.desc": "Resolve symlinks to their canonical paths for better monorepo support",
+  "manifest.settings.resolution.workspace.desc": "Resolve paths relative to workspace folders in monorepos",
   "manifest.capability.untrusted-workspaces.desc": "Limited functionality in untrusted workspaces",
   "runtime.statusbar.text": "$(file-directory) Paths-LE",
   "runtime.statusbar.tooltip": "Paths-LE: File Path Extraction",

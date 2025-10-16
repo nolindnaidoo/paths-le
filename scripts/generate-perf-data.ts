@@ -200,7 +200,7 @@ function formatBytes(bytes: number): string {
 function runBenchmarks(): string {
   console.log('\n📊 Running performance benchmarks...\n')
   try {
-    const output = execSync('bun test ./src/extraction/performance.bench.ts', {
+    const output = execSync('vitest run --config vitest.perf.config.ts --reporter=verbose', {
       encoding: 'utf-8',
       cwd: process.cwd(),
     })

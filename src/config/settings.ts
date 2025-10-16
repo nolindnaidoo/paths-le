@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import type { Telemetry } from '../telemetry/telemetry';
+import { getWorkspaceFolderForPath } from '../utils/pathResolver';
+import { resolvePathCanonical } from '../utils/pathValidation';
 import { getConfiguration } from './config';
 import {
 	type ValidationResult,
@@ -44,10 +46,31 @@ export function registerExportSettingsCommand(
 				});
 
 				if (uri) {
-					await vscode.workspace.fs.writeFile(
-						uri,
-						Buffer.from(configJson, 'utf8'),
-					);
+					// Resolve the canonical path for the export location
+					let resolvedPath = uri.fsPath;
+					try {
+						const workspaceFolder = getWorkspaceFolderForPath(uri.fsPath);
+						const options = {
+							resolveSymlinks: true,
+							resolveWorkspaceRelative: true,
+							...(workspaceFolder && { workspaceFolder }),
+						};
+						resolvedPath = await resolvePathCanonical(uri.fsPath, options);
+
+						// Create a new URI with the resolved path
+						const resolvedUri = vscode.Uri.file(resolvedPath);
+						await vscode.workspace.fs.writeFile(
+							resolvedUri,
+							Buffer.from(configJson, 'utf8'),
+						);
+					} catch (_resolveError) {
+						// Fallback to original URI if resolution fails
+						await vscode.workspace.fs.writeFile(
+							uri,
+							Buffer.from(configJson, 'utf8'),
+						);
+					}
+
 					vscode.window.showInformationMessage(
 						'Settings exported successfully',
 					);
@@ -82,8 +105,27 @@ export function registerImportSettingsCommand(
 					return;
 				}
 
+				// Resolve the canonical path for the import file
+				let resolvedUri = uri[0];
+				try {
+					const workspaceFolder = getWorkspaceFolderForPath(uri[0].fsPath);
+					const options = {
+						resolveSymlinks: true,
+						resolveWorkspaceRelative: true,
+						...(workspaceFolder && { workspaceFolder }),
+					};
+					const resolvedPath = await resolvePathCanonical(
+						uri[0].fsPath,
+						options,
+					);
+					resolvedUri = vscode.Uri.file(resolvedPath);
+				} catch (_resolveError) {
+					// Continue with original URI if resolution fails
+					resolvedUri = uri[0];
+				}
+
 				// Get file stats to check size before reading
-				const stats = await vscode.workspace.fs.stat(uri[0]);
+				const stats = await vscode.workspace.fs.stat(resolvedUri);
 				const fileSizeError = validateFileSize(stats.size);
 
 				if (fileSizeError) {
@@ -97,7 +139,7 @@ export function registerImportSettingsCommand(
 				}
 
 				// Read and parse file
-				const fileContent = await vscode.workspace.fs.readFile(uri[0]);
+				const fileContent = await vscode.workspace.fs.readFile(resolvedUri);
 				const configJson = Buffer.from(fileContent).toString('utf8');
 
 				let parsedSettings: unknown;

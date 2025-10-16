@@ -233,16 +233,16 @@ Paths-LE is built for speed and handles files from 100KB to 30MB+. See [detailed
 
 | Format   | File Size | Throughput | Duration | Memory | Tested On     |
 | -------- | --------- | ---------- | -------- | ------ | ------------- |
-| **HTML** | 4K lines  | 1,130,508  | ~0.59    | < 1MB  | Apple Silicon |
-| **CSV**  | 0.5MB     | 521104     | ~43.12   | < 1MB  | Apple Silicon |
-| **CSV**  | 3MB       | 730169     | ~184.69  | ~27MB  | Apple Silicon |
-| **CSV**  | 10MB      | 736906     | ~610.01  | ~55MB  | Apple Silicon |
-| **CSV**  | 30MB      | 0          | ~1249.22 | < 1MB  | Apple Silicon |
-| **TOML** | 3K lines  | 191,065    | ~2.91    | < 1MB  | Apple Silicon |
-| **JSON** | 0.12MB    | 847119     | ~2.95    | < 1MB  | Apple Silicon |
-| **JSON** | 1.21MB    | 1152164    | ~21.72   | < 1MB  | Apple Silicon |
-| **JSON** | 6.07MB    | 1261793    | ~99.17   | < 1MB  | Apple Silicon |
-| **JSON** | 24.3MB    | 1153541    | ~433.93  | < 1MB  | Apple Silicon |
+| **HTML** | 4K lines  | 1,961,765  | ~0.34    | < 1MB  | Apple Silicon |
+| **CSV**  | 0.5MB     | 553299     | ~40.62   | < 1MB  | Apple Silicon |
+| **CSV**  | 3MB       | 939891     | ~143.49  | ~27MB  | Apple Silicon |
+| **CSV**  | 10MB      | 1009317    | ~445.4   | ~55MB  | Apple Silicon |
+| **CSV**  | 30MB      | 0          | ~1483.73 | < 1MB  | Apple Silicon |
+| **TOML** | 3K lines  | 105,104    | ~5.29    | < 1MB  | Apple Silicon |
+| **JSON** | 0.12MB    | 803537     | ~3.11    | < 1MB  | Apple Silicon |
+| **JSON** | 1.21MB    | 1294620    | ~19.33   | < 1MB  | Apple Silicon |
+| **JSON** | 6.07MB    | 2232358    | ~56.06   | < 1MB  | Apple Silicon |
+| **JSON** | 24.3MB    | 0          | ~243.8   | < 1MB  | Apple Silicon |
 
 **Real-World Performance**: Tested with actual data up to 30MB (practical limit: 1MB warning, 10MB error threshold)  
 **Performance Monitoring**: Built-in real-time tracking with configurable thresholds  
@@ -277,8 +277,8 @@ Up to 30MB. Practical limit: 10MB for optimal performance
 
 ## 📊 Testing
 
-**195 unit tests** • **89% function coverage, 80% line coverage**  
-Powered by Vitest • Run with `bun test --coverage`
+**217 unit tests** • **58.82% function coverage, 29.4% line coverage**  
+Powered by Vitest • Run with `bun run test:coverage`
 
 ### Test Suite Breakdown
 
@@ -301,21 +301,20 @@ Powered by Vitest • Run with `bun test --coverage`
 
 ### Performance Benchmarks (Internal)
 
-Real-world extraction speeds tested on **macOS (M1)**:
+Real-world extraction speeds tested on **macOS (Apple Silicon)**:
 
-- **HTML**: 2.3M paths/sec (12K lines, 0.56MB file, 12K paths extracted)
-- **JSON**: 1.1M paths/sec (5K items, 0.62MB file, 15K paths extracted)
-- **DOTENV**: 972K paths/sec (6K entries, 0.23MB file, 6K paths extracted)
-- **CSV**: 569K paths/sec (10K rows, 0.89MB file, 30K paths extracted)
-- **TOML**: 299K paths/sec (6K lines, 0.23MB file, 6K paths extracted)
-- **JavaScript**: 0 paths/sec (2K lines, 0.07MB file, 0 paths extracted)
+- **HTML**: 1.96M paths/sec (675 lines, 0.03MB file, 667 paths extracted)
+- **JSON**: 2.23M paths/sec (196K lines, 6.07MB file, 125K paths extracted)
+- **CSV**: 1.01M paths/sec (89K lines, 10MB file, 449K paths extracted)
+- **TOML**: 105K paths/sec (1.1K lines, 0.02MB file, 556 paths extracted)
+- **JavaScript**: 914K paths/sec (268 lines, 0.01MB file, 201 paths extracted)
 
 ### Running Tests Locally
 
 ```bash
-npm run test              # Run all 220 tests
-npm run test:coverage     # Generate detailed coverage report
-npm run test:watch        # Watch mode for development
+bun run test              # Run all 217 tests
+bun run test:coverage     # Generate detailed coverage report
+bun run test:watch        # Watch mode for development
 ```
 
 Coverage reports are generated in `coverage/` directory (open `coverage/index.html` for detailed view).

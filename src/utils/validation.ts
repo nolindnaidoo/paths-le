@@ -1,7 +1,12 @@
 import type { Configuration, ValidationResult } from '../types';
 import {
+	getWorkspaceFolderForPath,
+	type PathResolutionOptions,
+} from './pathResolver';
+import {
 	detectPathType,
 	isValidPath,
+	resolvePathCanonical,
 	validatePathFormat,
 } from './pathValidation';
 
@@ -29,7 +34,7 @@ export async function validatePaths(
 
 async function validateSinglePath(
 	path: string,
-	_config: Configuration,
+	config: Configuration,
 ): Promise<ValidationResult> {
 	// Validate path format
 	const formatValidation = validatePathFormat(path);
@@ -50,11 +55,10 @@ async function validateSinglePath(
 		};
 	}
 
-	// Simulate file system validation
+	// Detect path type
 	const pathType = detectPathType(path);
 
-	// For now, we'll simulate validation results
-	// In a real implementation, you'd check file system existence and permissions
+	// URLs don't need file system validation
 	if (pathType === 'url') {
 		return {
 			path,
@@ -63,11 +67,81 @@ async function validateSinglePath(
 		};
 	}
 
-	// Simulate validation result
-	return {
+	// Resolve path canonically if enabled in config
+	let resolvedPath = path;
+	try {
+		if (
+			config.validation?.enabled &&
+			(config.resolution?.resolveSymlinks ||
+				config.resolution?.resolveWorkspaceRelative)
+		) {
+			const workspaceFolder = getWorkspaceFolderForPath(path);
+			const resolveOptions: Partial<PathResolutionOptions> = {
+				resolveSymlinks: config.resolution?.resolveSymlinks ?? true,
+				resolveWorkspaceRelative:
+					config.resolution?.resolveWorkspaceRelative ?? true,
+				...(workspaceFolder && { workspaceFolder }),
+			};
+
+			resolvedPath = await resolvePathCanonical(path, resolveOptions);
+		}
+	} catch (_error) {
+		// If canonical resolution fails, continue with original path
+		resolvedPath = path;
+	}
+
+	// Perform file system checks if enabled
+	if (config.validation?.checkExistence) {
+		try {
+			// Use VS Code's file system API for better compatibility
+			const uri = require('vscode').Uri.file(resolvedPath);
+			const _stat = await require('vscode').workspace.fs.stat(uri);
+
+			const result: ValidationResult = {
+				path,
+				status: 'valid',
+				exists: true,
+			};
+
+			if (config.validation?.checkPermissions) {
+				result.permissions = 'read-write';
+			}
+
+			if (resolvedPath !== path) {
+				result.resolvedPath = resolvedPath;
+			}
+
+			return result;
+		} catch (_error) {
+			const result: ValidationResult = {
+				path,
+				status: 'invalid',
+				exists: false,
+				error: `File not found: ${resolvedPath}`,
+			};
+
+			if (resolvedPath !== path) {
+				result.resolvedPath = resolvedPath;
+			}
+
+			return result;
+		}
+	}
+
+	// If existence checking is disabled, assume valid
+	const result: ValidationResult = {
 		path,
 		status: 'valid',
 		exists: true,
-		permissions: 'read-write',
 	};
+
+	if (config.validation?.checkPermissions) {
+		result.permissions = 'read-write';
+	}
+
+	if (resolvedPath !== path) {
+		result.resolvedPath = resolvedPath;
+	}
+
+	return result;
 }

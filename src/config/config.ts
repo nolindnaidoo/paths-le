@@ -97,6 +97,19 @@ export function getConfiguration(): Configuration {
 					| 'performance'
 					| 'validation')
 			: 'balanced',
+		resolution: Object.freeze({
+			resolveSymlinks: Boolean(config.get('resolution.resolveSymlinks', true)),
+			resolveWorkspaceRelative: Boolean(
+				config.get('resolution.resolveWorkspaceRelative', true),
+			),
+		}),
+		validation: Object.freeze({
+			enabled: Boolean(config.get('validation.enabled', true)),
+			checkExistence: Boolean(config.get('validation.checkExistence', true)),
+			checkPermissions: Boolean(
+				config.get('validation.checkPermissions', false),
+			),
+		}),
 	});
 }
 

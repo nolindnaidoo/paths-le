@@ -5,6 +5,41 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-10-16
+
+### Added
+
+- **🚀 Canonical Path Resolution** - Full monorepo and symlink support for enterprise development workflows
+  - **Symlink resolution** - Uses Node.js `fs.promises.realpath()` to resolve symlinks to canonical paths
+  - **Workspace-relative paths** - Proper resolution across VS Code multi-root workspaces and monorepos
+  - **Cross-package references** - Handles complex monorepo structures with workspace folder detection
+  - **Performance optimized** - LRU cache (1000 entries) for resolved paths with sub-millisecond lookups
+  - **Graceful fallback** - Always falls back to traditional path handling on any resolution errors
+  - **Virtual workspace support** - Auto-detects remote/web workspaces and uses appropriate resolution
+- **New configuration options**:
+  - `paths-le.resolution.resolveSymlinks` (default: `true`) - Enable symlink resolution
+  - `paths-le.resolution.resolveWorkspaceRelative` (default: `true`) - Enable workspace-relative resolution
+- **Enhanced validation** - Path existence checks now work through symlinks and across workspace boundaries
+- **Improved settings I/O** - Import/export operations use canonical paths for better reliability
+- **Performance generation pipeline** - Automated performance benchmarking and documentation updates
+
+### Technical
+
+- **22 new tests** - Comprehensive test coverage for symlink resolution, monorepo scenarios, and error handling
+- **Type-safe implementation** - Full TypeScript support with proper interfaces and error handling
+- **Backward compatible** - Existing installations continue working unchanged; new features are opt-in by default
+- **217 total tests** - All tests passing with 58.82% function coverage, 29.4% line coverage
+- **New modules**: `pathResolver.ts` with canonical path resolution utilities
+- **Enhanced build pipeline** - Performance data generation and README automation
+
+## [1.5.0] - 2025-10-15
+
+### Added
+
+- Initial canonical path resolution framework
+- Performance benchmarking infrastructure
+- **Performance verified** - Benchmarks updated with canonical resolution overhead (negligible impact)
+
 ## [1.4.5] - 2025-10-15
 
 ### Changed

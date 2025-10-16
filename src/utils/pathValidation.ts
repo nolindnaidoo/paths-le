@@ -1,4 +1,9 @@
 import type { PathType } from '../types';
+import {
+	getWorkspaceFolderForPath,
+	type PathResolutionOptions,
+	safeResolvePath,
+} from './pathResolver';
 
 export function isValidPath(path: string): boolean {
 	if (!path || path.trim().length === 0) return false;
@@ -183,6 +188,55 @@ export function resolvePath(basePath: string, relativePath: string): string {
 	return normalizePath(resolved);
 }
 
+/**
+ * Resolve a path with canonical resolution support (symlinks and workspace-relative)
+ * This is the enhanced version that supports monorepo and symlink scenarios
+ */
+export async function resolvePathCanonical(
+	inputPath: string,
+	options?: Partial<PathResolutionOptions>,
+): Promise<string> {
+	const workspaceFolder =
+		options?.workspaceFolder || getWorkspaceFolderForPath(inputPath);
+
+	const resolveOptions: PathResolutionOptions = {
+		resolveSymlinks: options?.resolveSymlinks ?? true,
+		resolveWorkspaceRelative: options?.resolveWorkspaceRelative ?? true,
+		...(workspaceFolder && { workspaceFolder }),
+	};
+
+	return await safeResolvePath(inputPath, resolveOptions);
+}
+
+/**
+ * Enhanced path resolution that combines traditional and canonical approaches
+ * Falls back gracefully to traditional resolution if canonical fails
+ */
+export async function resolvePathEnhanced(
+	basePath: string,
+	relativePath: string,
+	options?: Partial<PathResolutionOptions>,
+): Promise<string> {
+	// First, do traditional resolution
+	const traditionalResolved = resolvePath(basePath, relativePath);
+
+	// If canonical resolution is disabled, return traditional result
+	if (
+		options?.resolveSymlinks === false &&
+		options?.resolveWorkspaceRelative === false
+	) {
+		return traditionalResolved;
+	}
+
+	// Try canonical resolution
+	try {
+		return await resolvePathCanonical(traditionalResolved, options);
+	} catch {
+		// Fallback to traditional resolution
+		return traditionalResolved;
+	}
+}
+
 export function isPathSafe(path: string): boolean {
 	// Check for path traversal attempts
 	if (path.includes('..') || path.includes('~')) {
@@ -316,3 +370,27 @@ function detectNamingConvention(basename: string): string {
 	if (basename === basename.toLowerCase()) return 'lowercase';
 	return 'mixed';
 }
+
+// Freeze all exports for immutability
+Object.freeze({
+	isValidPath,
+	detectPathType,
+	normalizePath,
+	getPathComponents,
+	getPathDepth,
+	isAbsolutePath,
+	isRelativePath,
+	isFilePath,
+	isDirectoryPath,
+	getFileExtension,
+	getDirectoryPath,
+	getFileName,
+	getBaseName,
+	resolvePath,
+	resolvePathCanonical,
+	resolvePathEnhanced,
+	isPathSafe,
+	validatePathFormat,
+	analyzePathPatterns,
+	getWorkspaceFolderForPath,
+});

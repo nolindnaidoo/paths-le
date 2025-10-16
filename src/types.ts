@@ -101,6 +101,7 @@ export interface ValidationResult {
 	exists?: boolean;
 	permissions?: string;
 	error?: string;
+	resolvedPath?: string;
 }
 
 export type FileType =
@@ -118,6 +119,17 @@ export type FileType =
 	| 'unknown';
 
 export type OutputFormat = 'text' | 'json' | 'csv';
+
+export interface PathResolutionConfig {
+	readonly resolveSymlinks: boolean;
+	readonly resolveWorkspaceRelative: boolean;
+}
+
+export interface ValidationConfig {
+	readonly enabled: boolean;
+	readonly checkExistence: boolean;
+	readonly checkPermissions: boolean;
+}
 
 export interface Configuration {
 	readonly copyToClipboardEnabled: boolean;
@@ -155,6 +167,8 @@ export interface Configuration {
 		| 'comprehensive'
 		| 'performance'
 		| 'validation';
+	readonly resolution?: PathResolutionConfig;
+	readonly validation?: ValidationConfig;
 }
 
 // Re-export utility types for easier access

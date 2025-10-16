@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
-	"version": "1.4.5",
+	"version": "1.6.0",
 	"license": "MIT",
 	"author": {
 		"name": "Nolin D Naidoo",
@@ -318,6 +318,16 @@
 						"%manifest.settings.presets.default.option.validation%"
 					],
 					"description": "%manifest.settings.presets.default.desc%"
+				},
+				"paths-le.resolution.resolveSymlinks": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.resolution.symlinks.desc%"
+				},
+				"paths-le.resolution.resolveWorkspaceRelative": {
+					"type": "boolean",
+					"default": true,
+					"description": "%manifest.settings.resolution.workspace.desc%"
 				}
 			}
 		}
@@ -334,6 +344,7 @@
 		"test:ui": "vitest --ui",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
+		"generate-perf-data": "bun run scripts/generate-perf-data.ts",
 		"vscode:prepublish": "npm run build && npm run copy:i18n",
 		"package": "npm run clean:i18n && mkdir -p release && npx vsce package --out release/${npm_package_name}-${npm_package_version}.vsix && npm run clean:i18n",
 		"package:ls": "vsce ls release/${npm_package_name}-${npm_package_version}.vsix --tree | cat",
