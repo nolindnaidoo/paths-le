@@ -5,6 +5,77 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.4] - 2025-10-16
+
+### Technical
+
+- **Code quality maintenance** - Ran lint:fix with 2 files fixed for code quality standards
+- **Package generation** - Created fresh extension package (paths-le-1.6.3.vsix)
+- **Build verification** - Verified all build processes and dependencies are working correctly
+
+## [1.6.3] - 2025-10-16
+
+### Security
+
+- **🔒 Security-First Implementation** - Complete security hardening for canonical path resolution
+  - Canonical path resolution now disabled by default (`resolveSymlinks: false`, `resolveWorkspaceRelative: false`)
+  - Added comprehensive security warnings in settings with markdown descriptions
+  - Implemented first-time security warning dialog with options to continue, disable, or learn more
+  - Added dedicated security considerations section to documentation
+
+### Added
+
+- **🔔 Enhanced Status Notifications** - Real-time feedback for canonical path resolution operations
+  - Progress indicators during canonical path resolution with security warnings
+  - Resolution success/failure notifications with resolved path counts
+  - Security warning indicators in status bar during operations
+- **🌐 Complete Internationalization** - Added English i18n strings for all canonical resolution features
+  - Security warning messages and dialogs
+  - Status bar notifications and progress indicators
+  - Configuration descriptions with security warnings
+
+### Technical
+
+- **Security dialog implementation** - One-time warning dialog with options to continue, disable, or learn more
+- **Enhanced error handling** - Improved fallback mechanisms for canonical resolution failures
+- **Configuration validation** - Proper default value handling for security settings
+
+## [1.6.2] - 2025-10-16
+
+### Fixed
+
+- **🔧 Canonical Path Resolution Integration** - Fixed critical bug where canonical path resolution wasn't being applied during path extraction
+  - Path extraction command now properly resolves symlinks and workspace-relative paths
+  - Extracted paths now show resolved canonical locations instead of symlink paths
+  - Maintains graceful fallback to original paths if resolution fails
+  - Respects user configuration settings for `resolveSymlinks` and `resolveWorkspaceRelative`
+
+### Security
+
+- **🔒 Security-First Defaults** - Canonical path resolution now disabled by default for security
+  - Changed default values: `resolveSymlinks: false`, `resolveWorkspaceRelative: false`
+  - Added security warnings in settings descriptions with markdown formatting
+  - Implemented first-time security warning dialog when canonical resolution is enabled
+  - Added comprehensive security documentation section
+
+### Added
+
+- **🔔 Enhanced Status Notifications** - Real-time feedback for canonical path resolution operations
+  - Progress indicators during canonical path resolution
+  - Resolution success/failure notifications with counts
+  - Security warning indicators in status bar
+- **🌐 Internationalization** - Added English i18n strings for canonical resolution features
+  - Security warning messages
+  - Status bar notifications
+  - Configuration descriptions with security warnings
+
+### Technical
+
+- **Updated extraction workflow** - Modified `src/commands/extract.ts` to apply canonical resolution to extracted paths
+- **Enhanced path processing** - Each extracted path is now resolved through the canonical resolution pipeline when enabled
+- **Improved error handling** - Robust fallback ensures extraction never fails due to resolution errors
+- **Security dialog implementation** - One-time warning dialog with options to continue, disable, or learn more
+
 ## [1.6.1] - 2025-10-16
 
 ### Added

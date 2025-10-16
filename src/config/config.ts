@@ -98,9 +98,9 @@ export function getConfiguration(): Configuration {
 					| 'validation')
 			: 'balanced',
 		resolution: Object.freeze({
-			resolveSymlinks: Boolean(config.get('resolution.resolveSymlinks', true)),
+			resolveSymlinks: Boolean(config.get('resolution.resolveSymlinks', false)),
 			resolveWorkspaceRelative: Boolean(
-				config.get('resolution.resolveWorkspaceRelative', true),
+				config.get('resolution.resolveWorkspaceRelative', false),
 			),
 		}),
 		validation: Object.freeze({

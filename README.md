@@ -81,6 +81,10 @@ Paths-LE intelligently detects file paths in multiple formats (absolute, relativ
 
   Handles both Windows and Unix path formats with intelligent normalization and validation.
 
+- **Canonical path resolution** 🆕 ⚠️
+
+  Full monorepo and symlink support for enterprise development workflows. Resolves symlinks to canonical paths and handles workspace-relative paths across VS Code multi-root workspaces. Perfect for complex monorepo structures with cross-package references. **Security Note**: Disabled by default as it may expose sensitive file system paths.
+
 - **Multi-language support**
 
   Available in 13 languages: English, Chinese (Simplified), German, Spanish, French, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Ukrainian, and Vietnamese.
@@ -234,16 +238,16 @@ Paths-LE is built for speed and handles files from 100KB to 30MB+. See [detailed
 
 | Format   | File Size | Throughput | Duration | Memory | Tested On     |
 | -------- | --------- | ---------- | -------- | ------ | ------------- |
-| **HTML** | 4K lines  | 1,961,765  | ~0.34    | < 1MB  | Apple Silicon |
-| **CSV**  | 0.5MB     | 553299     | ~40.62   | < 1MB  | Apple Silicon |
-| **CSV**  | 3MB       | 939891     | ~143.49  | ~27MB  | Apple Silicon |
-| **CSV**  | 10MB      | 1009317    | ~445.4   | ~55MB  | Apple Silicon |
-| **CSV**  | 30MB      | 0          | ~1483.73 | < 1MB  | Apple Silicon |
+| **HTML** | 4K lines  | 2,021,212  | ~0.33    | < 1MB  | Apple Silicon |
+| **CSV**  | 0.5MB     | 541305     | ~41.52   | < 1MB  | Apple Silicon |
+| **CSV**  | 3MB       | 865986     | ~155.73  | ~27MB  | Apple Silicon |
+| **CSV**  | 10MB      | 933250     | ~481.72  | ~55MB  | Apple Silicon |
+| **CSV**  | 30MB      | 0          | ~1307.2  | < 1MB  | Apple Silicon |
 | **TOML** | 3K lines  | 105,104    | ~5.29    | < 1MB  | Apple Silicon |
-| **JSON** | 0.12MB    | 803537     | ~3.11    | < 1MB  | Apple Silicon |
-| **JSON** | 1.21MB    | 1294620    | ~19.33   | < 1MB  | Apple Silicon |
-| **JSON** | 6.07MB    | 2232358    | ~56.06   | < 1MB  | Apple Silicon |
-| **JSON** | 24.3MB    | 0          | ~243.8   | < 1MB  | Apple Silicon |
+| **JSON** | 0.12MB    | 898921     | ~2.78    | < 1MB  | Apple Silicon |
+| **JSON** | 1.21MB    | 1253130    | ~19.97   | < 1MB  | Apple Silicon |
+| **JSON** | 6.07MB    | 2211718    | ~56.58   | < 1MB  | Apple Silicon |
+| **JSON** | 24.3MB    | 0          | ~253.36  | < 1MB  | Apple Silicon |
 
 **Real-World Performance**: Tested with actual data up to 30MB (practical limit: 1MB warning, 10MB error threshold)  
 **Performance Monitoring**: Built-in real-time tracking with configurable thresholds  
@@ -278,7 +282,7 @@ Up to 30MB. Practical limit: 10MB for optimal performance
 
 ## 📊 Testing
 
-**217 unit tests** • **58.82% function coverage, 29.4% line coverage**  
+**217 unit tests** • **58.25% function coverage, 27.89% line coverage**  
 Powered by Vitest • Run with `bun run test:coverage`
 
 ### Test Suite Breakdown
@@ -340,7 +344,58 @@ cd test-fixtures/monorepo-test
 code workspace.code-workspace
 ```
 
+**Testing the Feature:**
+
+1. **Enable canonical resolution** in VS Code settings:
+
+   - `Paths-le › Resolution: Resolve Symlinks` ✅
+   - `Paths-le › Resolution: Resolve Workspace Relative` ✅
+
+2. **Open test file**: `packages/frontend/src/symlink-test.js`
+
+3. **Run extraction**: `Paths-LE: Extract Paths` (`Cmd+Alt+P`)
+
+4. **Expected results**:
+   - **Before**: `./utils-link.js` (symlink path)
+   - **After**: `/full/path/to/packages/shared/src/utils.js` (resolved canonical path)
+
 The test fixture includes a complete monorepo with symlinks, cross-package imports, and comprehensive documentation for testing all canonical path resolution features.
+
+## 🔒 Security Considerations
+
+### Canonical Path Resolution
+
+**⚠️ IMPORTANT SECURITY NOTICE**: Canonical path resolution is **disabled by default** for security reasons.
+
+**Why it's disabled:**
+
+- May expose sensitive file system paths in extracted output
+- Could reveal internal directory structures
+- Might leak information about development environment setup
+
+**When to enable:**
+
+- ✅ Trusted development environments
+- ✅ Internal monorepo workflows
+- ✅ When you control the output destination
+- ❌ Public repositories or shared workspaces
+- ❌ When output might be shared externally
+
+**Security Settings:**
+
+```json
+{
+  "paths-le.resolution.resolveSymlinks": false, // Default: disabled
+  "paths-le.resolution.resolveWorkspaceRelative": false // Default: disabled
+}
+```
+
+**First-time Warning:**
+When you first enable canonical resolution, Paths-LE will show a security warning dialog with options to:
+
+- Continue with canonical resolution
+- Disable and continue with standard resolution
+- Learn more about security implications
 
 ---
 

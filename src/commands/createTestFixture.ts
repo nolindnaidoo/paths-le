@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as vscode from 'vscode';
 
 /**
  * Creates a test fixture for canonical path resolution testing
@@ -36,19 +36,34 @@ export function registerCreateTestFixtureCommand(
 						cancellable: false,
 					},
 					async (progress) => {
-						progress.report({ increment: 10, message: 'Creating directories...' });
+						progress.report({
+							increment: 10,
+							message: 'Creating directories...',
+						});
 						await createDirectoryStructure(testDir);
 
-						progress.report({ increment: 30, message: 'Creating test files...' });
+						progress.report({
+							increment: 30,
+							message: 'Creating test files...',
+						});
 						await createTestFiles(testDir);
 
-						progress.report({ increment: 30, message: 'Creating workspace configuration...' });
+						progress.report({
+							increment: 30,
+							message: 'Creating workspace configuration...',
+						});
 						await createWorkspaceConfig(testDir);
 
-						progress.report({ increment: 20, message: 'Creating setup script...' });
+						progress.report({
+							increment: 20,
+							message: 'Creating setup script...',
+						});
 						await createSetupScript(testDir);
 
-						progress.report({ increment: 10, message: 'Creating documentation...' });
+						progress.report({
+							increment: 10,
+							message: 'Creating documentation...',
+						});
 						await createDocumentation(testDir);
 					},
 				);
@@ -65,7 +80,10 @@ export function registerCreateTestFixtureCommand(
 					const workspaceFile = vscode.Uri.file(
 						path.join(testDir, 'workspace.code-workspace'),
 					);
-					await vscode.commands.executeCommand('vscode.openFolder', workspaceFile);
+					await vscode.commands.executeCommand(
+						'vscode.openFolder',
+						workspaceFile,
+					);
 				} else if (openChoice === 'Open Folder') {
 					const folderUri = vscode.Uri.file(testDir);
 					await vscode.commands.executeCommand('vscode.openFolder', folderUri);
@@ -313,7 +331,7 @@ echo "🚀 Ready to test! Open workspace.code-workspace in VS Code"
 	// Make script executable (Unix systems)
 	try {
 		await fs.chmod(path.join(baseDir, 'setup-symlinks.sh'), 0o755);
-	} catch (error) {
+	} catch (_error) {
 		// Ignore chmod errors on Windows
 	}
 }
