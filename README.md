@@ -42,7 +42,7 @@ Open a file, press `Ctrl+Alt+P` (`Cmd+Alt+P` on Mac), and every file path in the
 | CSV | `csv` | Path-like cells |
 | Environment | `dotenv`, `env` | Path-like variable values and names |
 
-Every extracted path carries its real line and column. Version strings (`1.8.1`), IPs, and `data:`/`javascript:` URLs are filtered out. Known limitation: bare domains like `example.com` are indistinguishable from filenames and are extracted.
+Positions are real source positions for JS/TS, JSON/JSONC, HTML, and CSS (exact line and column of the path); TOML positions are located in the source text and can be approximate for repeated identical values; CSV positions are row/cell coordinates. Version strings (`1.8.1`) and IP addresses are never treated as paths, and `data:`/`javascript:` URLs are excluded from HTML/CSS extraction. Known limitation: bare domains like `example.com` are indistinguishable from filenames and are extracted.
 
 ## Commands
 
@@ -61,11 +61,10 @@ Every extracted path carries its real line and column. Version strings (`1.8.1`)
 | `paths-le.openResultsSideBySide` | `true` | Open results beside the current editor |
 | `paths-le.postProcess.openInNewFile` | `true` | Open results in a new file (when not side-by-side) |
 | `paths-le.copyToClipboardEnabled` | `false` | Also copy results to the clipboard |
-| `paths-le.notificationsLevel` | `silent` | `all` / `important` / `silent` |
+| `paths-le.notificationsLevel` | `silent` | `all` = every notification, `important` = warnings + errors, `silent` = errors only |
 | `paths-le.safety.enabled` | `true` | Guardrails for very large files |
 | `paths-le.safety.fileSizeWarnBytes` | `1000000` | Refuse extraction above this file size |
 | `paths-le.safety.largeOutputLinesThreshold` | `50000` | Warn above this line count |
-| `paths-le.showParseErrors` | `false` | Surface parse errors as notifications |
 | `paths-le.statusBar.enabled` | `true` | Show the status bar item |
 | `paths-le.telemetryEnabled` | `false` | Local-only event log (see Privacy) |
 | `paths-le.resolution.resolveSymlinks` | `false` | ⚠️ Resolve symlinks to canonical paths |

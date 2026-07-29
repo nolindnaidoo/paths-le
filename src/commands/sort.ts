@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import type { Notifier } from '../ui/notifier';
 
 type SortOrder = 'asc' | 'desc' | 'length-asc' | 'length-desc';
 
@@ -7,13 +8,16 @@ interface SortOption {
 	readonly value: SortOrder;
 }
 
-export function registerSortCommand(context: vscode.ExtensionContext): void {
+export function registerSortCommand(
+	context: vscode.ExtensionContext,
+	notifier: Notifier,
+): void {
 	const command = vscode.commands.registerCommand(
 		'paths-le.postProcess.sort',
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showWarningMessage('No active editor found');
+				notifier.showWarning('No active editor found');
 				return;
 			}
 
@@ -28,9 +32,7 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 
 			await replaceDocumentContent(document, sorted);
 
-			vscode.window.showInformationMessage(
-				`Sorted ${sorted.length} paths (${sortOption.label})`,
-			);
+			notifier.showInfo(`Sorted ${sorted.length} paths (${sortOption.label})`);
 		},
 	);
 

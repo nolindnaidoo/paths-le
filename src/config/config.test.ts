@@ -27,7 +27,6 @@ describe('config defaults parity with package.json', () => {
 		'paths-le.safety.fileSizeWarnBytes': 'safetyFileSizeWarnBytes',
 		'paths-le.safety.largeOutputLinesThreshold':
 			'safetyLargeOutputLinesThreshold',
-		'paths-le.showParseErrors': 'showParseErrors',
 		'paths-le.statusBar.enabled': 'statusBarEnabled',
 		'paths-le.telemetryEnabled': 'telemetryEnabled',
 		'paths-le.resolution.resolveSymlinks': 'resolveSymlinks',

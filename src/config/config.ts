@@ -14,7 +14,6 @@ export const CONFIG_DEFAULTS = Object.freeze({
 	safetyEnabled: true,
 	safetyFileSizeWarnBytes: 1_000_000,
 	safetyLargeOutputLinesThreshold: 50_000,
-	showParseErrors: false,
 	statusBarEnabled: true,
 	telemetryEnabled: false,
 	resolveSymlinks: false,
@@ -57,11 +56,6 @@ export function getConfiguration(): Configuration {
 			'safety.largeOutputLinesThreshold',
 			CONFIG_DEFAULTS.safetyLargeOutputLinesThreshold,
 			100,
-		),
-		showParseErrors: readBoolean(
-			config,
-			'showParseErrors',
-			CONFIG_DEFAULTS.showParseErrors,
 		),
 		statusBarEnabled: readBoolean(
 			config,

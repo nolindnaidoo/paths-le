@@ -16,7 +16,9 @@ extraction/extract.ts   dispatcher: languageId -> FileType -> extractor
 extraction/heuristics.ts  THE single isPathLike + classifyPathType
 extraction/position.ts    offset -> {line, column} via newline index (1-based)
 extraction/formats/*.ts   one extractor per format, whole-content matching
-ui/                     notifier (window messages), statusBar, help webView
+ui/                     notifier (window messages, gated by notificationsLevel:
+                        all -> everything, important -> warn+error, silent -> error only),
+                        statusBar, help webView
 utils/                  errors (sanitizeErrorMessage), safety (size guards),
                         pathResolver (normalize + opt-in canonical resolution)
 config/config.ts        getConfiguration() snapshot; CONFIG_DEFAULTS table
@@ -29,7 +31,7 @@ Conventions: factory functions + `Object.freeze` (no classes), early returns, de
 
 - **The bundle must be self-contained.** The VSIX ships `dist/extension.js` only; `scripts/check-bundle.js` (run in `vscode:prepublish` and CI) does a static require scan AND loads the bundle with `vscode` stubbed. esbuild uses `--main-fields=module,main` because jsonc-parser's UMD build smuggles `require` through a factory parameter.
 - **`CONFIG_DEFAULTS` must equal package.json defaults.** `config.test.ts` asserts parity over every declared setting; add new settings to both plus the KEY_MAP in the test.
-- **Every declared setting must have a consumer.** v1 shipped 18 no-op settings; don't add a setting without wiring it.
+- **Every declared setting must have a consumer.** v1 shipped 19 no-op settings; don't add a setting without wiring it.
 - **Extractor behavior is pinned by golden snapshots** (`extraction/characterization.test.ts` + `__fixtures__/`). Any output change must update goldens in the same commit and be listed in the CHANGELOG.
 - **Extension-internal flags go in `context.globalState`,** never in undeclared `paths-le.*` config keys (VS Code rejects writes to unregistered keys).
 - **nls catalogues stay in key-parity:** all 12 locale files carry exactly the keys of `package.nls.json`.

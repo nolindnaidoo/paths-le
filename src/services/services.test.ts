@@ -5,6 +5,7 @@ import {
 	_registeredCommands,
 	_resetMockState,
 	_setConfig,
+	_shownMessages,
 	executedBuiltins,
 } from '../__mocks__/vscode';
 import { registerOpenSettingsCommand } from '../config/settings';
@@ -76,12 +77,35 @@ describe('statusBar', () => {
 	});
 });
 
-describe('notifier', () => {
-	it('forwards to window message functions', () => {
+describe('notifier respects notificationsLevel', () => {
+	it('silent (default): errors only', () => {
 		const notifier = createNotifier();
 		notifier.showInfo('i');
 		notifier.showWarning('w');
 		notifier.showError('e');
+		expect(_shownMessages().map((m) => m.kind)).toEqual(['error']);
+	});
+
+	it('important: warnings and errors', () => {
+		_setConfig('paths-le.notificationsLevel', 'important');
+		const notifier = createNotifier();
+		notifier.showInfo('i');
+		notifier.showWarning('w');
+		notifier.showError('e');
+		expect(_shownMessages().map((m) => m.kind)).toEqual(['warning', 'error']);
+	});
+
+	it('all: everything', () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		const notifier = createNotifier();
+		notifier.showInfo('i');
+		notifier.showWarning('w');
+		notifier.showError('e');
+		expect(_shownMessages().map((m) => m.kind)).toEqual([
+			'info',
+			'warning',
+			'error',
+		]);
 	});
 });
 

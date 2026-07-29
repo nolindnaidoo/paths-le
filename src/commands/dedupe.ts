@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
+import type { Notifier } from '../ui/notifier';
 
-export function registerDedupeCommand(context: vscode.ExtensionContext): void {
+export function registerDedupeCommand(
+	context: vscode.ExtensionContext,
+	notifier: Notifier,
+): void {
 	const command = vscode.commands.registerCommand(
 		'paths-le.postProcess.dedupe',
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showWarningMessage('No active editor found');
+				notifier.showWarning('No active editor found');
 				return;
 			}
 
@@ -28,7 +32,7 @@ export function registerDedupeCommand(context: vscode.ExtensionContext): void {
 			await vscode.workspace.applyEdit(edit);
 
 			const removedCount = lines.length - deduped.length;
-			vscode.window.showInformationMessage(
+			notifier.showInfo(
 				`Removed ${removedCount} duplicate paths (${deduped.length} remaining)`,
 			);
 		},

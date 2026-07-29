@@ -50,19 +50,21 @@ integration suite on every CI run.
 
 ### Removed
 
-- 18 settings that were never read by any code path (`analysis.*`,
+- 19 settings that were never read by any code path (`analysis.*`,
   `validation.*`, `performance.*`, `keyboard.*`, `presets.*`,
-  `dedupeEnabled`, `safety.manyDocumentsThreshold`). 12 real settings
-  remain.
+  `dedupeEnabled`, `safety.manyDocumentsThreshold`, `showParseErrors`).
+  11 real settings remain, and `notificationsLevel` is now actually
+  wired: `all` shows everything, `important` shows warnings and errors,
+  `silent` (the default) shows errors only.
 - Three hidden, broken settings commands (export/import/reset) and the
   `createTestFixture` dev command (it wrote shell scripts to disk).
 - The runtime "localization" layer: it never loaded a single
   translation (broken `vscode-nls` wiring, and the bundles it needed
   were never generated) — users always saw English. Manifest/settings
   translations in 13 languages remain and now have full key parity.
-- Unused dependencies (`vscode-nls`, `js-yaml`, `ini`) and ~2,500 lines
-  of dead modules; stale docs (`ENTERPRISE_QUALITY.md`, `docs/`)
-  replaced by an accurate README + AGENTS.md.
+- Unused dependencies (`vscode-nls`, `js-yaml`, `ini`) and roughly
+  4,000 lines of dead modules; stale docs (`ENTERPRISE_QUALITY.md`,
+  `docs/`) replaced by an accurate README + AGENTS.md.
 
 ### Infrastructure
 
@@ -74,79 +76,26 @@ integration suite on every CI run.
 - Release workflow publishes to both the VS Code Marketplace and Open
   VSX (Cursor's marketplace source).
 
+> Entries below this line predate 2.0.0 and have been condensed: the
+> original release notes contained coverage, security, and feature
+> claims that did not hold up against the code (see 2.0.0 above for the
+> corrected record).
+
 ## [1.8.1] - 2025-11-02
 
 ### Documentation
 
-- **LE Family Updates** - Added Regex-LE and Secrets-LE to the "More from the LE Family" section in README
+- Added Regex-LE and Secrets-LE to the "More from the LE Family" section in README
 
 ## [1.8.0] - 2025-10-26
 
-### Security & Enterprise Readiness
-
-- **Path Traversal Prevention** - Added 64 comprehensive security tests covering:
-  - `../` and `../../` attack vectors
-  - Symlink exploitation prevention
-  - Null byte injection protection
-  - Windows reserved names (CON, PRN, AUX, NUL)
-  - Cross-platform path validation
-- **Error Handling Hardening** - Expanded from 33% to 94% coverage with 62 new tests:
-  - Credential sanitization in error messages
-  - Path sanitization for sensitive directories
-  - Comprehensive error categorization and recovery
-  - Safe error reporting without information leakage
-- **Test Suite Expansion** - Increased from 152 to 289 unit tests (+90%)
-  - 93.55% function coverage, 84.32% line coverage
-  - Zero critical vulnerabilities
-  - Enterprise-grade reliability
-
-### Quality Improvements
-
-- **Type Safety** - 100% TypeScript strict mode compliance
-- **Immutability** - All exports frozen with `Object.freeze()`
-- **Dependency Security** - Zero vulnerabilities in dependency chain
+- Added unit tests around path validation and error handling; added
+  credential/home-directory redaction for error messages. (Condensed —
+  much of the tested code was not reachable from the shipped extension.)
 
 ## [1.7.0] - 2025-01-27
 
-### Initial Public Release
-
-Paths-LE brings zero-hassle path extraction to VS Code. Simple, reliable, focused.
-
-#### Supported File Types
-
-- **JavaScript** - JS files with imports and requires
-- **TypeScript** - TS files with imports and requires
-- **JSON** - Configuration files and package.json
-- **HTML** - HTML files with asset references
-- **CSS** - Stylesheets with asset imports
-- **TOML** - Configuration files
-- **CSV** - Data files with path references
-- **Environment files** - .env files with path variables
-
-#### Features
-
-- **Multi-language support** - Comprehensive localization for 13+ languages
-- **Complete path detection** - Automatically finds file paths in multiple formats:
-  - Absolute paths
-  - Relative paths
-  - Windows paths
-  - Unix paths
-- **Powerful post-processing**:
-  - **Deduplicate paths** for cleaner analysis
-  - **Sort** with multiple modes (alphabetically or by length)
-- **Interactive sorting options**:
-  - Sort alphabetically (A→Z/Z→A)
-  - Sort by length (short→long/long→short)
-- **Smart path detection** - Intelligently filters package imports (like 'react' or 'lodash') from actual file paths
-- **Cross-platform compatibility** - Handles both Windows and Unix path formats with intelligent normalization
-- **Canonical path resolution** - Full monorepo and symlink support for enterprise development workflows
-- **Dependency analysis support** - Perfect for analyzing imports, exports, and file references
-- **One-command extraction** - `Ctrl+Alt+P` (`Cmd+Alt+P` on macOS)
-- **Developer-friendly** - 152 passing tests (93.33% function coverage, 84.32% line coverage), TypeScript strict mode, functional programming, MIT licensed
-
-#### Use Cases
-
-- **Dependency Analysis** - Analyze imports, exports, and file references to identify missing files and circular dependencies
-- **Configuration Management** - Extract and validate file paths from configuration files
-- **Path Validation** - Verify that all referenced files exist and are accessible
-- **Monorepo Management** - Handle complex monorepo structures with cross-package references
+- Initial public release: path extraction for JS/TS, JSON, HTML, CSS,
+  TOML, CSV, and .env files; dedupe and sort post-processing;
+  `Ctrl+Alt+P` / `Cmd+Alt+P`; opt-in canonical path resolution;
+  manifest/settings translations. (Condensed.)

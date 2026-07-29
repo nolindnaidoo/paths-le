@@ -9,6 +9,7 @@ import {
 	_shownMessages,
 	appliedEdits,
 } from '../__mocks__/vscode';
+import { createNotifier } from '../ui/notifier';
 import { registerDedupeCommand } from './dedupe';
 import { registerSortCommand } from './sort';
 
@@ -28,14 +29,16 @@ beforeEach(() => {
 
 describe('paths-le.postProcess.dedupe', () => {
 	it('warns when no editor is active', async () => {
-		registerDedupeCommand(makeContext());
+		_setConfig('paths-le.notificationsLevel', 'important');
+		registerDedupeCommand(makeContext(), createNotifier());
 		await runCommand('paths-le.postProcess.dedupe');
 		expect(_shownMessages()[0]?.kind).toBe('warning');
 		expect(appliedEdits).toHaveLength(0);
 	});
 
 	it('removes duplicates and reports an honest count', async () => {
-		registerDedupeCommand(makeContext());
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerDedupeCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/a\n/b\n\n/a\n/c\n/b\n' }));
 		await runCommand('paths-le.postProcess.dedupe');
 
@@ -46,11 +49,21 @@ describe('paths-le.postProcess.dedupe', () => {
 			'Removed 2 duplicate paths (3 remaining)',
 		);
 	});
+
+	it('suppresses the success toast at the default silent level', async () => {
+		registerDedupeCommand(makeContext(), createNotifier());
+		_setActiveEditor(_createDocument({ content: '/a\n/a' }));
+		await runCommand('paths-le.postProcess.dedupe');
+
+		expect(appliedEdits).toHaveLength(1); // the edit still happens
+		expect(_shownMessages()).toHaveLength(0); // the toast does not
+	});
 });
 
 describe('paths-le.postProcess.sort', () => {
 	it('sorts alphabetically ascending via quick pick', async () => {
-		registerSortCommand(makeContext());
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerSortCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/c\n/a\n/b' }));
 		_respondToQuickPick(
 			(items) =>
@@ -65,7 +78,7 @@ describe('paths-le.postProcess.sort', () => {
 	});
 
 	it('sorts by length descending', async () => {
-		registerSortCommand(makeContext());
+		registerSortCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/ab\n/abcd\n/a' }));
 		_respondToQuickPick((items) =>
 			(items as Array<{ value: string }>).find(
@@ -78,7 +91,7 @@ describe('paths-le.postProcess.sort', () => {
 	});
 
 	it('does nothing when the quick pick is dismissed', async () => {
-		registerSortCommand(makeContext());
+		registerSortCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/b\n/a' }));
 		_respondToQuickPick(() => undefined);
 		await runCommand('paths-le.postProcess.sort');

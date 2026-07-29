@@ -16,7 +16,7 @@ export function registerCommands(
 	}>,
 ): void {
 	registerExtractCommand(context, deps);
-	registerDedupeCommand(context);
-	registerSortCommand(context);
+	registerDedupeCommand(context, deps.notifier);
+	registerSortCommand(context, deps.notifier);
 	registerHelpCommand(context, deps);
 }

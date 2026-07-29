@@ -12,7 +12,6 @@ function makeConfig(overrides: Partial<Configuration> = {}): Configuration {
 		safetyEnabled: true,
 		safetyFileSizeWarnBytes: 1_000_000,
 		safetyLargeOutputLinesThreshold: 50_000,
-		showParseErrors: false,
 		statusBarEnabled: true,
 		telemetryEnabled: false,
 		resolution: { resolveSymlinks: false, resolveWorkspaceRelative: false },
