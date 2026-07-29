@@ -1,22 +1,22 @@
 {
 	"name": "paths-le",
-	"publisher": "OffensiveEdge",
+	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
 	"version": "2.0.0",
 	"license": "MIT",
 	"author": {
-		"name": "OffensiveEdge",
-		"url": "https://github.com/OffensiveEdge"
+		"name": "nolindnaidoo",
+		"url": "https://github.com/nolindnaidoo"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/OffensiveEdge/paths-le.git"
+		"url": "https://github.com/nolindnaidoo/paths-le.git"
 	},
 	"bugs": {
-		"url": "https://github.com/OffensiveEdge/paths-le/issues"
+		"url": "https://github.com/nolindnaidoo/paths-le/issues"
 	},
-	"homepage": "https://github.com/OffensiveEdge/paths-le#readme",
+	"homepage": "https://github.com/nolindnaidoo/paths-le#readme",
 	"engines": {
 		"vscode": "^1.90.0",
 		"node": ">=20.0.0"

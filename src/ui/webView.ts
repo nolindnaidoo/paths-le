@@ -222,9 +222,9 @@ function getHelpHtml(): string {
 
     <h2>📚 Additional Resources</h2>
     <ul class="feature-list">
-        <li><strong>GitHub Repository</strong> - <a href="https://github.com/OffensiveEdge/paths-le">https://github.com/OffensiveEdge/paths-le</a></li>
-        <li><strong>Issues</strong> - <a href="https://github.com/OffensiveEdge/paths-le/issues">Report bugs and request features</a></li>
-        <li><strong>Documentation</strong> - <a href="https://github.com/OffensiveEdge/paths-le#readme">Complete documentation</a></li>
+        <li><strong>GitHub Repository</strong> - <a href="https://github.com/nolindnaidoo/paths-le">https://github.com/nolindnaidoo/paths-le</a></li>
+        <li><strong>Issues</strong> - <a href="https://github.com/nolindnaidoo/paths-le/issues">Report bugs and request features</a></li>
+        <li><strong>Documentation</strong> - <a href="https://github.com/nolindnaidoo/paths-le#readme">Complete documentation</a></li>
     </ul>
 
     <h2>🙏 Thank You!</h2>

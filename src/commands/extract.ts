@@ -150,7 +150,7 @@ async function handleCanonicalResolutionWarning(
 	if (choice === 'Learn More') {
 		await vscode.env.openExternal(
 			vscode.Uri.parse(
-				'https://github.com/OffensiveEdge/paths-le#security-considerations',
+				'https://github.com/nolindnaidoo/paths-le#privacy--security',
 			),
 		);
 		return false;
