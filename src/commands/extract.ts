@@ -57,7 +57,10 @@ export function registerExtractCommand(
 			);
 
 			if (canonicalEnabled) {
-				const shouldContinue = await handleCanonicalResolutionWarning(deps);
+				const shouldContinue = await handleCanonicalResolutionWarning(
+					context,
+					deps,
+				);
 				if (!shouldContinue) {
 					return;
 				}
@@ -110,14 +113,17 @@ function handleExtractionFailure(
 	);
 }
 
+const CANONICAL_WARNING_KEY = 'paths-le.canonicalWarningShown';
+
 async function handleCanonicalResolutionWarning(
+	context: vscode.ExtensionContext,
 	deps: Readonly<{ notifier: Notifier; statusBar: StatusBar }>,
 ): Promise<boolean> {
 	deps.statusBar.showProgress('⚠️ Resolving canonical paths...');
 
-	const context = vscode.workspace.getConfiguration('paths-le');
-	const warningShown = Boolean(
-		context.get('_internal.canonicalWarningShown', false),
+	const warningShown = context.globalState.get<boolean>(
+		CANONICAL_WARNING_KEY,
+		false,
 	);
 
 	if (warningShown) {
@@ -146,11 +152,7 @@ async function handleCanonicalResolutionWarning(
 	}
 
 	if (choice === 'Continue') {
-		await context.update(
-			'_internal.canonicalWarningShown',
-			true,
-			vscode.ConfigurationTarget.Global,
-		);
+		await context.globalState.update(CANONICAL_WARNING_KEY, true);
 		return true;
 	}
 
