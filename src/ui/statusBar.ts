@@ -10,35 +10,41 @@ export interface StatusBar {
 }
 
 export function createStatusBar(context: vscode.ExtensionContext): StatusBar {
-	const config = getConfiguration();
-	let statusBarItem: vscode.StatusBarItem | undefined;
+	const statusBarItem = vscode.window.createStatusBarItem(
+		vscode.StatusBarAlignment.Left,
+		100,
+	);
+	statusBarItem.text = IDLE_TEXT;
+	statusBarItem.tooltip = 'Paths-LE: File Path Extraction';
+	statusBarItem.command = 'paths-le.extractPaths';
+	context.subscriptions.push(statusBarItem);
 
-	if (config.statusBarEnabled) {
-		statusBarItem = vscode.window.createStatusBarItem(
-			vscode.StatusBarAlignment.Left,
-			100,
-		);
-		statusBarItem.text = IDLE_TEXT;
-		statusBarItem.tooltip = 'Paths-LE: File Path Extraction';
-		statusBarItem.command = 'paths-le.extractPaths';
-		statusBarItem.show();
+	const applyVisibility = (): void => {
+		if (getConfiguration().statusBarEnabled) {
+			statusBarItem.show();
+		} else {
+			statusBarItem.hide();
+		}
+	};
+	applyVisibility();
 
-		context.subscriptions.push(statusBarItem);
-	}
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeConfiguration((event) => {
+			if (event.affectsConfiguration('paths-le.statusBar.enabled')) {
+				applyVisibility();
+			}
+		}),
+	);
 
 	return Object.freeze({
 		showProgress(message: string): void {
-			if (statusBarItem) {
-				statusBarItem.text = `$(loading~spin) ${message}`;
-			}
+			statusBarItem.text = `$(loading~spin) ${message}`;
 		},
 		hideProgress(): void {
-			if (statusBarItem) {
-				statusBarItem.text = IDLE_TEXT;
-			}
+			statusBarItem.text = IDLE_TEXT;
 		},
 		dispose(): void {
-			statusBarItem?.dispose();
+			statusBarItem.dispose();
 		},
 	});
 }
