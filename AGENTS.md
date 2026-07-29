@@ -49,6 +49,8 @@ Conventions: factory functions + `Object.freeze` (no classes), early returns, de
 
 1. Bump `version` in package.json, add a CHANGELOG entry.
 2. CI green on all 3 OSes (includes packaging + integration tests).
+   Locally, `bun run package && bun run test:e2e-vsix` proves the actual
+   VSIX installs and works in a clean VS Code profile.
 3. `Release` workflow (manual dispatch) publishes to the VS Code Marketplace (`VSCE_PAT`) and Open VSX (`OVSX_PAT`) — Open VSX is what Cursor/VSCodium users install from. Locally: `bun run package` then `vsce publish` / `ovsx publish`.
 
 ## Known limitations (documented, not bugs)
