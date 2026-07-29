@@ -1,0 +1,5 @@
+{
+	// JSONC comment — current extractor fails to parse this file entirely
+	"entry": "./src/main.ts",
+	"assets": ["images/bg.png"],
+}

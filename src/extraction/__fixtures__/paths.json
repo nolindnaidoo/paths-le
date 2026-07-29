@@ -1,0 +1,19 @@
+{
+	"main": "./dist/index.js",
+	"version": "1.8.1",
+	"homepage": "https://example.com/docs",
+	"domain": "example.com",
+	"config": {
+		"output": "/var/log/app.log",
+		"temp": "C:\\Temp\\cache",
+		"empty": "",
+		"short": "ab"
+	},
+	"files": ["src/app.ts", "assets/logo.png", 42, null],
+	"name": "my-package",
+	"nested": {
+		"deep": {
+			"script": "../scripts/run.sh"
+		}
+	}
+}

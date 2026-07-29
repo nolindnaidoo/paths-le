@@ -1,0 +1,630 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`extraction characterization > comments.jsonc as jsonc 1`] = `
+{
+  "errors": [],
+  "paths": [],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.css as css 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "CSS @import",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "relative",
+      "value": "./base/reset.css",
+    },
+    {
+      "context": "CSS @import",
+      "position": {
+        "column": 1,
+        "line": 2,
+      },
+      "type": "relative",
+      "value": "../themes/dark.css",
+    },
+    {
+      "context": "CSS url()",
+      "position": {
+        "column": 14,
+        "line": 5,
+      },
+      "type": "absolute",
+      "value": "/assets/bg/hero.jpg",
+    },
+    {
+      "context": "CSS url()",
+      "position": {
+        "column": 10,
+        "line": 6,
+      },
+      "type": "file",
+      "value": "images/cursor.png",
+    },
+    {
+      "context": "CSS url()",
+      "position": {
+        "column": 8,
+        "line": 11,
+      },
+      "type": "url",
+      "value": "https://cdn.example.com/mask.svg",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.csv as csv 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "CSV cell [2,2]",
+      "position": {
+        "column": 2,
+        "line": 2,
+      },
+      "type": "absolute",
+      "value": "/srv/reports/q1.pdf",
+    },
+    {
+      "context": "CSV cell [4,2]",
+      "position": {
+        "column": 2,
+        "line": 4,
+      },
+      "type": "url",
+      "value": "https://example.net/index.html",
+    },
+    {
+      "context": "CSV cell [5,2]",
+      "position": {
+        "column": 2,
+        "line": 5,
+      },
+      "type": "file",
+      "value": "3.4.5",
+    },
+    {
+      "context": "CSV cell [7,2]",
+      "position": {
+        "column": 2,
+        "line": 7,
+      },
+      "type": "absolute",
+      "value": "C:\\Users\\dev\\file.txt",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.env as dotenv 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "Environment variable: LOG_FILE",
+      "position": {
+        "column": 9,
+        "line": 2,
+      },
+      "type": "absolute",
+      "value": "/var/log/service.log",
+    },
+    {
+      "context": "Environment variable: CACHE_DIR",
+      "position": {
+        "column": 10,
+        "line": 3,
+      },
+      "type": "relative",
+      "value": "./cache/primary",
+    },
+    {
+      "context": "Environment variable: API_URL",
+      "position": {
+        "column": 8,
+        "line": 4,
+      },
+      "type": "url",
+      "value": "https://api.example.com/v2",
+    },
+    {
+      "context": "Environment variable: WINDOWS_TMP",
+      "position": {
+        "column": 12,
+        "line": 5,
+      },
+      "type": "absolute",
+      "value": "C:\\Temp\\work",
+    },
+    {
+      "context": "Environment variable: VERSION",
+      "position": {
+        "column": 8,
+        "line": 6,
+      },
+      "type": "file",
+      "value": "1.2.3",
+    },
+    {
+      "context": "Environment variable: "./quoted/key.js"",
+      "position": {
+        "column": 18,
+        "line": 9,
+      },
+      "type": "relative",
+      "value": "./quoted/value.js",
+    },
+    {
+      "context": "Environment variable name",
+      "position": {
+        "column": 1,
+        "line": 9,
+      },
+      "type": "relative",
+      "value": "./quoted/key.js",
+    },
+    {
+      "context": "Environment variable: ./quoted/key.js",
+      "position": {
+        "column": 18,
+        "line": 9,
+      },
+      "type": "relative",
+      "value": "./quoted/value.js",
+    },
+    {
+      "context": "Environment variable name",
+      "position": {
+        "column": 1,
+        "line": 10,
+      },
+      "type": "relative",
+      "value": "./unquoted/key.sh",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.html as html 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "HTML href",
+      "position": {
+        "column": 25,
+        "line": 4,
+      },
+      "type": "relative",
+      "value": "./css/site.css",
+    },
+    {
+      "context": "HTML src",
+      "position": {
+        "column": 10,
+        "line": 5,
+      },
+      "type": "absolute",
+      "value": "/js/app.bundle.js",
+    },
+    {
+      "context": "HTML src",
+      "position": {
+        "column": 7,
+        "line": 8,
+      },
+      "type": "file",
+      "value": "images/logo.png",
+    },
+    {
+      "context": "HTML srcset",
+      "position": {
+        "column": 29,
+        "line": 8,
+      },
+      "type": "file",
+      "value": "images/logo.png",
+    },
+    {
+      "context": "HTML srcset",
+      "position": {
+        "column": 29,
+        "line": 8,
+      },
+      "type": "file",
+      "value": "images/logo@2x.png",
+    },
+    {
+      "context": "HTML href",
+      "position": {
+        "column": 5,
+        "line": 9,
+      },
+      "type": "url",
+      "value": "https://example.com/about",
+    },
+    {
+      "context": "HTML poster",
+      "position": {
+        "column": 9,
+        "line": 12,
+      },
+      "type": "absolute",
+      "value": "/media/poster.jpg",
+    },
+    {
+      "context": "HTML src",
+      "position": {
+        "column": 36,
+        "line": 12,
+      },
+      "type": "absolute",
+      "value": "/media/clip.mp4",
+    },
+    {
+      "context": "HTML action",
+      "position": {
+        "column": 8,
+        "line": 13,
+      },
+      "type": "relative",
+      "value": "../submit/handler.php",
+    },
+    {
+      "context": "HTML src",
+      "position": {
+        "column": 4,
+        "line": 15,
+      },
+      "type": "relative",
+      "value": "./split/across/lines.png",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.js as javascript 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 2,
+      },
+      "type": "relative",
+      "value": "./utils/helper",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 3,
+      },
+      "type": "relative",
+      "value": "../config/app.config.js",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 4,
+      },
+      "type": "url",
+      "value": "https://cdn.example.com/lib.js",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 5,
+      },
+      "type": "relative",
+      "value": "./styles/global.css",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 16,
+        "line": 6,
+      },
+      "type": "relative",
+      "value": "./legacy/module.js",
+    },
+    {
+      "context": "JS dynamic import",
+      "position": {
+        "column": 16,
+        "line": 8,
+      },
+      "type": "relative",
+      "value": "./dynamic/loader.js",
+    },
+    {
+      "context": "JS export",
+      "position": {
+        "column": 1,
+        "line": 9,
+      },
+      "type": "relative",
+      "value": "./exports/thing",
+    },
+    {
+      "context": "JS export",
+      "position": {
+        "column": 1,
+        "line": 10,
+      },
+      "type": "absolute",
+      "value": "/absolute/path/module",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 17,
+        "line": 16,
+      },
+      "type": "absolute",
+      "value": "C:\\\\Program Files\\\\app\\\\main.js",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 17,
+        "line": 17,
+      },
+      "type": "url",
+      "value": "file:///opt/data/blob.bin",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.js as typescript 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 2,
+      },
+      "type": "relative",
+      "value": "./utils/helper",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 3,
+      },
+      "type": "relative",
+      "value": "../config/app.config.js",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 4,
+      },
+      "type": "url",
+      "value": "https://cdn.example.com/lib.js",
+    },
+    {
+      "context": "JS import",
+      "position": {
+        "column": 1,
+        "line": 5,
+      },
+      "type": "relative",
+      "value": "./styles/global.css",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 16,
+        "line": 6,
+      },
+      "type": "relative",
+      "value": "./legacy/module.js",
+    },
+    {
+      "context": "JS dynamic import",
+      "position": {
+        "column": 16,
+        "line": 8,
+      },
+      "type": "relative",
+      "value": "./dynamic/loader.js",
+    },
+    {
+      "context": "JS export",
+      "position": {
+        "column": 1,
+        "line": 9,
+      },
+      "type": "relative",
+      "value": "./exports/thing",
+    },
+    {
+      "context": "JS export",
+      "position": {
+        "column": 1,
+        "line": 10,
+      },
+      "type": "absolute",
+      "value": "/absolute/path/module",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 17,
+        "line": 16,
+      },
+      "type": "absolute",
+      "value": "C:\\\\Program Files\\\\app\\\\main.js",
+    },
+    {
+      "context": "JS require",
+      "position": {
+        "column": 17,
+        "line": 17,
+      },
+      "type": "url",
+      "value": "file:///opt/data/blob.bin",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.json as json 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "JSON main",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "relative",
+      "value": "./dist/index.js",
+    },
+    {
+      "context": "JSON homepage",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "url",
+      "value": "https://example.com/docs",
+    },
+    {
+      "context": "JSON domain",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "file",
+      "value": "example.com",
+    },
+    {
+      "context": "JSON config.output",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "absolute",
+      "value": "/var/log/app.log",
+    },
+    {
+      "context": "JSON config.temp",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "absolute",
+      "value": "C:\\Temp\\cache",
+    },
+    {
+      "context": "JSON nested.deep.script",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "relative",
+      "value": "../scripts/run.sh",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.toml as toml 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "file",
+      "value": "2.1.0",
+    },
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "absolute",
+      "value": "/var/lib/appdata",
+    },
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "relative",
+      "value": "./logs/app.log",
+    },
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "absolute",
+      "value": "C:\\Backups\\daily",
+    },
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "url",
+      "value": "https://example.org/start",
+    },
+    {
+      "context": "TOML key",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "relative",
+      "value": "./relative/key.sh",
+    },
+    {
+      "context": "TOML value",
+      "position": {
+        "column": 1,
+        "line": 1,
+      },
+      "type": "file",
+      "value": "configs/alpha.toml",
+    },
+  ],
+  "success": true,
+}
+`;

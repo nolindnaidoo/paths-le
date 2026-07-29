@@ -1,0 +1,15 @@
+title = "Example config"
+version = "2.1.0"
+
+[paths]
+data_dir = "/var/lib/appdata"
+log_file = "./logs/app.log"
+backup = "C:\\Backups\\daily"
+homepage = "https://example.org/start"
+
+[tools."./relative/key.sh"]
+enabled = true
+
+[[servers]]
+name = "alpha"
+config = "configs/alpha.toml"

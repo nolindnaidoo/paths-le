@@ -1,0 +1,12 @@
+@import './base/reset.css';
+@import url("../themes/dark.css");
+
+body {
+	background: url('/assets/bg/hero.jpg');
+	cursor: url(images/cursor.png), auto;
+}
+
+.icon {
+	background-image: url(data:image/png;base64,iVBORw0KGgo=);
+	mask: url("https://cdn.example.com/mask.svg");
+}
