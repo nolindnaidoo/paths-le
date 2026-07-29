@@ -78,10 +78,10 @@ async function replaceDocumentContent(
 	lines: string[],
 ): Promise<void> {
 	const edit = new vscode.WorkspaceEdit();
-	edit.replace(
-		document.uri,
-		new vscode.Range(0, 0, document.lineCount, 0),
-		lines.join('\n'),
+	const fullRange = new vscode.Range(
+		document.positionAt(0),
+		document.lineAt(document.lineCount - 1).range.end,
 	);
+	edit.replace(document.uri, fullRange, lines.join('\n'));
 	await vscode.workspace.applyEdit(edit);
 }
