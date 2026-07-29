@@ -178,7 +178,7 @@
 				},
 				"paths-le.safety.fileSizeWarnBytes": {
 					"type": "number",
-					"default": 1000000.0,
+					"default": 1000000,
 					"minimum": 1000,
 					"description": "%manifest.settings.safety.warn.file-size.desc%"
 				},

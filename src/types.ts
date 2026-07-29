@@ -122,50 +122,18 @@ export interface PathResolutionConfig {
 	readonly resolveWorkspaceRelative: boolean;
 }
 
-export interface ValidationConfig {
-	readonly enabled: boolean;
-	readonly checkExistence: boolean;
-	readonly checkPermissions: boolean;
-}
-
 export interface Configuration {
 	readonly copyToClipboardEnabled: boolean;
-	readonly dedupeEnabled: boolean;
 	readonly notificationsLevel: 'all' | 'important' | 'silent';
 	readonly postProcessOpenInNewFile: boolean;
 	readonly openResultsSideBySide: boolean;
 	readonly safetyEnabled: boolean;
 	readonly safetyFileSizeWarnBytes: number;
 	readonly safetyLargeOutputLinesThreshold: number;
-	readonly safetyManyDocumentsThreshold: number;
 	readonly showParseErrors: boolean;
 	readonly statusBarEnabled: boolean;
 	readonly telemetryEnabled: boolean;
-	readonly analysisEnabled: boolean;
-	readonly analysisIncludeValidation: boolean;
-	readonly analysisIncludePatterns: boolean;
-	readonly validationEnabled: boolean;
-	readonly validationCheckExistence: boolean;
-	readonly validationCheckPermissions: boolean;
-	readonly performanceEnabled: boolean;
-	readonly performanceMaxDuration: number;
-	readonly performanceMaxMemoryUsage: number;
-	readonly performanceMaxCpuUsage: number;
-	readonly performanceMinThroughput: number;
-	readonly performanceMaxCacheSize: number;
-	readonly keyboardShortcutsEnabled: boolean;
-	readonly keyboardExtractShortcut: string;
-	readonly keyboardValidateShortcut: string;
-	readonly keyboardAnalyzeShortcut: string;
-	readonly presetsEnabled: boolean;
-	readonly defaultPreset:
-		| 'minimal'
-		| 'balanced'
-		| 'comprehensive'
-		| 'performance'
-		| 'validation';
-	readonly resolution?: PathResolutionConfig;
-	readonly validation?: ValidationConfig;
+	readonly resolution: PathResolutionConfig;
 }
 
 // Re-export utility types for easier access
