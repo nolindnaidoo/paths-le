@@ -1,7 +1,4 @@
 import * as vscode from 'vscode';
-import * as nls from 'vscode-nls';
-
-const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
 
 type SortOrder = 'asc' | 'desc' | 'length-asc' | 'length-desc';
 
@@ -16,9 +13,7 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				vscode.window.showWarningMessage(
-					localize('runtime.sort.no-editor', 'No active editor found'),
-				);
+				vscode.window.showWarningMessage('No active editor found');
 				return;
 			}
 
@@ -34,12 +29,7 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 			await replaceDocumentContent(document, sorted);
 
 			vscode.window.showInformationMessage(
-				localize(
-					'runtime.sort.success',
-					'Sorted {0} paths ({1})',
-					sorted.length,
-					sortOption.label,
-				),
+				`Sorted ${sorted.length} paths (${sortOption.label})`,
 			);
 		},
 	);
@@ -49,32 +39,14 @@ export function registerSortCommand(context: vscode.ExtensionContext): void {
 
 async function promptSortOrder(): Promise<SortOption | undefined> {
 	const options: SortOption[] = [
-		{
-			label: localize('runtime.sort.pick.alpha-asc', 'Alphabetical (A → Z)'),
-			value: 'asc',
-		},
-		{
-			label: localize('runtime.sort.pick.alpha-desc', 'Alphabetical (Z → A)'),
-			value: 'desc',
-		},
-		{
-			label: localize(
-				'runtime.sort.pick.length-asc',
-				'By Length (Short → Long)',
-			),
-			value: 'length-asc',
-		},
-		{
-			label: localize(
-				'runtime.sort.pick.length-desc',
-				'By Length (Long → Short)',
-			),
-			value: 'length-desc',
-		},
+		{ label: 'Alphabetical (A → Z)', value: 'asc' },
+		{ label: 'Alphabetical (Z → A)', value: 'desc' },
+		{ label: 'By Length (Short → Long)', value: 'length-asc' },
+		{ label: 'By Length (Long → Short)', value: 'length-desc' },
 	];
 
 	return vscode.window.showQuickPick(options, {
-		placeHolder: localize('runtime.sort.pick.placeholder', 'Select sort order'),
+		placeHolder: 'Select sort order',
 	});
 }
 

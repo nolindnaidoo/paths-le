@@ -3,7 +3,6 @@ import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
 import type { ErrorHandler } from '../utils/errorHandling';
-import type { Localizer } from '../utils/localization';
 import type { PerformanceMonitor } from '../utils/performance';
 import { registerCreateTestFixtureCommand } from './createTestFixture';
 import { registerDedupeCommand } from './dedupe';
@@ -17,7 +16,6 @@ export function registerCommands(
 		telemetry: Telemetry;
 		notifier: Notifier;
 		statusBar: StatusBar;
-		localizer: Localizer;
 		performanceMonitor: PerformanceMonitor;
 		errorHandler: ErrorHandler;
 	}>,

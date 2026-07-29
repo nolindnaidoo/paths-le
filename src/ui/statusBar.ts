@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
-import * as nls from 'vscode-nls';
 import { getConfiguration } from '../config/config';
 
-const localize = nls.config({ messageFormat: nls.MessageFormat.file })();
+const IDLE_TEXT = '$(file-directory) Paths-LE';
 
 export interface StatusBar {
 	showProgress(message: string): void;
@@ -19,14 +18,8 @@ export function createStatusBar(context: vscode.ExtensionContext): StatusBar {
 			vscode.StatusBarAlignment.Left,
 			100,
 		);
-		statusBarItem.text = localize(
-			'runtime.statusbar.text',
-			'$(file-directory) Paths-LE',
-		);
-		statusBarItem.tooltip = localize(
-			'runtime.statusbar.tooltip',
-			'Paths-LE: File Path Extraction',
-		);
+		statusBarItem.text = IDLE_TEXT;
+		statusBarItem.tooltip = 'Paths-LE: File Path Extraction';
 		statusBarItem.command = 'paths-le.extractPaths';
 		statusBarItem.show();
 
@@ -41,10 +34,7 @@ export function createStatusBar(context: vscode.ExtensionContext): StatusBar {
 		},
 		hideProgress(): void {
 			if (statusBarItem) {
-				statusBarItem.text = localize(
-					'runtime.statusbar.text',
-					'$(file-directory) Paths-LE',
-				);
+				statusBarItem.text = IDLE_TEXT;
 			}
 		},
 		dispose(): void {
