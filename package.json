@@ -3,7 +3,7 @@
 	"publisher": "OffensiveEdge",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction and analysis from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
-	"version": "1.8.1",
+	"version": "2.0.0",
 	"license": "MIT",
 	"author": {
 		"name": "OffensiveEdge",
