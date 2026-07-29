@@ -4,46 +4,15 @@ export interface ExtractionResult {
 	errors: readonly ParseError[];
 }
 
-export type ErrorCategory =
-	| 'parsing'
-	| 'format'
-	| 'validation'
-	| 'file-system'
-	| 'configuration'
-	| 'path-validation'
-	| 'analysis'
-	| 'performance'
-	| 'unknown';
-
-export type ErrorSeverity = 'info' | 'warning' | 'error' | 'critical';
-
-export type RecoveryAction =
-	| 'retry'
-	| 'fallback'
-	| 'user-action'
-	| 'skip'
-	| 'abort'
-	| 'none';
-
-export interface PathsLeError {
-	readonly category: ErrorCategory;
-	readonly severity: ErrorSeverity;
+export interface ParseError {
+	readonly category: 'parsing' | 'format';
+	readonly severity: 'info' | 'warning' | 'error';
 	readonly message: string;
 	readonly context?: string;
 	readonly recoverable: boolean;
-	readonly recoveryAction: RecoveryAction;
+	readonly recoveryAction: 'retry' | 'skip' | 'none';
 	readonly timestamp: number;
-	readonly stack?: string;
 	readonly metadata?: Readonly<Record<string, unknown>>;
-}
-
-export interface ParseError extends PathsLeError {
-	readonly category: 'parsing' | 'format';
-	readonly filepath?: string;
-	readonly position?: {
-		readonly line: number;
-		readonly column: number;
-	};
 }
 
 export interface Path {
@@ -56,53 +25,7 @@ export interface Path {
 	context: string;
 }
 
-export type PathType =
-	| 'file'
-	| 'directory'
-	| 'relative'
-	| 'absolute'
-	| 'url'
-	| 'unknown';
-
-export interface AnalysisResult {
-	count: number;
-	unique: number;
-	duplicates: number;
-	types: Record<string, number>;
-	validation?: ValidationAnalysis;
-	patterns?: PatternAnalysis;
-}
-
-export interface ValidationAnalysis {
-	valid: number;
-	invalid: number;
-	broken: number;
-	inaccessible: number;
-	permissions: Record<string, number>;
-}
-
-export interface PatternAnalysis {
-	commonPatterns: CommonPattern[];
-	depthDistribution: Record<string, number>;
-	namingConventions: Record<string, number>;
-	extensions: Record<string, number>;
-}
-
-export interface CommonPattern {
-	pattern: string;
-	count: number;
-	percentage: number;
-	examples: string[];
-}
-
-export interface ValidationResult {
-	path: string;
-	status: 'valid' | 'invalid' | 'broken' | 'inaccessible';
-	exists?: boolean;
-	permissions?: string;
-	error?: string;
-	resolvedPath?: string;
-}
+export type PathType = 'file' | 'relative' | 'absolute' | 'url' | 'unknown';
 
 export type FileType =
 	| 'json'
@@ -114,8 +37,6 @@ export type FileType =
 	| 'toml'
 	| 'dotenv'
 	| 'unknown';
-
-export type OutputFormat = 'text' | 'json' | 'csv';
 
 export interface PathResolutionConfig {
 	readonly resolveSymlinks: boolean;
@@ -135,10 +56,3 @@ export interface Configuration {
 	readonly telemetryEnabled: boolean;
 	readonly resolution: PathResolutionConfig;
 }
-
-// Re-export utility types for easier access
-export type {
-	ErrorHandler,
-	ErrorLogger,
-	ErrorNotifier,
-} from './utils/errorHandling';

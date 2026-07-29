@@ -2,7 +2,6 @@ import type * as vscode from 'vscode';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
-import type { ErrorHandler } from '../utils/errorHandling';
 import { registerDedupeCommand } from './dedupe';
 import { registerExtractCommand } from './extract';
 import { registerHelpCommand } from './help';
@@ -14,7 +13,6 @@ export function registerCommands(
 		telemetry: Telemetry;
 		notifier: Notifier;
 		statusBar: StatusBar;
-		errorHandler: ErrorHandler;
 	}>,
 ): void {
 	registerExtractCommand(context, deps);

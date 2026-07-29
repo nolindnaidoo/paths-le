@@ -4,8 +4,11 @@ import { extractPaths } from '../extraction/extract';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
-import { getWorkspaceFolderForPath } from '../utils/pathResolver';
-import { resolvePathCanonical } from '../utils/pathValidation';
+import { sanitizeErrorMessage } from '../utils/errors';
+import {
+	getWorkspaceFolderForPath,
+	resolvePathCanonical,
+} from '../utils/pathResolver';
 import { handleSafetyChecks } from '../utils/safety';
 
 export function registerExtractCommand(
@@ -109,7 +112,9 @@ function handleExtractionFailure(
 	}
 
 	deps.notifier.showError(
-		`Failed to extract paths: ${firstError.message ?? 'Unknown error'}`,
+		sanitizeErrorMessage(
+			`Failed to extract paths: ${firstError.message ?? 'Unknown error'}`,
+		),
 	);
 }
 
