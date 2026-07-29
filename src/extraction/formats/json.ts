@@ -1,105 +1,62 @@
+import { type Node, parseTree } from 'jsonc-parser';
 import type { Path } from '../../types';
+import { classifyPathType, isPathLike } from '../heuristics';
+import { createPositionIndex, type PositionIndex } from '../position';
 
 /**
- * Extract paths from JSON files
- * Recursively searches for path-like string values
+ * Extract paths from JSON/JSONC string values.
+ * jsonc-parser provides real node offsets (v1.x reported every path at
+ * 1:1) and tolerates comments and trailing commas, so .jsonc documents
+ * extract instead of silently returning nothing.
  */
 export function extractFromJson(content: string): Path[] {
 	if (content.trim().length === 0) return [];
 
-	try {
-		const parsed = JSON.parse(content);
-		const paths: Path[] = [];
-		extractPathsFromValue(parsed, paths, [], 1);
-		return paths;
-	} catch (_error) {
-		// Return empty array on parse error
-		return [];
-	}
+	const root = parseTree(content, undefined, {
+		allowTrailingComma: true,
+		disallowComments: false,
+	});
+	if (!root) return [];
+
+	const toPosition = createPositionIndex(content);
+	const paths: Path[] = [];
+	visitNode(root, [], paths, toPosition);
+	return paths;
 }
 
-/**
- * Recursively extract paths from a JSON value
- */
-function extractPathsFromValue(
-	value: unknown,
-	paths: Path[],
+function visitNode(
+	node: Node,
 	keyPath: string[],
-	lineOffset: number,
+	paths: Path[],
+	toPosition: PositionIndex,
 ): void {
-	if (typeof value === 'string' && isPathLike(value)) {
-		paths.push({
-			value,
-			type: classifyPathType(value),
-			position: {
-				line: lineOffset,
-				column: 1,
-			},
-			context: `JSON ${keyPath.length > 0 ? keyPath.join('.') : 'value'}`,
+	if (node.type === 'string' && typeof node.value === 'string') {
+		const value = node.value;
+		if (isPathLike(value)) {
+			paths.push({
+				value,
+				type: classifyPathType(value),
+				// +1 skips the opening quote so the position points at the path
+				position: toPosition(node.offset + 1),
+				context: `JSON ${keyPath.length > 0 ? keyPath.join('.') : 'value'}`,
+			});
+		}
+		return;
+	}
+
+	if (node.type === 'array') {
+		node.children?.forEach((child, index) => {
+			visitNode(child, [...keyPath, `[${index}]`], paths, toPosition);
 		});
-	} else if (Array.isArray(value)) {
-		for (let i = 0; i < value.length; i++) {
-			extractPathsFromValue(
-				value[i],
-				paths,
-				[...keyPath, `[${i}]`],
-				lineOffset,
-			);
-		}
-	} else if (value && typeof value === 'object') {
-		for (const [key, val] of Object.entries(value)) {
-			extractPathsFromValue(val, paths, [...keyPath, key], lineOffset);
+		return;
+	}
+
+	if (node.type === 'object') {
+		for (const property of node.children ?? []) {
+			const [keyNode, valueNode] = property.children ?? [];
+			if (!keyNode || !valueNode) continue;
+			const key = typeof keyNode.value === 'string' ? keyNode.value : '';
+			visitNode(valueNode, [...keyPath, key], paths, toPosition);
 		}
 	}
-}
-
-/**
- * Check if a string looks like a file path
- */
-function isPathLike(value: string): boolean {
-	if (!value || value.length < 3) return false;
-
-	// Common path patterns
-	const patterns = [
-		/^\/[^"'<>|*?]+(?:\/[^"'<>|*?]*)*$/, // Unix absolute paths
-		/^[A-Za-z]:\\[^"'<>|*?]+(?:\\[^"'<>|*?]*)*$/, // Windows absolute paths
-		/^\.\.?\/[^"'<>|*?]+(?:\/[^"'<>|*?]*)*$/, // Relative paths
-		/^https?:\/\/[^"'<>|*?\s]+$/, // URLs
-		/^file:\/\/[^"'<>|*?\s]+$/, // File URLs
-		/^[^"'<>|*?\s/\\]{3,}\.[a-zA-Z]{2,}$/, // Files with extensions (min 3 chars before dot, 2+ letter extension)
-	];
-
-	return patterns.some((pattern) => pattern.test(value));
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('file://')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (
-		path.startsWith('C:\\') ||
-		path.startsWith('D:\\') ||
-		/^[A-Za-z]:\\/.test(path)
-	) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
 }

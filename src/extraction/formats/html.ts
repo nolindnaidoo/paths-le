@@ -1,118 +1,79 @@
 import type { Path } from '../../types';
+import { classifyPathType } from '../heuristics';
+import { createPositionIndex } from '../position';
 
 /**
- * Extract paths from HTML files
- * Extracts standard path attributes: src, href, data, action, poster, etc.
+ * Extract paths from HTML attributes (src, href, srcset, action, …).
+ * Whole-content matching, so attributes inside multi-line tags are
+ * found; columns point at the attribute value, and each srcset entry
+ * gets its own real position.
  */
+
+const ATTRIBUTE_PATTERN =
+	/\b(src|href|data|action|poster|background|cite|formaction|icon|manifest|srcset)\s*=\s*(["'])([^"']+)\2/dgi;
+
 export function extractFromHtml(content: string): Path[] {
 	if (content.trim().length === 0) return [];
 
+	const toPosition = createPositionIndex(content);
 	const paths: Path[] = [];
-	const lines = content.split('\n');
 
-	// Pattern for standard path attributes
-	const attributePattern =
-		/(src|href|data|action|poster|background|cite|formaction|icon|manifest|srcset)\s*=\s*["']([^"']+)["']/gi;
+	ATTRIBUTE_PATTERN.lastIndex = 0;
+	let match: RegExpExecArray | null;
 
-	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-		const line = lines[lineIndex];
-		if (!line) continue;
+	while ((match = ATTRIBUTE_PATTERN.exec(content)) !== null) {
+		const attrName = match[1]?.toLowerCase();
+		const attrValue = match[3];
+		const indices = match.indices?.[3];
+		if (!attrName || !attrValue || !indices) continue;
 
-		attributePattern.lastIndex = 0;
-		let match: RegExpExecArray | null;
+		const valueOffset = indices[0];
 
-		while ((match = attributePattern.exec(line)) !== null) {
-			const attrName = match[1]?.toLowerCase();
-			const attrValue = match[2];
-
-			if (!attrValue) continue;
-
-			// Handle srcset specially (can have multiple URLs)
-			if (attrName === 'srcset') {
-				extractFromSrcset(attrValue, lineIndex, match.index, paths);
-			} else if (!isDataUrl(attrValue) && !isJavaScriptUrl(attrValue)) {
-				paths.push({
-					value: attrValue,
-					type: classifyPathType(attrValue),
-					position: {
-						line: lineIndex + 1,
-						column: match.index + 1,
-					},
-					context: `HTML ${attrName}`,
-				});
-			}
+		if (attrName === 'srcset') {
+			extractFromSrcset(attrValue, valueOffset, paths, toPosition);
+			continue;
 		}
+
+		if (isExcluded(attrValue)) continue;
+
+		paths.push({
+			value: attrValue,
+			type: classifyPathType(attrValue),
+			position: toPosition(valueOffset),
+			context: `HTML ${attrName}`,
+		});
 	}
 
 	return paths;
 }
 
 /**
- * Extract paths from srcset attribute (can have multiple URLs with descriptors)
- * Format: "image1.jpg 1x, image2.jpg 2x" or "image1.jpg 480w, image2.jpg 800w"
+ * srcset holds multiple URLs with descriptors:
+ * "image1.jpg 1x, image2.jpg 2x". Each entry's offset is computed
+ * within the attribute value so every URL gets its own position.
  */
 function extractFromSrcset(
 	srcset: string,
-	lineIndex: number,
-	columnIndex: number,
+	baseOffset: number,
 	paths: Path[],
+	toPosition: (offset: number) => { line: number; column: number },
 ): void {
-	const entries = srcset.split(',');
-	for (const entry of entries) {
-		// Split by whitespace and take first part (the URL)
+	let cursor = 0;
+	for (const entry of srcset.split(',')) {
+		const trimmedStart = cursor + (entry.length - entry.trimStart().length);
 		const url = entry.trim().split(/\s+/)[0];
-		if (url && !isDataUrl(url)) {
+		if (url && !isExcluded(url)) {
 			paths.push({
 				value: url,
 				type: classifyPathType(url),
-				position: {
-					line: lineIndex + 1,
-					column: columnIndex + 1,
-				},
+				position: toPosition(baseOffset + trimmedStart),
 				context: 'HTML srcset',
 			});
 		}
+		cursor += entry.length + 1; // +1 for the comma
 	}
 }
 
-/**
- * Check if a URL is a data URL (should be excluded)
- */
-function isDataUrl(value: string): boolean {
-	return value.startsWith('data:');
-}
-
-/**
- * Check if a URL is a JavaScript URL (should be excluded)
- */
-function isJavaScriptUrl(value: string): boolean {
-	return value.startsWith('javascript:');
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('//')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.startsWith('#')) {
-		return 'unknown'; // Fragment identifier
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
+function isExcluded(value: string): boolean {
+	return value.startsWith('data:') || value.startsWith('javascript:');
 }

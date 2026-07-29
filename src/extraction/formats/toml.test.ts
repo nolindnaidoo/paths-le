@@ -65,7 +65,11 @@ log = "./logs/app.log"`;
 		const result = extractFromToml(content);
 		expect(result[0]?.position).toEqual({
 			line: 1,
-			column: 1,
+			column: 11, // start of the value inside the quotes
+		});
+		expect(result[1]?.position).toEqual({
+			line: 2,
+			column: 8,
 		});
 	});
 

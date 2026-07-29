@@ -3,7 +3,26 @@
 exports[`extraction characterization > comments.jsonc as jsonc 1`] = `
 {
   "errors": [],
-  "paths": [],
+  "paths": [
+    {
+      "context": "JSON entry",
+      "position": {
+        "column": 12,
+        "line": 3,
+      },
+      "type": "relative",
+      "value": "./src/main.ts",
+    },
+    {
+      "context": "JSON assets.[0]",
+      "position": {
+        "column": 14,
+        "line": 4,
+      },
+      "type": "file",
+      "value": "images/bg.png",
+    },
+  ],
   "success": true,
 }
 `;
@@ -15,7 +34,7 @@ exports[`extraction characterization > paths.css as css 1`] = `
     {
       "context": "CSS @import",
       "position": {
-        "column": 1,
+        "column": 10,
         "line": 1,
       },
       "type": "relative",
@@ -24,7 +43,7 @@ exports[`extraction characterization > paths.css as css 1`] = `
     {
       "context": "CSS @import",
       "position": {
-        "column": 1,
+        "column": 14,
         "line": 2,
       },
       "type": "relative",
@@ -33,7 +52,7 @@ exports[`extraction characterization > paths.css as css 1`] = `
     {
       "context": "CSS url()",
       "position": {
-        "column": 14,
+        "column": 19,
         "line": 5,
       },
       "type": "absolute",
@@ -42,7 +61,7 @@ exports[`extraction characterization > paths.css as css 1`] = `
     {
       "context": "CSS url()",
       "position": {
-        "column": 10,
+        "column": 14,
         "line": 6,
       },
       "type": "file",
@@ -51,7 +70,7 @@ exports[`extraction characterization > paths.css as css 1`] = `
     {
       "context": "CSS url()",
       "position": {
-        "column": 8,
+        "column": 13,
         "line": 11,
       },
       "type": "url",
@@ -76,6 +95,15 @@ exports[`extraction characterization > paths.csv as csv 1`] = `
       "value": "/srv/reports/q1.pdf",
     },
     {
+      "context": "CSV cell [3,2]",
+      "position": {
+        "column": 2,
+        "line": 3,
+      },
+      "type": "relative",
+      "value": "./images/avatar with space.png",
+    },
+    {
       "context": "CSV cell [4,2]",
       "position": {
         "column": 2,
@@ -83,15 +111,6 @@ exports[`extraction characterization > paths.csv as csv 1`] = `
       },
       "type": "url",
       "value": "https://example.net/index.html",
-    },
-    {
-      "context": "CSV cell [5,2]",
-      "position": {
-        "column": 2,
-        "line": 5,
-      },
-      "type": "file",
-      "value": "3.4.5",
     },
     {
       "context": "CSV cell [7,2]",
@@ -114,7 +133,7 @@ exports[`extraction characterization > paths.env as dotenv 1`] = `
     {
       "context": "Environment variable: LOG_FILE",
       "position": {
-        "column": 9,
+        "column": 10,
         "line": 2,
       },
       "type": "absolute",
@@ -123,7 +142,7 @@ exports[`extraction characterization > paths.env as dotenv 1`] = `
     {
       "context": "Environment variable: CACHE_DIR",
       "position": {
-        "column": 10,
+        "column": 12,
         "line": 3,
       },
       "type": "relative",
@@ -132,7 +151,7 @@ exports[`extraction characterization > paths.env as dotenv 1`] = `
     {
       "context": "Environment variable: API_URL",
       "position": {
-        "column": 8,
+        "column": 9,
         "line": 4,
       },
       "type": "url",
@@ -141,25 +160,16 @@ exports[`extraction characterization > paths.env as dotenv 1`] = `
     {
       "context": "Environment variable: WINDOWS_TMP",
       "position": {
-        "column": 12,
+        "column": 13,
         "line": 5,
       },
       "type": "absolute",
       "value": "C:\\Temp\\work",
     },
     {
-      "context": "Environment variable: VERSION",
+      "context": "Environment variable: ./quoted/key.js",
       "position": {
-        "column": 8,
-        "line": 6,
-      },
-      "type": "file",
-      "value": "1.2.3",
-    },
-    {
-      "context": "Environment variable: "./quoted/key.js"",
-      "position": {
-        "column": 18,
+        "column": 20,
         "line": 9,
       },
       "type": "relative",
@@ -168,20 +178,11 @@ exports[`extraction characterization > paths.env as dotenv 1`] = `
     {
       "context": "Environment variable name",
       "position": {
-        "column": 1,
+        "column": 2,
         "line": 9,
       },
       "type": "relative",
       "value": "./quoted/key.js",
-    },
-    {
-      "context": "Environment variable: ./quoted/key.js",
-      "position": {
-        "column": 18,
-        "line": 9,
-      },
-      "type": "relative",
-      "value": "./quoted/value.js",
     },
     {
       "context": "Environment variable name",
@@ -204,7 +205,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML href",
       "position": {
-        "column": 25,
+        "column": 31,
         "line": 4,
       },
       "type": "relative",
@@ -213,7 +214,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML src",
       "position": {
-        "column": 10,
+        "column": 15,
         "line": 5,
       },
       "type": "absolute",
@@ -222,7 +223,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML src",
       "position": {
-        "column": 7,
+        "column": 12,
         "line": 8,
       },
       "type": "file",
@@ -231,7 +232,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML srcset",
       "position": {
-        "column": 29,
+        "column": 37,
         "line": 8,
       },
       "type": "file",
@@ -240,7 +241,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML srcset",
       "position": {
-        "column": 29,
+        "column": 57,
         "line": 8,
       },
       "type": "file",
@@ -249,7 +250,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML href",
       "position": {
-        "column": 5,
+        "column": 11,
         "line": 9,
       },
       "type": "url",
@@ -258,7 +259,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML poster",
       "position": {
-        "column": 9,
+        "column": 17,
         "line": 12,
       },
       "type": "absolute",
@@ -267,7 +268,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML src",
       "position": {
-        "column": 36,
+        "column": 41,
         "line": 12,
       },
       "type": "absolute",
@@ -276,7 +277,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML action",
       "position": {
-        "column": 8,
+        "column": 16,
         "line": 13,
       },
       "type": "relative",
@@ -285,7 +286,7 @@ exports[`extraction characterization > paths.html as html 1`] = `
     {
       "context": "HTML src",
       "position": {
-        "column": 4,
+        "column": 9,
         "line": 15,
       },
       "type": "relative",
@@ -303,7 +304,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 25,
         "line": 2,
       },
       "type": "relative",
@@ -312,7 +313,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 29,
         "line": 3,
       },
       "type": "relative",
@@ -321,7 +322,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 9,
         "line": 4,
       },
       "type": "url",
@@ -330,7 +331,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 9,
         "line": 5,
       },
       "type": "relative",
@@ -339,7 +340,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS require",
       "position": {
-        "column": 16,
+        "column": 25,
         "line": 6,
       },
       "type": "relative",
@@ -348,7 +349,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS dynamic import",
       "position": {
-        "column": 16,
+        "column": 24,
         "line": 8,
       },
       "type": "relative",
@@ -357,7 +358,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS export",
       "position": {
-        "column": 1,
+        "column": 24,
         "line": 9,
       },
       "type": "relative",
@@ -366,16 +367,25 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS export",
       "position": {
-        "column": 1,
+        "column": 16,
         "line": 10,
       },
       "type": "absolute",
       "value": "/absolute/path/module",
     },
     {
+      "context": "JS import",
+      "position": {
+        "column": 9,
+        "line": 14,
+      },
+      "type": "relative",
+      "value": "./multiline/import-target.js",
+    },
+    {
       "context": "JS require",
       "position": {
-        "column": 17,
+        "column": 26,
         "line": 16,
       },
       "type": "absolute",
@@ -384,7 +394,7 @@ exports[`extraction characterization > paths.js as javascript 1`] = `
     {
       "context": "JS require",
       "position": {
-        "column": 17,
+        "column": 26,
         "line": 17,
       },
       "type": "url",
@@ -402,7 +412,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 25,
         "line": 2,
       },
       "type": "relative",
@@ -411,7 +421,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 29,
         "line": 3,
       },
       "type": "relative",
@@ -420,7 +430,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 9,
         "line": 4,
       },
       "type": "url",
@@ -429,7 +439,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS import",
       "position": {
-        "column": 1,
+        "column": 9,
         "line": 5,
       },
       "type": "relative",
@@ -438,7 +448,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS require",
       "position": {
-        "column": 16,
+        "column": 25,
         "line": 6,
       },
       "type": "relative",
@@ -447,7 +457,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS dynamic import",
       "position": {
-        "column": 16,
+        "column": 24,
         "line": 8,
       },
       "type": "relative",
@@ -456,7 +466,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS export",
       "position": {
-        "column": 1,
+        "column": 24,
         "line": 9,
       },
       "type": "relative",
@@ -465,16 +475,25 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS export",
       "position": {
-        "column": 1,
+        "column": 16,
         "line": 10,
       },
       "type": "absolute",
       "value": "/absolute/path/module",
     },
     {
+      "context": "JS import",
+      "position": {
+        "column": 9,
+        "line": 14,
+      },
+      "type": "relative",
+      "value": "./multiline/import-target.js",
+    },
+    {
       "context": "JS require",
       "position": {
-        "column": 17,
+        "column": 26,
         "line": 16,
       },
       "type": "absolute",
@@ -483,7 +502,7 @@ exports[`extraction characterization > paths.js as typescript 1`] = `
     {
       "context": "JS require",
       "position": {
-        "column": 17,
+        "column": 26,
         "line": 17,
       },
       "type": "url",
@@ -501,8 +520,8 @@ exports[`extraction characterization > paths.json as json 1`] = `
     {
       "context": "JSON main",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 11,
+        "line": 2,
       },
       "type": "relative",
       "value": "./dist/index.js",
@@ -510,8 +529,8 @@ exports[`extraction characterization > paths.json as json 1`] = `
     {
       "context": "JSON homepage",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 15,
+        "line": 4,
       },
       "type": "url",
       "value": "https://example.com/docs",
@@ -519,8 +538,8 @@ exports[`extraction characterization > paths.json as json 1`] = `
     {
       "context": "JSON domain",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 13,
+        "line": 5,
       },
       "type": "file",
       "value": "example.com",
@@ -528,8 +547,8 @@ exports[`extraction characterization > paths.json as json 1`] = `
     {
       "context": "JSON config.output",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 14,
+        "line": 7,
       },
       "type": "absolute",
       "value": "/var/log/app.log",
@@ -537,17 +556,35 @@ exports[`extraction characterization > paths.json as json 1`] = `
     {
       "context": "JSON config.temp",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 12,
+        "line": 8,
       },
       "type": "absolute",
       "value": "C:\\Temp\\cache",
     },
     {
+      "context": "JSON files.[0]",
+      "position": {
+        "column": 13,
+        "line": 12,
+      },
+      "type": "file",
+      "value": "src/app.ts",
+    },
+    {
+      "context": "JSON files.[1]",
+      "position": {
+        "column": 27,
+        "line": 12,
+      },
+      "type": "file",
+      "value": "assets/logo.png",
+    },
+    {
       "context": "JSON nested.deep.script",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 15,
+        "line": 16,
       },
       "type": "relative",
       "value": "../scripts/run.sh",
@@ -564,17 +601,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML value",
       "position": {
-        "column": 1,
-        "line": 1,
-      },
-      "type": "file",
-      "value": "2.1.0",
-    },
-    {
-      "context": "TOML value",
-      "position": {
-        "column": 1,
-        "line": 1,
+        "column": 13,
+        "line": 5,
       },
       "type": "absolute",
       "value": "/var/lib/appdata",
@@ -582,8 +610,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML value",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 13,
+        "line": 6,
       },
       "type": "relative",
       "value": "./logs/app.log",
@@ -591,8 +619,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML value",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 11,
+        "line": 7,
       },
       "type": "absolute",
       "value": "C:\\Backups\\daily",
@@ -600,8 +628,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML value",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 13,
+        "line": 8,
       },
       "type": "url",
       "value": "https://example.org/start",
@@ -609,8 +637,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML key",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 9,
+        "line": 10,
       },
       "type": "relative",
       "value": "./relative/key.sh",
@@ -618,8 +646,8 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
     {
       "context": "TOML value",
       "position": {
-        "column": 1,
-        "line": 1,
+        "column": 11,
+        "line": 15,
       },
       "type": "file",
       "value": "configs/alpha.toml",

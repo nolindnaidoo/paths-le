@@ -1,95 +1,61 @@
 import type { Path } from '../../types';
+import { classifyPathType } from '../heuristics';
+import { createPositionIndex } from '../position';
 
 /**
- * Extract paths from CSS files
- * Extracts url() and @import paths
+ * Extract url() and @import paths from CSS/SCSS/LESS.
+ * Whole-content matching; columns point at the path itself. @import
+ * matches are recorded first and their url() spans skipped so a path is
+ * never double-counted.
  */
+
+const IMPORT_PATTERN =
+	/@import\s+(?:url\s*\(\s*)?(['"])([^'"]+)\1(?:\s*\))?/dgi;
+const URL_PATTERN = /url\s*\(\s*(['"]?)([^'"()]+?)\1\s*\)/dgi;
+
 export function extractFromCss(content: string): Path[] {
 	if (content.trim().length === 0) return [];
 
+	const toPosition = createPositionIndex(content);
 	const paths: Path[] = [];
-	const lines = content.split('\n');
+	const claimed = new Set<number>();
 
-	// Patterns for CSS paths
-	const urlPattern = /url\s*\(\s*['"]?([^'"()]+?)['"]?\s*\)/gi;
-	const importPattern =
-		/@import\s+(?:url\s*\(\s*)?['"]([^'"]+)['"](?:\s*\))?/gi;
-
-	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-		const line = lines[lineIndex];
-		if (!line) continue;
-
-		// If line contains @import, prefer extracting only @import to avoid double-counting url() inside
-		if (/@import\b/.test(line)) {
-			importPattern.lastIndex = 0;
-			let importMatch: RegExpExecArray | null;
-			while ((importMatch = importPattern.exec(line)) !== null) {
-				const pathValue = importMatch[1]?.trim();
-				if (pathValue) {
-					paths.push({
-						value: pathValue,
-						type: classifyPathType(pathValue),
-						position: {
-							line: lineIndex + 1,
-							column: importMatch.index + 1,
-						},
-						context: 'CSS @import',
-					});
-				}
-			}
-			continue;
-		}
-
-		// Otherwise, extract url() values
-		urlPattern.lastIndex = 0;
-		let urlMatch: RegExpExecArray | null;
-		while ((urlMatch = urlPattern.exec(line)) !== null) {
-			const pathValue = urlMatch[1]?.trim();
-			if (pathValue && !isDataUrl(pathValue)) {
-				paths.push({
-					value: pathValue,
-					type: classifyPathType(pathValue),
-					position: {
-						line: lineIndex + 1,
-						column: urlMatch.index + 1,
-					},
-					context: 'CSS url()',
-				});
-			}
-		}
+	IMPORT_PATTERN.lastIndex = 0;
+	let match: RegExpExecArray | null;
+	while ((match = IMPORT_PATTERN.exec(content)) !== null) {
+		const value = match[2]?.trim();
+		const indices = match.indices?.[2];
+		if (!value || !indices || isExcluded(value)) continue;
+		claimed.add(indices[0]);
+		paths.push({
+			value,
+			type: classifyPathType(value),
+			position: toPosition(indices[0]),
+			context: 'CSS @import',
+		});
 	}
 
-	return paths;
+	URL_PATTERN.lastIndex = 0;
+	while ((match = URL_PATTERN.exec(content)) !== null) {
+		const value = match[2]?.trim();
+		const indices = match.indices?.[2];
+		if (!value || !indices || isExcluded(value)) continue;
+		if (claimed.has(indices[0])) continue;
+		paths.push({
+			value,
+			type: classifyPathType(value),
+			position: toPosition(indices[0]),
+			context: 'CSS url()',
+		});
+	}
+
+	return paths.sort(
+		(a, b) =>
+			a.position.line - b.position.line ||
+			a.position.column - b.position.column,
+	);
 }
 
-/**
- * Check if a URL is a data URL (should be excluded)
- */
-function isDataUrl(value: string): boolean {
+function isExcluded(value: string): boolean {
 	return value.startsWith('data:');
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('//')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
 }

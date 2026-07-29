@@ -1,9 +1,11 @@
 import { parse } from 'csv-parse/sync';
 import type { Path } from '../../types';
+import { classifyPathType, isPathLike } from '../heuristics';
 
 /**
- * Extract paths from CSV files
- * Looks for path-like values in CSV cells
+ * Extract path-like cells from CSV.
+ * Positions are cell coordinates — line is the row number, column is
+ * the cell index (not a character offset); the context repeats both.
  */
 export function extractFromCsv(content: string): Path[] {
 	if (content.trim().length === 0) return [];
@@ -43,56 +45,4 @@ export function extractFromCsv(content: string): Path[] {
 		// Return empty array on parse error
 		return [];
 	}
-}
-
-/**
- * Check if a string looks like a file path
- */
-function isPathLike(value: string): boolean {
-	if (!value || value.length < 2) return false;
-
-	// Common path patterns
-	const patterns = [
-		/^\/[^\s"'<>|*?]+$/, // Unix absolute paths
-		/^[A-Za-z]:\\[^\s"'<>|*?]+$/, // Windows absolute paths
-		/^\.\.?\/[^\s"'<>|*?]+$/, // Relative paths
-		/^https?:\/\/[^\s"'<>|*?]+$/, // URLs
-		/^file:\/\/[^\s"'<>|*?]+$/, // File URLs
-		/^[^\s"'<>|*?]+\.[a-zA-Z0-9]+$/, // Files with extensions
-		/^[^\s"'<>|*?]+\/[^\s"'<>|*?]+$/, // Directory/file patterns
-	];
-
-	return patterns.some((pattern) => pattern.test(value));
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('file://')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (
-		path.startsWith('C:\\') ||
-		path.startsWith('D:\\') ||
-		/^[A-Za-z]:\\/.test(path)
-	) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
 }

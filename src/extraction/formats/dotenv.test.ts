@@ -61,11 +61,11 @@ LOG_PATH=./logs/app.log`;
 		const result = extractFromDotenv(content);
 		expect(result[0]?.position).toEqual({
 			line: 1,
-			column: 12, // After "CONFIG_PATH="
+			column: 13, // start of the value after "CONFIG_PATH="
 		});
 		expect(result[1]?.position).toEqual({
 			line: 2,
-			column: 9, // After "LOG_PATH="
+			column: 10, // start of the value after "LOG_PATH="
 		});
 	});
 

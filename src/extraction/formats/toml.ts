@@ -1,113 +1,92 @@
 import { parse } from '@iarna/toml';
 import type { Path } from '../../types';
+import { classifyPathType, isPathLike } from '../heuristics';
+import { createPositionIndex, type PositionIndex } from '../position';
 
 /**
- * Extract paths from TOML files
- * Recursively searches through TOML structure for path-like values
+ * Extract paths from TOML values (and keys that look like paths).
+ * @iarna/toml does not expose source offsets, so positions come from a
+ * forward-moving locate over the source text: exact match first, then
+ * the backslash-escaped form for Windows paths inside basic strings.
+ * Repeated identical values resolve to successive occurrences; a value
+ * that cannot be located falls back to 1:1.
  */
 export function extractFromToml(content: string): Path[] {
 	if (content.trim().length === 0) return [];
 
+	let parsed: unknown;
 	try {
-		const parsed = parse(content);
-		const paths: Path[] = [];
-		extractPathsFromObject(parsed, paths, 1);
-		return paths;
+		parsed = parse(content);
 	} catch (_error) {
-		// Return empty array on parse error
 		return [];
 	}
+
+	const locator = createLocator(content);
+	const paths: Path[] = [];
+	walk(parsed, paths, locator);
+	return paths;
 }
 
-/**
- * Recursively extract paths from a TOML object
- */
-function extractPathsFromObject(
+function walk(
 	obj: unknown,
 	paths: Path[],
-	lineOffset: number,
+	locate: (value: string) => { line: number; column: number },
 ): void {
-	if (typeof obj === 'string' && isPathLike(obj)) {
-		paths.push({
-			value: obj,
-			type: classifyPathType(obj),
-			position: {
-				line: lineOffset,
-				column: 1,
-			},
-			context: 'TOML value',
-		});
-	} else if (Array.isArray(obj)) {
-		for (const item of obj) {
-			extractPathsFromObject(item, paths, lineOffset);
+	if (typeof obj === 'string') {
+		if (isPathLike(obj)) {
+			paths.push({
+				value: obj,
+				type: classifyPathType(obj),
+				position: locate(obj),
+				context: 'TOML value',
+			});
 		}
-	} else if (obj && typeof obj === 'object') {
+		return;
+	}
+
+	if (Array.isArray(obj)) {
+		for (const item of obj) {
+			walk(item, paths, locate);
+		}
+		return;
+	}
+
+	if (obj && typeof obj === 'object') {
 		for (const [key, value] of Object.entries(obj)) {
-			// Check if the key itself looks like a path
 			if (isPathLike(key)) {
 				paths.push({
 					value: key,
 					type: classifyPathType(key),
-					position: {
-						line: lineOffset,
-						column: 1,
-					},
+					position: locate(key),
 					context: 'TOML key',
 				});
 			}
-			extractPathsFromObject(value, paths, lineOffset);
+			walk(value, paths, locate);
 		}
 	}
 }
 
-/**
- * Check if a string looks like a file path
- */
-function isPathLike(value: string): boolean {
-	if (!value || value.length < 2) return false;
+function createLocator(
+	content: string,
+): (value: string) => { line: number; column: number } {
+	const toPosition: PositionIndex = createPositionIndex(content);
+	let searchFrom = 0;
 
-	// Common path patterns - more flexible to catch valid paths including spaces
-	const patterns = [
-		/^\/[^"'<>|*?]+(?:\/[^"'<>|*?]*)*$/, // Unix absolute paths (allow spaces)
-		/^[A-Za-z]:\\[^"'<>|*?]+(?:\\[^"'<>|*?]*)*$/, // Windows absolute paths (allow spaces)
-		/^\.\.?\/[^"'<>|*?]+(?:\/[^"'<>|*?]*)*$/, // Relative paths (allow spaces)
-		/^https?:\/\/[^"'<>|*?]+$/, // URLs
-		/^file:\/\/[^"'<>|*?]+$/, // File URLs
-		/^[^"'<>|*?]+\.[a-zA-Z0-9]+$/, // Files with extensions (allow spaces)
-		/^[^"'<>|*?]+\/[^"'<>|*?]+$/, // Directory/file patterns (allow spaces)
-	];
-
-	return patterns.some((pattern) => pattern.test(value));
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('file://')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (
-		path.startsWith('C:\\') ||
-		path.startsWith('D:\\') ||
-		/^[A-Za-z]:\\/.test(path)
-	) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
+	return (value: string) => {
+		const candidates = [value, value.replaceAll('\\', '\\\\')];
+		for (const candidate of candidates) {
+			const at = content.indexOf(candidate, searchFrom);
+			if (at !== -1) {
+				searchFrom = at + candidate.length;
+				return toPosition(at);
+			}
+			// Occurrences can appear before the cursor when table order
+			// differs from source order — retry from the top.
+			const anywhere = content.indexOf(candidate);
+			if (anywhere !== -1) {
+				return toPosition(anywhere);
+			}
+		}
+		return { line: 1, column: 1 };
+	};
 }

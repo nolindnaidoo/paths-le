@@ -1,118 +1,90 @@
 import type { Path } from '../../types';
+import { classifyPathType } from '../heuristics';
+import { createPositionIndex } from '../position';
 
 /**
- * Extract paths from JavaScript/TypeScript files
- * Extracts import/require/export statements with reliable patterns
+ * Extract module paths from JavaScript/TypeScript source.
+ * Whole-content regex (not per-line), so multi-line import/export
+ * statements are matched. Only module specifiers are extracted —
+ * import/export…from, side-effect imports, dynamic import(), require()
+ * — and package names ('react', '@org/pkg') are filtered out.
  */
+
+interface PatternSpec {
+	readonly pattern: RegExp;
+	readonly context: (match: RegExpExecArray) => string;
+}
+
+const PATTERNS: readonly PatternSpec[] = [
+	{
+		// import/export … from '…' — the statement head may span lines;
+		// [^;'"`]*? cannot cross a string or statement boundary.
+		pattern: /\b(import|export)\b[^;'"`]*?\bfrom\s*(['"])([^'"\n]+)\2/dg,
+		context: (match) => `JS ${match[1]}`,
+	},
+	{
+		pattern: /\bimport\s*\(\s*(['"])([^'"\n]+)\1\s*\)/dg,
+		context: () => 'JS dynamic import',
+	},
+	{
+		pattern: /\brequire\s*\(\s*(['"])([^'"\n]+)\1\s*\)/dg,
+		context: () => 'JS require',
+	},
+	{
+		// side-effect import: import './x'
+		pattern: /\bimport\s*(['"])([^'"\n]+)\1/dg,
+		context: () => 'JS import',
+	},
+];
+
 export function extractFromJavaScript(content: string): Path[] {
 	if (content.trim().length === 0) return [];
 
+	const toPosition = createPositionIndex(content);
 	const paths: Path[] = [];
-	const lines = content.split('\n');
+	const seenOffsets = new Set<number>();
 
-	// Patterns for reliable extraction
-	const patterns = [
-		// ES6 import: import x from './path'
-		/import\s+(?:[\w{},\s*]+\s+from\s+)?['"]([^'"]+)['"]/g,
-		// Dynamic import: import('./path')
-		/import\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
-		// CommonJS require: require('./path')
-		/require\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
-		// ES6 export: export x from './path'
-		/export\s+(?:[\w{},\s*]+\s+from\s+)?['"]([^'"]+)['"]/g,
-	];
+	for (const { pattern, context } of PATTERNS) {
+		pattern.lastIndex = 0;
+		let match: RegExpExecArray | null;
 
-	for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-		const line = lines[lineIndex];
-		if (!line) continue;
+		while ((match = pattern.exec(content)) !== null) {
+			// The path is always the last capture group.
+			const groupIndex = match.length - 1;
+			const value = match[groupIndex];
+			const indices = match.indices?.[groupIndex];
+			if (!value || !indices || !isModulePath(value)) continue;
 
-		for (const pattern of patterns) {
-			// Reset regex lastIndex for each line
-			pattern.lastIndex = 0;
-			let match: RegExpExecArray | null;
+			const [start] = indices;
+			if (seenOffsets.has(start)) continue;
+			seenOffsets.add(start);
 
-			while ((match = pattern.exec(line)) !== null) {
-				const pathValue = match[1];
-				if (pathValue && isModulePath(pathValue)) {
-					paths.push({
-						value: pathValue,
-						type: classifyPathType(pathValue),
-						position: {
-							line: lineIndex + 1,
-							column: match.index + 1,
-						},
-						context: `JS ${getImportType(match[0])}`,
-					});
-				}
-			}
+			paths.push({
+				value,
+				type: classifyPathType(value),
+				position: toPosition(start),
+				context: context(match),
+			});
 		}
 	}
 
-	return paths;
+	return paths.sort(
+		(a, b) =>
+			a.position.line - b.position.line ||
+			a.position.column - b.position.column,
+	);
 }
 
 /**
- * Check if a string is a module path (not a package name)
- * Valid paths start with: ./ ../ / or are absolute (C:\ etc)
+ * Module specifiers that are file paths (not package names):
+ * relative, absolute, drive-letter, or URL.
  */
 function isModulePath(value: string): boolean {
-	if (!value || value.length < 2) return false;
-
-	// Relative paths
+	if (value.length < 2) return false;
 	if (value.startsWith('./') || value.startsWith('../')) return true;
-
-	// Absolute Unix paths
 	if (value.startsWith('/')) return true;
-
-	// Absolute Windows paths
 	if (/^[A-Za-z]:[/\\]/.test(value)) return true;
-
-	// URLs
 	if (value.startsWith('http://') || value.startsWith('https://')) return true;
 	if (value.startsWith('file://')) return true;
-
-	// Not a file path - likely a package name like 'react' or '@org/package'
 	return false;
-}
-
-/**
- * Determine the type of import statement
- */
-function getImportType(statement: string): string {
-	if (statement.includes('require')) return 'require';
-	if (statement.includes('export')) return 'export';
-	if (statement.includes('import(')) return 'dynamic import';
-	return 'import';
-}
-
-/**
- * Classify the type of path
- */
-function classifyPathType(
-	path: string,
-): 'file' | 'directory' | 'relative' | 'absolute' | 'url' | 'unknown' {
-	if (
-		path.startsWith('http://') ||
-		path.startsWith('https://') ||
-		path.startsWith('file://')
-	) {
-		return 'url';
-	}
-	if (path.startsWith('/')) {
-		return 'absolute';
-	}
-	if (
-		path.startsWith('C:\\') ||
-		path.startsWith('D:\\') ||
-		/^[A-Za-z]:[/\\]/.test(path)
-	) {
-		return 'absolute';
-	}
-	if (path.startsWith('./') || path.startsWith('../')) {
-		return 'relative';
-	}
-	if (path.includes('.')) {
-		return 'file';
-	}
-	return 'unknown';
 }
