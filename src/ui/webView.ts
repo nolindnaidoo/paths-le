@@ -32,7 +32,7 @@ export function createHelpWebView(
 				'Paths-LE Help',
 				vscode.ViewColumn.Beside,
 				{
-					enableScripts: true,
+					enableScripts: false,
 					localResourceRoots: [],
 				},
 			);
@@ -136,29 +136,33 @@ function getHelpHtml(): string {
 </head>
 <body>
     <h1>Paths-LE Help & Documentation</h1>
-    
-    <p>Paths-LE is a VS Code extension that extracts and analyzes file paths from various file formats including configuration files, logs, and code.</p>
+
+    <p>Paths-LE is a VS Code extension that extracts file paths from code and configuration files.</p>
 
     <h2>🚀 Quick Start</h2>
     <ol>
-        <li>Open a file containing paths (JSON, YAML, JavaScript, etc.)</li>
+        <li>Open a file containing paths (JSON, JavaScript, CSV, etc.)</li>
         <li>Press <span class="command">Ctrl+Alt+P</span> (or <span class="command">Cmd+Alt+P</span> on Mac)</li>
         <li>View extracted paths in a new document</li>
     </ol>
 
     <h2>📋 Commands</h2>
-    
+
     <h3>Extract Paths</h3>
     <p><span class="command">paths-le.extractPaths</span></p>
     <p>Extracts all file paths from the current document and displays them in a new file.</p>
 
-    <h3>Validate Paths</h3>
-    <p><span class="command">paths-le.validatePaths</span></p>
-    <p>Validates extracted paths for existence and accessibility.</p>
+    <h3>Deduplicate Paths</h3>
+    <p><span class="command">paths-le.postProcess.dedupe</span></p>
+    <p>Removes duplicate lines from the extraction results.</p>
 
-    <h3>Analyze Paths</h3>
-    <p><span class="command">paths-le.analyzePaths</span></p>
-    <p>Analyzes path patterns, types, and naming conventions.</p>
+    <h3>Sort Paths</h3>
+    <p><span class="command">paths-le.postProcess.sort</span></p>
+    <p>Sorts the extraction results alphabetically or by length.</p>
+
+    <h3>Open Settings</h3>
+    <p><span class="command">paths-le.openSettings</span></p>
+    <p>Opens the Paths-LE settings.</p>
 
     <h3>Help</h3>
     <p><span class="command">paths-le.help</span></p>
@@ -166,15 +170,13 @@ function getHelpHtml(): string {
 
     <h2>📁 Supported File Types</h2>
     <ul class="feature-list">
-        <li><strong>JSON</strong> (.json) - JavaScript Object Notation</li>
-        <li><strong>YAML</strong> (.yaml, .yml) - YAML Ain't Markup Language</li>
-        <li><strong>JavaScript</strong> (.js) - JavaScript source files</li>
-        <li><strong>TypeScript</strong> (.ts, .tsx) - TypeScript source files</li>
-        <li><strong>Log Files</strong> (.log, .txt) - Log and text files</li>
-        <li><strong>INI</strong> (.ini, .cfg, .conf) - Configuration files</li>
-        <li><strong>CSV</strong> (.csv) - Comma-separated values</li>
-        <li><strong>TOML</strong> (.toml) - Tom's Obvious, Minimal Language</li>
-        <li><strong>Environment</strong> (.env) - Environment variable files</li>
+        <li><strong>JavaScript / TypeScript</strong> (.js, .jsx, .ts, .tsx) - import/require/export paths</li>
+        <li><strong>JSON</strong> (.json, .jsonc) - path-like string values</li>
+        <li><strong>HTML</strong> (.html) - src, href, srcset, and related attributes</li>
+        <li><strong>CSS</strong> (.css, .scss, .less) - url() and @import</li>
+        <li><strong>TOML</strong> (.toml) - path-like values</li>
+        <li><strong>CSV</strong> (.csv) - path-like cells</li>
+        <li><strong>Environment</strong> (.env) - path-like variable values</li>
     </ul>
 
     <h2>🔍 Path Types Detected</h2>
@@ -188,14 +190,13 @@ function getHelpHtml(): string {
 
     <h2>⚙️ Configuration</h2>
     <p>Access settings via <span class="command">paths-le.openSettings</span> or VS Code Settings UI.</p>
-    
+
     <h3>Key Settings</h3>
     <ul class="feature-list">
-        <li><strong>Safety Checks</strong> - Enable/disable file size warnings</li>
-        <li><strong>Validation</strong> - Configure path existence and permission checks</li>
-        <li><strong>Analysis</strong> - Control which analysis features are enabled</li>
-        <li><strong>Output</strong> - Configure how results are displayed</li>
-        <li><strong>Performance</strong> - Set performance thresholds and monitoring</li>
+        <li><strong>Safety Checks</strong> - File size and output volume warnings</li>
+        <li><strong>Output</strong> - Side-by-side view, new file, or in-place; clipboard copy</li>
+        <li><strong>Notifications</strong> - How chatty the extension is</li>
+        <li><strong>Resolution</strong> - Optional symlink / workspace-relative canonical resolution</li>
     </ul>
 
     <h2>🔧 Troubleshooting</h2>
@@ -211,21 +212,11 @@ function getHelpHtml(): string {
         </ul>
     </div>
 
-    <div class="warning">
-        <strong>Validation errors:</strong>
-        <ul>
-            <li>Check if paths are relative to the correct working directory</li>
-            <li>Verify file permissions</li>
-            <li>Ensure paths use correct path separators for your OS</li>
-        </ul>
-    </div>
-
     <div class="info">
-        <strong>Performance issues:</strong>
+        <strong>Large files:</strong>
         <ul>
-            <li>Enable safety checks to prevent processing large files</li>
-            <li>Use validation settings to limit checks</li>
-            <li>Consider using analysis features selectively</li>
+            <li>Safety checks warn before processing very large files</li>
+            <li>Thresholds are adjustable under Paths-LE settings</li>
         </ul>
     </div>
 
@@ -238,11 +229,6 @@ function getHelpHtml(): string {
 
     <h2>🙏 Thank You!</h2>
     <p>Thank you for using Paths-LE! If this extension has been helpful, please consider leaving a rating on the VS Code Marketplace.</p>
-
-    <script>
-        // Add any interactive features here
-        console.log('Paths-LE Help WebView loaded');
-    </script>
 </body>
 </html>
 	`;

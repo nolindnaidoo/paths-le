@@ -1,11 +1,6 @@
 import type * as vscode from 'vscode';
 import { registerCommands } from './commands';
-import {
-	registerExportSettingsCommand,
-	registerImportSettingsCommand,
-	registerOpenSettingsCommand,
-	registerResetSettingsCommand,
-} from './config/settings';
+import { registerOpenSettingsCommand } from './config/settings';
 import { createServices } from './services/serviceFactory';
 
 /**
@@ -19,11 +14,8 @@ export function activate(context: vscode.ExtensionContext): void {
 	// Register all commands with dependencies
 	registerCommands(context, services);
 
-	// Register settings commands
+	// Register settings command
 	registerOpenSettingsCommand(context, services.telemetry);
-	registerExportSettingsCommand(context, services.telemetry);
-	registerImportSettingsCommand(context, services.telemetry);
-	registerResetSettingsCommand(context, services.telemetry);
 
 	// Log activation
 	services.telemetry.event('extension-activated');

@@ -106,13 +106,10 @@ export interface ValidationResult {
 
 export type FileType =
 	| 'json'
-	| 'yaml'
 	| 'javascript'
 	| 'typescript'
 	| 'html'
 	| 'css'
-	| 'log'
-	| 'ini'
 	| 'csv'
 	| 'toml'
 	| 'dotenv'
@@ -177,8 +174,3 @@ export type {
 	ErrorLogger,
 	ErrorNotifier,
 } from './utils/errorHandling';
-export type {
-	PerformanceMetrics,
-	PerformanceMonitor,
-	PerformanceThresholds,
-} from './utils/performance';

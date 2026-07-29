@@ -110,3 +110,4 @@ dist/
 !src/detection/__data__/*.env.*
 release/
 src/extraction/__performance__/
+.claude/
