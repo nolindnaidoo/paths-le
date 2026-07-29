@@ -18,7 +18,7 @@
 	},
 	"homepage": "https://github.com/OffensiveEdge/paths-le#readme",
 	"engines": {
-		"vscode": "^1.70.0",
+		"vscode": "^1.90.0",
 		"node": ">=20.0.0"
 	},
 	"categories": [
@@ -64,12 +64,7 @@
 		"onLanguage:html",
 		"onLanguage:css",
 		"onLanguage:scss",
-		"onLanguage:less",
-		"onCommand:paths-le.extractPaths",
-		"onCommand:paths-le.postProcess.dedupe",
-		"onCommand:paths-le.postProcess.sort",
-		"onCommand:paths-le.openSettings",
-		"onCommand:paths-le.help"
+		"onLanguage:less"
 	],
 	"capabilities": {
 		"virtualWorkspaces": {
@@ -121,7 +116,7 @@
 			"editor/context": [
 				{
 					"command": "paths-le.extractPaths",
-					"when": "resourceExtname in .csv || resourceExtname in .toml || resourceExtname in .env || resourceExtname in .js || resourceExtname in .jsx || resourceExtname in .ts || resourceExtname in .tsx || resourceExtname in .json || resourceExtname in .html || resourceExtname in .css || resourceExtname in .scss || resourceExtname in .less",
+					"when": "editorLangId =~ /^(javascript|javascriptreact|typescript|typescriptreact|json|jsonc|html|css|scss|less|csv|toml|dotenv|env)$/",
 					"group": "1_modification@1"
 				}
 			],
@@ -150,11 +145,6 @@
 					"type": "boolean",
 					"default": false,
 					"description": "%manifest.settings.copy.clipboard.desc%"
-				},
-				"paths-le.dedupeEnabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "%manifest.settings.dedupe.desc%"
 				},
 				"paths-le.notificationsLevel": {
 					"type": "string",
@@ -198,12 +188,6 @@
 					"minimum": 100,
 					"description": "%manifest.settings.safety.warn.large-output.desc%"
 				},
-				"paths-le.safety.manyDocumentsThreshold": {
-					"type": "number",
-					"default": 8,
-					"minimum": 1,
-					"description": "%manifest.settings.safety.warn.many-documents.desc%"
-				},
 				"paths-le.showParseErrors": {
 					"type": "boolean",
 					"default": false,
@@ -218,105 +202,6 @@
 					"type": "boolean",
 					"default": false,
 					"description": "%manifest.settings.telemetry.desc%"
-				},
-				"paths-le.analysis.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.analysis.enabled.desc%"
-				},
-				"paths-le.analysis.includeValidation": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.analysis.includeValidation.desc%"
-				},
-				"paths-le.analysis.includePatterns": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.analysis.includePatterns.desc%"
-				},
-				"paths-le.validation.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.validation.enabled.desc%"
-				},
-				"paths-le.validation.checkExistence": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.validation.checkExistence.desc%"
-				},
-				"paths-le.validation.checkPermissions": {
-					"type": "boolean",
-					"default": false,
-					"description": "%manifest.settings.validation.checkPermissions.desc%"
-				},
-				"paths-le.performance.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.performance.enabled.desc%"
-				},
-				"paths-le.performance.maxDuration": {
-					"type": "number",
-					"default": 5000,
-					"minimum": 1000,
-					"description": "%manifest.settings.performance.max-duration.desc%"
-				},
-				"paths-le.performance.maxMemoryUsage": {
-					"type": "number",
-					"default": 104857600,
-					"minimum": 1048576,
-					"description": "%manifest.settings.performance.max-memory.desc%"
-				},
-				"paths-le.performance.maxCpuUsage": {
-					"type": "number",
-					"default": 1000000.0,
-					"minimum": 100000.0,
-					"description": "%manifest.settings.performance.max-cpu.desc%"
-				},
-				"paths-le.performance.minThroughput": {
-					"type": "number",
-					"default": 1000,
-					"minimum": 100,
-					"description": "%manifest.settings.performance.min-throughput.desc%"
-				},
-				"paths-le.performance.maxCacheSize": {
-					"type": "number",
-					"default": 1000,
-					"minimum": 100,
-					"description": "%manifest.settings.performance.max-cache.desc%"
-				},
-				"paths-le.keyboard.shortcuts.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.keyboard.shortcuts.enabled.desc%"
-				},
-				"paths-le.keyboard.extractShortcut": {
-					"type": "string",
-					"default": "ctrl+alt+p",
-					"description": "%manifest.settings.keyboard.extract.shortcut.desc%"
-				},
-				"paths-le.presets.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "%manifest.settings.presets.enabled.desc%"
-				},
-				"paths-le.presets.defaultPreset": {
-					"type": "string",
-					"default": "balanced",
-					"enum": [
-						"minimal",
-						"balanced",
-						"comprehensive",
-						"performance",
-						"validation"
-					],
-					"enumDescriptions": [
-						"%manifest.settings.presets.default.option.minimal%",
-						"%manifest.settings.presets.default.option.balanced%",
-						"%manifest.settings.presets.default.option.comprehensive%",
-						"%manifest.settings.presets.default.option.performance%",
-						"%manifest.settings.presets.default.option.validation%"
-					],
-					"description": "%manifest.settings.presets.default.desc%"
 				},
 				"paths-le.resolution.resolveSymlinks": {
 					"type": "boolean",
@@ -354,7 +239,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
 		"@types/node": "^24.7.1",
-		"@types/vscode": "^1.70.0",
+		"@types/vscode": "^1.90.0",
 		"@vitest/coverage-v8": "^3.2.4",
 		"@vitest/ui": "^3.2.4",
 		"@vscode/test-electron": "^2.3.0",
