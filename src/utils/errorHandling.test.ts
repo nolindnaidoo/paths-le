@@ -236,15 +236,6 @@ describe('Error Handling', () => {
 			expect(error.suggestion).toBe('Custom suggestion');
 		});
 
-		it.skip('should create enhanced error with context', () => {
-			const error = createEnhancedError(new Error('Test error'), 'parse', {
-				filepath: '/test/file.log',
-			});
-
-			expect(error.userFriendlyMessage).toBeDefined();
-			expect(error.context?.filepath).toBe('/test/file.log');
-		});
-
 		it('should freeze enhanced error object', () => {
 			const error = createEnhancedError(new Error('Test error'), 'parse');
 			expect(Object.isFrozen(error)).toBe(true);
