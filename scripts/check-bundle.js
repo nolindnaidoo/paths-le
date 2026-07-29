@@ -1,34 +1,103 @@
 #!/usr/bin/env node
 /**
- * Bundle gate: the packaged VSIX ships dist/extension.js with no node_modules,
- * so every require() in the bundle must resolve to 'vscode' or a Node builtin.
- * A bare module specifier here means esbuild left a dependency external and
- * the extension would fail to activate after install (v1.x shipped broken
- * exactly this way).
+ * Bundle gate: the packaged VSIX ships dist/extension.js with no
+ * node_modules, so the bundle must be fully self-contained.
+ *
+ * Two checks:
+ * 1. Static: no literal require() of anything but 'vscode' and Node
+ *    builtins.
+ * 2. Runtime: actually load the bundle with 'vscode' stubbed. This
+ *    catches requires the static scan cannot see — e.g. a UMD wrapper
+ *    passing `require` through a factory parameter (jsonc-parser did
+ *    exactly this and shipped a bundle that crashed on activation).
  */
 const fs = require('node:fs');
-const { isBuiltin } = require('node:module');
+const path = require('node:path');
+const Module = require('node:module');
 
-const bundlePath = 'dist/extension.js';
+const bundlePath = path.resolve('dist/extension.js');
 const source = fs.readFileSync(bundlePath, 'utf8');
 
+// --- 1. static scan -------------------------------------------------
 const offenders = new Set();
 for (const match of source.matchAll(/\brequire\(\s*["']([^"']+)["']\s*\)/g)) {
 	const specifier = match[1];
 	if (specifier === 'vscode') continue;
-	if (isBuiltin(specifier)) continue;
-	if (specifier.startsWith('./') || specifier.startsWith('../')) continue;
+	if (Module.isBuiltin(specifier)) continue;
 	offenders.add(specifier);
 }
-
 if (offenders.size > 0) {
 	console.error(
-		`FAIL: ${bundlePath} requires unbundled modules: ${[...offenders].join(', ')}`,
-	);
-	console.error(
-		'These are not shipped in the VSIX — the extension would not activate.',
+		`FAIL (static): ${bundlePath} requires unbundled modules: ${[...offenders].join(', ')}`,
 	);
 	process.exit(1);
 }
 
-console.log(`OK: ${bundlePath} has no external requires beyond vscode/builtins.`);
+// --- 2. runtime load with vscode stubbed ----------------------------
+const noop = () => undefined;
+const disposable = { dispose: noop };
+const vscodeStub = new Proxy(
+	{},
+	{
+		get: (_target, prop) => {
+			if (prop === 'workspace') {
+				return new Proxy(
+					{},
+					{
+						get: (_t, p) => {
+							if (p === 'onDidChangeConfiguration') return () => disposable;
+							if (p === 'getConfiguration')
+								return () => ({ get: (_k, d) => d, update: async () => {} });
+							return noop;
+						},
+					},
+				);
+			}
+			if (prop === 'window') {
+				return new Proxy(
+					{},
+					{
+						get: (_t, p) => {
+							if (p === 'createStatusBarItem')
+								return () => ({
+									show: noop,
+									hide: noop,
+									dispose: noop,
+									text: '',
+								});
+							if (p === 'createOutputChannel')
+								return () => ({ appendLine: noop, dispose: noop });
+							return noop;
+						},
+					},
+				);
+			}
+			if (prop === 'commands')
+				return { registerCommand: () => disposable, executeCommand: noop };
+			return new Proxy(noop, { get: () => noop });
+		},
+	},
+);
+
+const originalLoad = Module._load;
+Module._load = function patchedLoad(request, ...rest) {
+	if (request === 'vscode') return vscodeStub;
+	return originalLoad.call(this, request, ...rest);
+};
+
+try {
+	const extension = require(bundlePath);
+	if (typeof extension.activate !== 'function') {
+		console.error('FAIL (runtime): bundle exports no activate()');
+		process.exit(1);
+	}
+} catch (error) {
+	console.error(`FAIL (runtime): bundle failed to load: ${error.message}`);
+	process.exit(1);
+} finally {
+	Module._load = originalLoad;
+}
+
+console.log(
+	`OK: ${path.relative(process.cwd(), bundlePath)} is self-contained (static scan + runtime load).`,
+);

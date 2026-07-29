@@ -111,3 +111,7 @@ dist/
 release/
 src/extraction/__performance__/
 .claude/
+
+# Integration test compile output
+out-test/
+*.vsix
