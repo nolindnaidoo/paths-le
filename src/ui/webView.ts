@@ -225,7 +225,11 @@ function getHelpHtml(): string {
         <li><strong>GitHub Repository</strong> - <a href="https://github.com/nolindnaidoo/paths-le">https://github.com/nolindnaidoo/paths-le</a></li>
         <li><strong>Issues</strong> - <a href="https://github.com/nolindnaidoo/paths-le/issues">Report bugs and request features</a></li>
         <li><strong>Documentation</strong> - <a href="https://github.com/nolindnaidoo/paths-le#readme">Complete documentation</a></li>
+        <li><strong>LE Tools</strong> - <a href="https://letools.dev">https://letools.dev</a></li>
     </ul>
+
+    <h2>👤 Built by</h2>
+    <p><a href="https://github.com/nolindnaidoo">nolindnaidoo</a> — MIT licensed.</p>
 
     <h2>🙏 Thank You!</h2>
     <p>Thank you for using Paths-LE! If this extension has been helpful, please consider leaving a rating on the VS Code Marketplace.</p>
