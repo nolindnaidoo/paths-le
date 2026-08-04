@@ -74,6 +74,12 @@ function extractFromSrcset(
 	}
 }
 
+// Pseudo-schemes that are never file paths. Matched case-insensitively and
+// past leading whitespace because HTML attribute values are neither
+// case-normalised nor trimmed by the parser — `JavaScript:` and ` vbscript:`
+// are both valid in markup and were previously extracted as paths.
+const NON_PATH_SCHEME = /^\s*(?:data|javascript|vbscript):/i;
+
 function isExcluded(value: string): boolean {
-	return value.startsWith('data:') || value.startsWith('javascript:');
+	return NON_PATH_SCHEME.test(value);
 }

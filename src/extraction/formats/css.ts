@@ -56,6 +56,10 @@ export function extractFromCss(content: string): Path[] {
 	);
 }
 
+// Same pseudo-scheme rule as the HTML extractor: url() accepts these too, and
+// none of them are file paths.
+const NON_PATH_SCHEME = /^\s*(?:data|javascript|vbscript):/i;
+
 function isExcluded(value: string): boolean {
-	return value.startsWith('data:');
+	return NON_PATH_SCHEME.test(value);
 }

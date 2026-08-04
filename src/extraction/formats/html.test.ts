@@ -191,3 +191,26 @@ describe('extractFromHtml', () => {
 		expect(result[0]?.value).toBe('./process.php');
 	});
 });
+
+describe('pseudo-scheme exclusion', () => {
+	it('should exclude vbscript: URLs', () => {
+		const content = `<a href="vbscript:msgbox(1)">Link</a>`;
+
+		const result = extractFromHtml(content);
+		expect(result).toHaveLength(0);
+	});
+
+	it('should exclude pseudo-schemes regardless of case', () => {
+		const content = `<a href="JavaScript:void(0)">Link</a>`;
+
+		const result = extractFromHtml(content);
+		expect(result).toHaveLength(0);
+	});
+
+	it('should still extract ordinary relative paths', () => {
+		const content = `<a href="./docs/page.html">Link</a>`;
+
+		const result = extractFromHtml(content);
+		expect(result.map((p) => p.value)).toContain('./docs/page.html');
+	});
+});
