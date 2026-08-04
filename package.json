@@ -249,7 +249,7 @@
 		"@types/node": "^26.1.2",
 		"@types/vscode": "1.90.0",
 		"@vitest/coverage-v8": "^4.1.10",
-		"@vitest/ui": "^3.2.7",
+		"@vitest/ui": "^4.1.10",
 		"@vscode/test-cli": "^0.0.15",
 		"@vscode/test-electron": "^3.1.0",
 		"@vscode/vsce": "^3.9.2",
