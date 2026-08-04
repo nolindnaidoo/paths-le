@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Zero Hassle file path extraction from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"license": "MIT",
 	"author": {
 		"name": "nolindnaidoo",
