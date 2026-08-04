@@ -92,6 +92,25 @@ bun run package          # VSIX into release/
 
 Architecture and conventions live in [AGENTS.md](AGENTS.md). Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
+## Performance
+
+<!-- performance:start -->
+| Input | Size | Found | Time | Rate | Scan speed |
+| --- | --- | --- | --- | --- | --- |
+| TypeScript imports | 2.10 MB | 40,000 | 20.4 ms | 1,960,564/sec | 103.1 MB/s |
+| JSON config | 1.17 MB | 40,001 | 25.1 ms | 1,593,917/sec | 46.7 MB/s |
+| HTML document | 1.27 MB | 40,000 | 17.57 ms | 2,277,234/sec | 72 MB/s |
+| CSS stylesheet | 1.57 MB | 40,000 | 18.59 ms | 2,151,130/sec | 84.5 MB/s |
+| CSV data | 2.09 MB | 60,000 | 57.33 ms | 1,046,485/sec | 36.5 MB/s |
+
+Median of 7 runs after warmup, on Apple M5 Pro, 24 GB RAM, Node 24.3.0. Inputs are generated
+by `scripts/benchmark.ts` rather than checked in, so the sizes above are
+exactly what was measured. Reproduce with `bun run benchmark`.
+
+These are machine-specific and are not asserted in CI — a benchmark that gates
+a build only tells you how busy the runner was.
+<!-- performance:end -->
+
 ## Testing
 
 <!-- coverage:start -->

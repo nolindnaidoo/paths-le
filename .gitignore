@@ -114,3 +114,4 @@ src/extraction/__performance__/
 # Integration test compile output
 out-test/
 *.vsix
+benchmark-results.json
