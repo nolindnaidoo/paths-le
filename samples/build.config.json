@@ -1,0 +1,10 @@
+{
+  "entry": "./src/app.ts",
+  "outDir": "./dist",
+  "assets": [
+    "./public/favicon.ico",
+    "./public/images/logo.svg",
+    "../shared/fonts/inter.woff2"
+  ],
+  "tsconfig": "./tsconfig.build.json"
+}
