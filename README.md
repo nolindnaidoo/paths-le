@@ -11,6 +11,12 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le">
     <img src="https://img.shields.io/badge/Install%20from-VS%20Code-blue?style=for-the-badge&logo=visualstudiocode" alt="Install from VS Code Marketplace" />
   </a>
+  <a href="https://open-vsx.org/extension/OffensiveEdge/paths-le">
+    <img src="https://img.shields.io/open-vsx/dt/OffensiveEdge/paths-le?style=for-the-badge&label=Open%20VSX&color=blue" alt="Open VSX downloads" />
+  </a>
+  <a href="https://www.npmjs.com/package/paths-le-mcp">
+    <img src="https://img.shields.io/npm/v/paths-le-mcp?style=for-the-badge&label=MCP%20server&color=blue&logo=npm" alt="paths-le-mcp on npm" />
+  </a>
   <a href="https://letools.dev">
     <img src="https://img.shields.io/badge/LE%20Tools-letools.dev-blue?style=for-the-badge" alt="LE Tools" />
   </a>
@@ -34,6 +40,67 @@ Open a file, press `Ctrl+Alt+P` (`Cmd+Alt+P` on Mac), and every file path in the
 - **Import analysis** — extract local imports from JS/TS, including multi-line import statements; npm package names are filtered out
 - **Asset auditing** — every `src`, `href`, `srcset`, `url()`, and `@import` in HTML/CSS
 - **Config review** — path-like values from JSON/JSONC, TOML, CSV, and `.env` files
+
+## Use it from an AI agent
+
+The same engine runs as an [MCP](https://modelcontextprotocol.io) server, so an agent can call it directly instead of you running a command.
+
+| Editor | How |
+|---|---|
+| **VS Code** 1.101+ | Nothing to install — the extension registers `extract_paths` with agent mode |
+| **Zed** | [Paths-LE](https://github.com/zed-industries/extensions/pull/7081) — *pending review* |
+| **Claude Code** | `claude mcp add paths-le -- npx -y paths-le-mcp` |
+| **Cursor, Windsurf, anything else** | point it at `npx paths-le-mcp` |
+
+```
+extract_paths(content, format?, filename?, dedupe?, maxResults?)
+```
+
+Returns every path classified as file, relative, absolute or url, with its 1-based line and column. Paths are reported exactly as written — nothing is resolved against a workspace or touched on disk.
+
+The server takes content and returns data — it reads no files and makes no network requests of its own. Published as [`paths-le-mcp`](https://www.npmjs.com/package/paths-le-mcp) on npm and as `io.github.nolindnaidoo/paths-le` in the [MCP registry](https://registry.modelcontextprotocol.io).
+
+<details>
+<summary><b>Configuring it by hand</b> — any host with an MCP config file</summary>
+
+Most hosts read a JSON config. Add one entry:
+
+```json
+{
+  "mcpServers": {
+    "paths-le": {
+      "command": "npx",
+      "args": ["-y", "paths-le-mcp"]
+    }
+  }
+}
+```
+
+`-y` skips the install prompt on first run. Pin a version if you would rather not track releases — `paths-le-mcp@2.2.1`.
+
+Prefer not to go through `npx` on every launch? Install it once and point at the binary instead:
+
+```bash
+npm install -g paths-le-mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "paths-le": { "command": "paths-le-mcp" }
+  }
+}
+```
+
+It speaks MCP over stdio and needs no environment variables, no API key and no configuration of its own. To check it before wiring it into anything:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | npx -y paths-le-mcp
+```
+
+That prints the tool list and exits — if you see `extract_paths`, the server works.
+
+</details>
 
 ## Supported formats
 
@@ -92,6 +159,7 @@ setting of its own.
 
 - **No network access.** The extension never sends data anywhere. The `telemetryEnabled` setting only writes events to a local Output Channel you can inspect (`Paths-LE Telemetry`).
 - **Canonical resolution is opt-in and warned.** Resolving symlinks/workspace-relative paths can put absolute filesystem paths into the results document; the extension warns before first use. Leave both `resolution.*` settings off unless you need them.
+- **The MCP server holds the same line.** It takes content as an argument and returns data: no filesystem access, no network calls, no telemetry. Your agent already has file-read tools, so duplicating them inside the server would add a path-traversal surface for no capability. `check:mcp-bundle` fails the build if the server ever imports something that could reach either.
 - Error notifications redact home directories and credential-shaped fragments.
 
 ## Development
@@ -150,6 +218,8 @@ run. Reproduce with `bun run test:coverage`.
 
 Every tool in the family, one page: **[letools.dev](https://letools.dev)**
 
+All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same engine.
+
 - **[String-LE](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.string-le)** - Extract string values for i18n from JSON, YAML, CSV, TOML, INI, and .env
 - **[Numbers-LE](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.numbers-le)** - Extract numeric values from JSON, YAML, CSV, TOML, INI, and .env
 - **[EnvSync-LE](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.envsync-le)** - Spot missing keys across your .env files, with a markdown report
@@ -164,8 +234,10 @@ Every tool in the family, one page: **[letools.dev](https://letools.dev)**
 
 **Rust**
 
-- **[pixelcoords](https://github.com/nolindnaidoo/pixelcoords)** - Mark pixel-exact coordinates machines can use · [pixelcoords.dev](https://pixelcoords.dev)
-- **[pixelactions](https://github.com/nolindnaidoo/pixelactions)** - Perform the interaction and confirm it landed · [pixelactions.dev](https://pixelactions.dev)
+- **[pixelcoords](https://github.com/nolindnaidoo/pixelcoords)** — Freeze your screen, mark regions, get pixel-exact coordinates and crops
+  [pixelcoords.dev](https://pixelcoords.dev) · [crates.io](https://crates.io/crates/pixelcoords) · [docs.rs](https://docs.rs/pixelcoords)
+- **[pixelactions](https://github.com/nolindnaidoo/pixelactions)** — Consume human-verified coordinates, perform the interaction, confirm it landed
+  [pixelactions.dev](https://pixelactions.dev) · [crates.io](https://crates.io/crates/pixelactions) · [docs.rs](https://docs.rs/pixelactions)
 
 **Contact Developer** — [GitHub](https://github.com/nolindnaidoo) · [LinkedIn](https://www.linkedin.com/in/nolindnaidoo/)
 
