@@ -71,6 +71,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Every `else` block is gone (4 of them), replaced by guard clauses and early
+  returns, per the fleet standard in `../AGENTS.md`.
+- `commands/extract.ts` held orchestration, canonical path resolution, output
+  routing and the success message in 398 lines. Routing moved to
+  `commands/output.ts`, leaving 262 and 141.
+
 - Test coverage raised from 74.04% to 83.87% of branches (82.20% to 90.72% of
   statements). Four files sat below one of the repo's own floors; none do now.
   `commands/extract.ts` was the least-covered file in the family at 40%
