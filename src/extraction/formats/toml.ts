@@ -11,7 +11,7 @@ import { createPositionIndex, type PositionIndex } from '../position';
  * Repeated identical values resolve to successive occurrences; a value
  * that cannot be located falls back to 1:1.
  */
-export function extractFromToml(content: string): Path[] {
+export function extractFromToml(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	let parsed: unknown;

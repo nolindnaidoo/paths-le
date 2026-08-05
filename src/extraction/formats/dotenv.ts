@@ -7,7 +7,7 @@ import { classifyPathType, isPathLike } from '../heuristics';
  * is a line-oriented format. Columns are 1-based offsets into the raw
  * (untrimmed) line and point at the value/key itself.
  */
-export function extractFromDotenv(content: string): Path[] {
+export function extractFromDotenv(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	const lines = content.split('\n');

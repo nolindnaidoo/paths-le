@@ -26,7 +26,10 @@ export async function extractPaths(
 	});
 }
 
-function extractPathsByFileType(content: string, fileType: FileType): Path[] {
+function extractPathsByFileType(
+	content: string,
+	fileType: FileType,
+): readonly Path[] {
 	switch (fileType) {
 		case 'csv':
 			return extractFromCsv(content);

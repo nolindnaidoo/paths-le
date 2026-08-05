@@ -9,7 +9,7 @@ import { createPositionIndex, type PositionIndex } from '../position';
  * 1:1) and tolerates comments and trailing commas, so .jsonc documents
  * extract instead of silently returning nothing.
  */
-export function extractFromJson(content: string): Path[] {
+export function extractFromJson(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	const root = parseTree(content, undefined, {

@@ -7,7 +7,7 @@ import { classifyPathType, isPathLike } from '../heuristics';
  * Positions are cell coordinates — line is the row number, column is
  * the cell index (not a character offset); the context repeats both.
  */
-export function extractFromCsv(content: string): Path[] {
+export function extractFromCsv(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	try {
@@ -18,7 +18,9 @@ export function extractFromCsv(content: string): Path[] {
 			relax_quotes: true,
 			relax_column_count: true,
 			trim: true,
-		}) as unknown as ReadonlyArray<ReadonlyArray<string>>;
+			// csv-parse's sync parse is typed `any`; with `columns: false` it
+			// yields rows of cells, which is what one cast states directly.
+		}) as string[][];
 
 		const paths: Path[] = [];
 

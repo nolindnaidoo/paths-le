@@ -13,7 +13,7 @@ import { isExcludedScheme } from './schemes';
 const ATTRIBUTE_PATTERN =
 	/\b(src|href|data|action|poster|background|cite|formaction|icon|manifest|srcset)\s*=\s*(["'])([^"']+)\2/dgi;
 
-export function extractFromHtml(content: string): Path[] {
+export function extractFromHtml(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	const toPosition = createPositionIndex(content);

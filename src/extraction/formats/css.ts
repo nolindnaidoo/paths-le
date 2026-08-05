@@ -14,7 +14,7 @@ const IMPORT_PATTERN =
 	/@import\s+(?:url\s*\(\s*)?(['"])([^'"]+)\1(?:\s*\))?/dgi;
 const URL_PATTERN = /url\s*\(\s*(['"]?)([^'"()]+?)\1\s*\)/dgi;
 
-export function extractFromCss(content: string): Path[] {
+export function extractFromCss(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	const toPosition = createPositionIndex(content);

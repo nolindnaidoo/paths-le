@@ -1,7 +1,7 @@
 export interface ExtractionResult {
-	success: boolean;
-	paths: readonly Path[];
-	errors: readonly ParseError[];
+	readonly success: boolean;
+	readonly paths: readonly Path[];
+	readonly errors: readonly ParseError[];
 }
 
 export interface ParseError {
@@ -16,13 +16,13 @@ export interface ParseError {
 }
 
 export interface Path {
-	value: string;
-	type: PathType;
-	position: {
-		line: number;
-		column: number;
+	readonly value: string;
+	readonly type: PathType;
+	readonly position: {
+		readonly line: number;
+		readonly column: number;
 	};
-	context: string;
+	readonly context: string;
 }
 
 export type PathType = 'file' | 'relative' | 'absolute' | 'url' | 'unknown';

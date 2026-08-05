@@ -37,7 +37,7 @@ const PATTERNS: readonly PatternSpec[] = [
 	},
 ];
 
-export function extractFromJavaScript(content: string): Path[] {
+export function extractFromJavaScript(content: string): readonly Path[] {
 	if (content.trim().length === 0) return [];
 
 	const toPosition = createPositionIndex(content);
