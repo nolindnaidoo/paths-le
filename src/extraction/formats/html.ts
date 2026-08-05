@@ -1,6 +1,7 @@
 import type { Path } from '../../types';
 import { classifyPathType } from '../heuristics';
 import { createPositionIndex } from '../position';
+import { isExcludedScheme } from './schemes';
 
 /**
  * Extract paths from HTML attributes (src, href, srcset, action, …).
@@ -34,7 +35,7 @@ export function extractFromHtml(content: string): Path[] {
 			continue;
 		}
 
-		if (isExcluded(attrValue)) continue;
+		if (isExcludedScheme(attrValue)) continue;
 
 		paths.push({
 			value: attrValue,
@@ -62,7 +63,7 @@ function extractFromSrcset(
 	for (const entry of srcset.split(',')) {
 		const trimmedStart = cursor + (entry.length - entry.trimStart().length);
 		const url = entry.trim().split(/\s+/)[0];
-		if (url && !isExcluded(url)) {
+		if (url && !isExcludedScheme(url)) {
 			paths.push({
 				value: url,
 				type: classifyPathType(url),
@@ -72,14 +73,4 @@ function extractFromSrcset(
 		}
 		cursor += entry.length + 1; // +1 for the comma
 	}
-}
-
-// Pseudo-schemes that are never file paths. Matched case-insensitively and
-// past leading whitespace because HTML attribute values are neither
-// case-normalised nor trimmed by the parser — `JavaScript:` and ` vbscript:`
-// are both valid in markup and were previously extracted as paths.
-const NON_PATH_SCHEME = /^\s*(?:data|javascript|vbscript):/i;
-
-function isExcluded(value: string): boolean {
-	return NON_PATH_SCHEME.test(value);
 }

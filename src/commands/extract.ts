@@ -26,7 +26,7 @@ export function registerExtractCommand(
 
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				deps.notifier.showWarning('No active editor found');
+				deps.notifier.showWarning(vscode.l10n.t('No active editor found'));
 				return;
 			}
 
@@ -50,7 +50,9 @@ export function registerExtractCommand(
 			}
 
 			if (result.paths.length === 0) {
-				deps.notifier.showInfo('No paths found in the current document');
+				deps.notifier.showInfo(
+					vscode.l10n.t('No paths found in the current document'),
+				);
 				return;
 			}
 
@@ -102,7 +104,9 @@ function handleExtractionFailure(
 		| undefined;
 
 	if (!firstError) {
-		deps.notifier.showError('Failed to extract paths: Unknown error');
+		deps.notifier.showError(
+			vscode.l10n.t('Failed to extract paths: Unknown error'),
+		);
 		return;
 	}
 
@@ -124,7 +128,7 @@ async function handleCanonicalResolutionWarning(
 	context: vscode.ExtensionContext,
 	deps: Readonly<{ notifier: Notifier; statusBar: StatusBar }>,
 ): Promise<boolean> {
-	deps.statusBar.showProgress('⚠️ Resolving canonical paths...');
+	deps.statusBar.showProgress(vscode.l10n.t('⚠️ Resolving canonical paths...'));
 
 	const warningShown = context.globalState.get<boolean>(
 		CANONICAL_WARNING_KEY,
@@ -135,19 +139,30 @@ async function handleCanonicalResolutionWarning(
 		return true;
 	}
 
+	// Bound once and reused for the comparisons below. showWarningMessage
+	// returns the label that was clicked, so a localized label compared against
+	// an English literal silently takes the "dismissed" path in every other
+	// language — and this particular dialog governs whether absolute filesystem
+	// paths end up in the output.
+	const continueLabel = vscode.l10n.t('Continue');
+	const disableLabel = vscode.l10n.t('Disable and Continue');
+	const learnMoreLabel = vscode.l10n.t('Learn More');
+
 	const choice = await vscode.window.showWarningMessage(
-		'⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.',
-		'Continue',
-		'Disable and Continue',
-		'Learn More',
+		vscode.l10n.t(
+			'⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.',
+		),
+		continueLabel,
+		disableLabel,
+		learnMoreLabel,
 	);
 
-	if (choice === 'Disable and Continue') {
+	if (choice === disableLabel) {
 		await disableCanonicalResolution(deps);
 		return false;
 	}
 
-	if (choice === 'Learn More') {
+	if (choice === learnMoreLabel) {
 		await vscode.env.openExternal(
 			vscode.Uri.parse(
 				'https://github.com/nolindnaidoo/paths-le#privacy--security',
@@ -156,7 +171,7 @@ async function handleCanonicalResolutionWarning(
 		return false;
 	}
 
-	if (choice === 'Continue') {
+	if (choice === continueLabel) {
 		await context.globalState.update(CANONICAL_WARNING_KEY, true);
 		return true;
 	}
@@ -181,7 +196,9 @@ async function disableCanonicalResolution(
 			false,
 			vscode.ConfigurationTarget.Workspace,
 		);
-	deps.notifier.showInfo('Canonical path resolution disabled for security');
+	deps.notifier.showInfo(
+		vscode.l10n.t('Canonical path resolution disabled for security'),
+	);
 }
 
 async function resolvePathsIfNeeded(
@@ -321,7 +338,9 @@ function showSuccessMessage(
 	languageId: string,
 	deps: Readonly<{ notifier: Notifier; telemetry: Telemetry }>,
 ): void {
-	deps.notifier.showInfo(`Extracted ${pathCount} paths from document`);
+	deps.notifier.showInfo(
+		vscode.l10n.t('Extracted {0} paths from document', pathCount),
+	);
 	deps.telemetry.event('extract-success', {
 		count: pathCount,
 		language: languageId,

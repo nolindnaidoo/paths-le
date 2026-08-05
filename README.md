@@ -75,7 +75,18 @@ Positions are real source positions for JS/TS, JSON/JSONC, HTML, and CSS (exact 
 | `paths-le.resolution.resolveSymlinks` | `false` | ⚠️ Resolve symlinks to canonical paths |
 | `paths-le.resolution.resolveWorkspaceRelative` | `false` | ⚠️ Resolve paths against workspace folders |
 
-The settings UI is translated into 12 languages besides English.
+## Languages
+
+Twelve languages besides English:
+
+German · Spanish · French · Indonesian · Italian · Japanese · Korean ·
+Portuguese (Brazil) · Russian · Ukrainian · Vietnamese · Chinese (Simplified)
+
+Both halves are covered — the manifest (command titles, setting names and
+descriptions) and everything shown while the extension runs (notifications,
+the status bar, quick-picks and prompts). The extension follows VS Code's
+display language, so it matches whatever the editor is already set to; no
+setting of its own.
 
 ## Privacy & security
 
@@ -121,12 +132,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 82.18% |
-| Branches | 73.58% |
-| Functions | 88.18% |
-| Lines | 82.49% |
+| Statements | 90.72% |
+| Branches | 83.87% |
+| Functions | 94.49% |
+| Lines | 91.66% |
 
-142 test cases across 16 files, plus an integration suite that runs
+168 test cases across 18 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 

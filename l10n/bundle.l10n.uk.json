@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Не знайдено активного редактора",
+	"Sorted {0} paths ({1})": "Відсортовано {0} шляхів ({1})",
+	"Alphabetical (A → Z)": "Алфавітний (A → Z)",
+	"Alphabetical (Z → A)": "За алфавітом (Z → A)",
+	"By Length (Short → Long)": "За довжиною (короткі → довгі)",
+	"By Length (Long → Short)": "За довжиною (довгі → короткі)",
+	"Select sort order": "Вибрати порядок сортування",
+	"No paths found in the current document": "У поточному документі не знайдено шляхів",
+	"Failed to extract paths: Unknown error": "Не вдалося витягти шляхи: невідома помилка",
+	"Canonical path resolution disabled for security": "Визначення канонічного шляху вимкнено з міркувань безпеки",
+	"Extracted {0} paths from document": "Витягнуто шляхи до файлів {0} з документа",
+	"Paths-LE: File Path Extraction": "Paths-LE: Витяг шляху до файлу",
+	"Continue": "Продовжити",
+	"Disable and Continue": "Вимкнути та продовжити",
+	"Learn More": "Дізнатися більше",
+	"⚠️ Resolving canonical paths...": "⚠️ Визначення канонічних шляхів...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ ПОПЕРЕДЖЕННЯ ЩОДО БЕЗПЕКИ: Увімкнено розпізнавання канонічних шляхів. Це може призвести до розкриття конфіденційних шляхів до файлової системи у виведеній інформації. Використовуйте лише в надійних середовищах."
+}

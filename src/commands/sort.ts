@@ -17,7 +17,7 @@ export function registerSortCommand(
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				notifier.showWarning('No active editor found');
+				notifier.showWarning(vscode.l10n.t('No active editor found'));
 				return;
 			}
 
@@ -32,7 +32,13 @@ export function registerSortCommand(
 
 			await replaceDocumentContent(document, sorted);
 
-			notifier.showInfo(`Sorted ${sorted.length} paths (${sortOption.label})`);
+			notifier.showInfo(
+				vscode.l10n.t(
+					'Sorted {0} paths ({1})',
+					sorted.length,
+					sortOption.label,
+				),
+			);
 		},
 	);
 
@@ -41,14 +47,14 @@ export function registerSortCommand(
 
 async function promptSortOrder(): Promise<SortOption | undefined> {
 	const options: SortOption[] = [
-		{ label: 'Alphabetical (A → Z)', value: 'asc' },
-		{ label: 'Alphabetical (Z → A)', value: 'desc' },
-		{ label: 'By Length (Short → Long)', value: 'length-asc' },
-		{ label: 'By Length (Long → Short)', value: 'length-desc' },
+		{ label: vscode.l10n.t('Alphabetical (A → Z)'), value: 'asc' },
+		{ label: vscode.l10n.t('Alphabetical (Z → A)'), value: 'desc' },
+		{ label: vscode.l10n.t('By Length (Short → Long)'), value: 'length-asc' },
+		{ label: vscode.l10n.t('By Length (Long → Short)'), value: 'length-desc' },
 	];
 
 	return vscode.window.showQuickPick(options, {
-		placeHolder: 'Select sort order',
+		placeHolder: vscode.l10n.t('Select sort order'),
 	});
 }
 

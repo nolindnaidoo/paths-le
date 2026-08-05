@@ -1,0 +1,19 @@
+{
+	"No active editor found": "활성 편집기 없음",
+	"Sorted {0} paths ({1})": "{0} 경로 정렬 완료 ({1}개)",
+	"Alphabetical (A → Z)": "알파벳순 (A → Z)",
+	"Alphabetical (Z → A)": "알파벳순 (Z → A)",
+	"By Length (Short → Long)": "길이순 (짧음 → 길음)",
+	"By Length (Long → Short)": "길이순 (길음 → 짧음)",
+	"Select sort order": "정렬 순서 선택",
+	"No paths found in the current document": "현재 문서에서 경로를 찾을 수 없습니다.",
+	"Failed to extract paths: Unknown error": "경로 추출에 실패했습니다: 알 수 없는 오류",
+	"Canonical path resolution disabled for security": "보안상의 이유로 표준 경로 확인 기능이 비활성화되었습니다.",
+	"Extracted {0} paths from document": "문서에서 {0} 경로를 추출했습니다.",
+	"Paths-LE: File Path Extraction": "Paths-LE: 파일 경로 추출",
+	"Continue": "계속",
+	"Disable and Continue": "비활성화하고 계속하기",
+	"Learn More": "자세히 알아보기",
+	"⚠️ Resolving canonical paths...": "⚠️ 표준 경로 확인 중...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ 보안 경고: 캐노니컬 경로 확인 기능이 활성화되어 있습니다. 이로 인해 추출된 출력에 민감한 파일 시스템 경로가 노출될 수 있습니다. 신뢰할 수 있는 환경에서만 사용하십시오."
+}

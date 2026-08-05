@@ -1,0 +1,19 @@
+{
+	"No active editor found": "未找到活动编辑器",
+	"Sorted {0} paths ({1})": "已排序 {0} 个路径（共 {1} 个）",
+	"Alphabetical (A → Z)": "按字母排序（A → Z）",
+	"Alphabetical (Z → A)": "按字母顺序（Z → A）",
+	"By Length (Short → Long)": "按长度排序（短 → 长）",
+	"By Length (Long → Short)": "按长度排序（长 → 短）",
+	"Select sort order": "选择排序顺序",
+	"No paths found in the current document": "在当前文档中未找到路径",
+	"Failed to extract paths: Unknown error": "无法提取路径：未知错误",
+	"Canonical path resolution disabled for security": "出于安全考虑，已禁用规范路径解析",
+	"Extracted {0} paths from document": "从文档中提取了{0}路径",
+	"Paths-LE: File Path Extraction": "Paths-LE：文件路径提取",
+	"Continue": "继续",
+	"Disable and Continue": "禁用并继续",
+	"Learn More": "了解更多",
+	"⚠️ Resolving canonical paths...": "⚠️ 正在解析规范路径...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ 安全警告：已启用规范路径解析。这可能会导致提取的输出中暴露敏感的文件系统路径。请仅在可信环境中使用。"
+}

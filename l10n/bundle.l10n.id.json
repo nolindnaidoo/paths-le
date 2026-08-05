@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Tidak ditemukan editor aktif",
+	"Sorted {0} paths ({1})": "{0} jalur diurutkan ({1})",
+	"Alphabetical (A → Z)": "Abjad (A → Z)",
+	"Alphabetical (Z → A)": "Abjad (Z → A)",
+	"By Length (Short → Long)": "Berdasarkan Panjang (Pendek → Panjang)",
+	"By Length (Long → Short)": "Berdasarkan Panjang (Panjang → Pendek)",
+	"Select sort order": "Pilih urutan penyortiran",
+	"No paths found in the current document": "Tidak ditemukan jalur apa pun dalam dokumen ini",
+	"Failed to extract paths: Unknown error": "Gagal mengekstrak jalur: Kesalahan tidak diketahui",
+	"Canonical path resolution disabled for security": "Resolusi jalur kanonik dinonaktifkan demi keamanan",
+	"Extracted {0} paths from document": "Mengekstrak jalur {0} dari dokumen",
+	"Paths-LE: File Path Extraction": "Paths-LE: Ekstraksi Jalur File",
+	"Continue": "Lanjutkan",
+	"Disable and Continue": "Nonaktifkan dan Lanjutkan",
+	"Learn More": "Pelajari Lebih Lanjut",
+	"⚠️ Resolving canonical paths...": "⚠️ Sedang menentukan jalur kanonik...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ PERINGATAN KEAMANAN: Fitur resolusi jalur kanonik telah diaktifkan. Hal ini dapat menyebabkan terungkapnya jalur sistem berkas yang sensitif dalam hasil ekstraksi. Gunakan hanya di lingkungan yang tepercaya."
+}

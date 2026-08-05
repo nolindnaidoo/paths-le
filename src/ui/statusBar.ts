@@ -15,7 +15,7 @@ export function createStatusBar(context: vscode.ExtensionContext): StatusBar {
 		100,
 	);
 	statusBarItem.text = IDLE_TEXT;
-	statusBarItem.tooltip = 'Paths-LE: File Path Extraction';
+	statusBarItem.tooltip = vscode.l10n.t('Paths-LE: File Path Extraction');
 	statusBarItem.command = 'paths-le.extractPaths';
 	context.subscriptions.push(statusBarItem);
 

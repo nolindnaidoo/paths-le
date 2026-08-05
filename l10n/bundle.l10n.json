@@ -1,0 +1,19 @@
+{
+  "Paths-LE: File Path Extraction": "Paths-LE: File Path Extraction",
+  "No active editor found": "No active editor found",
+  "Sorted {0} paths ({1})": "Sorted {0} paths ({1})",
+  "Alphabetical (A → Z)": "Alphabetical (A → Z)",
+  "Alphabetical (Z → A)": "Alphabetical (Z → A)",
+  "By Length (Short → Long)": "By Length (Short → Long)",
+  "By Length (Long → Short)": "By Length (Long → Short)",
+  "Select sort order": "Select sort order",
+  "No paths found in the current document": "No paths found in the current document",
+  "Failed to extract paths: Unknown error": "Failed to extract paths: Unknown error",
+  "⚠️ Resolving canonical paths...": "⚠️ Resolving canonical paths...",
+  "Continue": "Continue",
+  "Disable and Continue": "Disable and Continue",
+  "Learn More": "Learn More",
+  "⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.",
+  "Canonical path resolution disabled for security": "Canonical path resolution disabled for security",
+  "Extracted {0} paths from document": "Extracted {0} paths from document"
+}

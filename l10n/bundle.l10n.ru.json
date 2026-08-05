@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Не найден активный редактор",
+	"Sorted {0} paths ({1})": "Отсортировано {0} пути ({1})",
+	"Alphabetical (A → Z)": "По алфавиту (A → Z)",
+	"Alphabetical (Z → A)": "По алфавиту (Z → A)",
+	"By Length (Short → Long)": "По длине (короткий → длинный)",
+	"By Length (Long → Short)": "По длине (длинный → короткий)",
+	"Select sort order": "Выбрать порядок сортировки",
+	"No paths found in the current document": "В текущем документе не найдено ни одного пути",
+	"Failed to extract paths: Unknown error": "Не удалось извлечь пути: неизвестная ошибка",
+	"Canonical path resolution disabled for security": "Распознавание канонического пути отключено из соображений безопасности",
+	"Extracted {0} paths from document": "Извлечены пути {0} из документа",
+	"Paths-LE: File Path Extraction": "Paths-LE: Извлечение путей к файлам",
+	"Continue": "Продолжить",
+	"Disable and Continue": "Отключить и продолжить",
+	"Learn More": "Узнать больше",
+	"⚠️ Resolving canonical paths...": "⚠️ Определение канонических путей...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ ПРЕДУПРЕЖДЕНИЕ О БЕЗОПАСНОСТИ: Включена функция преобразования канонических путей. Это может привести к раскрытию конфиденциальных путей файловой системы в результатах извлечения. Использовать только в доверенных средах."
+}

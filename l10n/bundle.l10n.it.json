@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Nessun editor attivo trovato",
+	"Sorted {0} paths ({1})": "Ordinati {0} percorsi ({1})",
+	"Alphabetical (A → Z)": "Alfabetico (A → Z)",
+	"Alphabetical (Z → A)": "Alfabetico (Z → A)",
+	"By Length (Short → Long)": "Per lunghezza (da breve a lungo)",
+	"By Length (Long → Short)": "Per lunghezza (da lungo a breve)",
+	"Select sort order": "Seleziona ordine di ordinamento",
+	"No paths found in the current document": "Nessun percorso trovato nel documento corrente",
+	"Failed to extract paths: Unknown error": "Impossibile estrarre i percorsi: errore sconosciuto",
+	"Canonical path resolution disabled for security": "Risoluzione del percorso canonico disabilitata per motivi di sicurezza",
+	"Extracted {0} paths from document": "Ha estratto i percorsi \"{0}\" dal documento",
+	"Paths-LE: File Path Extraction": "Paths-LE: Estrazione del percorso dei file",
+	"Continue": "Continua",
+	"Disable and Continue": "Disattiva e continua",
+	"Learn More": "Scopri di più",
+	"⚠️ Resolving canonical paths...": "⚠️ Risoluzione dei percorsi canonici...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ AVVISO DI SICUREZZA: La risoluzione dei percorsi canonici è abilitata. Ciò potrebbe rendere visibili percorsi sensibili del file system nell'output estratto. Utilizzare solo in ambienti affidabili."
+}

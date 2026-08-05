@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Kein aktiver Editor gefunden",
+	"Sorted {0} paths ({1})": "{0} Pfade sortiert ({1})",
+	"Alphabetical (A → Z)": "Alphabetisch (A → Z)",
+	"Alphabetical (Z → A)": "Alphabetisch (Z → A)",
+	"By Length (Short → Long)": "Nach Länge (kurz → lang)",
+	"By Length (Long → Short)": "Nach Länge (lang → kurz)",
+	"Select sort order": "Sortierreihenfolge auswählen",
+	"No paths found in the current document": "Im aktuellen Dokument wurden keine Pfade gefunden",
+	"Failed to extract paths: Unknown error": "Pfade konnten nicht extrahiert werden: Unbekannter Fehler",
+	"Canonical path resolution disabled for security": "Die Auflösung des kanonischen Pfads wurde aus Sicherheitsgründen deaktiviert",
+	"Extracted {0} paths from document": "{0}-Pfade aus dem Dokument extrahiert",
+	"Paths-LE: File Path Extraction": "Paths-LE: Extraktion von Dateipfaden",
+	"Continue": "Weiter",
+	"Disable and Continue": "Deaktivieren und fortfahren",
+	"Learn More": "Mehr erfahren",
+	"⚠️ Resolving canonical paths...": "⚠️ Kanonische Pfade werden ermittelt...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ SICHERHEITSWARNUNG: Die Auflösung kanonischer Pfade ist aktiviert. Dadurch können sensible Dateisystempfade in der extrahierten Ausgabe offengelegt werden. Nur in vertrauenswürdigen Umgebungen verwenden."
+}

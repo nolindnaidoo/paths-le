@@ -125,11 +125,12 @@ async function resolveSymlinks(inputPath: string): Promise<string> {
 
 	try {
 		return await fs.realpath(inputPath);
-	} catch (error) {
-		const code = (error as NodeJS.ErrnoException).code;
-		if (code === 'ENOENT' || code === 'EACCES' || code === 'EPERM') {
-			return inputPath;
-		}
+	} catch {
+		// Any failure — missing file, permission denied, a broken link — falls
+		// back to the path as written, which is the useful answer for an
+		// extractor. This previously branched on ENOENT/EACCES/EPERM via an
+		// `as NodeJS.ErrnoException` cast and then returned the same value from
+		// both arms, so the condition and the cast were inert.
 		return inputPath;
 	}
 }

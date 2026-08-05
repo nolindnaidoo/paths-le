@@ -1,0 +1,19 @@
+{
+	"No active editor found": "Không tìm thấy trình chỉnh sửa hoạt động",
+	"Sorted {0} paths ({1})": "Đã sắp xếp {0} đường dẫn ({1})",
+	"Alphabetical (A → Z)": "Theo thứ tự alphabet (A → Z)",
+	"Alphabetical (Z → A)": "Theo thứ tự chữ cái (Z → A)",
+	"By Length (Short → Long)": "Theo độ dài (Ngắn → Dài)",
+	"By Length (Long → Short)": "Theo độ dài (Dài → Ngắn)",
+	"Select sort order": "Chọn thứ tự sắp xếp",
+	"No paths found in the current document": "Không tìm thấy đường dẫn nào trong tài liệu hiện tại",
+	"Failed to extract paths: Unknown error": "Không thể trích xuất đường dẫn: Lỗi không xác định",
+	"Canonical path resolution disabled for security": "Chức năng giải quyết đường dẫn chuẩn đã bị vô hiệu hóa vì lý do bảo mật",
+	"Extracted {0} paths from document": "Đã trích xuất các đường dẫn {0} từ tài liệu",
+	"Paths-LE: File Path Extraction": "Paths-LE: Trích xuất đường dẫn tệp",
+	"Continue": "Tiếp tục",
+	"Disable and Continue": "Tắt và Tiếp tục",
+	"Learn More": "Tìm hiểu thêm",
+	"⚠️ Resolving canonical paths...": "⚠️ Đang xác định các đường dẫn chuẩn...",
+	"⚠️ SECURITY WARNING: Canonical path resolution is enabled. This may expose sensitive file system paths in the extracted output. Only use in trusted environments.": "⚠️ CẢNH BÁO BẢO MẬT: Tính năng giải quyết đường dẫn chuẩn đã được bật. Điều này có thể làm lộ các đường dẫn nhạy cảm trong hệ thống tệp trong kết quả giải nén. Chỉ nên sử dụng trong các môi trường đáng tin cậy."
+}

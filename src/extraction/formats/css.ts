@@ -1,6 +1,7 @@
 import type { Path } from '../../types';
 import { classifyPathType } from '../heuristics';
 import { createPositionIndex } from '../position';
+import { isExcludedScheme } from './schemes';
 
 /**
  * Extract url() and @import paths from CSS/SCSS/LESS.
@@ -25,7 +26,7 @@ export function extractFromCss(content: string): Path[] {
 	while ((match = IMPORT_PATTERN.exec(content)) !== null) {
 		const value = match[2]?.trim();
 		const indices = match.indices?.[2];
-		if (!value || !indices || isExcluded(value)) continue;
+		if (!value || !indices || isExcludedScheme(value)) continue;
 		claimed.add(indices[0]);
 		paths.push({
 			value,
@@ -39,7 +40,7 @@ export function extractFromCss(content: string): Path[] {
 	while ((match = URL_PATTERN.exec(content)) !== null) {
 		const value = match[2]?.trim();
 		const indices = match.indices?.[2];
-		if (!value || !indices || isExcluded(value)) continue;
+		if (!value || !indices || isExcludedScheme(value)) continue;
 		if (claimed.has(indices[0])) continue;
 		paths.push({
 			value,
@@ -54,12 +55,4 @@ export function extractFromCss(content: string): Path[] {
 			a.position.line - b.position.line ||
 			a.position.column - b.position.column,
 	);
-}
-
-// Same pseudo-scheme rule as the HTML extractor: url() accepts these too, and
-// none of them are file paths.
-const NON_PATH_SCHEME = /^\s*(?:data|javascript|vbscript):/i;
-
-function isExcluded(value: string): boolean {
-	return NON_PATH_SCHEME.test(value);
 }

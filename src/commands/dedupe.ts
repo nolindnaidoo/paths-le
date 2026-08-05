@@ -10,7 +10,7 @@ export function registerDedupeCommand(
 		async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
-				notifier.showWarning('No active editor found');
+				notifier.showWarning(vscode.l10n.t('No active editor found'));
 				return;
 			}
 

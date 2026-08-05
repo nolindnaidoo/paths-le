@@ -5,14 +5,64 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.2] - 2026-08-04
+## [2.1.0] - 2026-08-04
 
 ### Added
+
+- Runtime strings are localized, and this time they render. All 11 of them —
+  notifications, status bar, quick-picks and prompts — go through
+  `vscode.l10n` and ship as twelve translated bundles in `l10n/`. The v1.x
+  line carried manifest catalogues that worked and runtime catalogues that
+  never reached the screen: `vscode-nls` was configured without
+  `__filename`, so every runtime string fell back to English while the VSIX
+  looked correct.
+- An integration test covering both localization mechanisms — manifest
+  substitution, key parity across all thirteen catalogues, and placeholder
+  integrity in every translation. A translation that silently drops `{0}`
+  now fails the build instead of shipping a message with the value missing.
 
 - Dependency review on pull requests, failing on a high-severity addition
   before Dependabot's auto-merge can act.
 
+### Fixed
+
+- Symlink resolution branched on `ENOENT`/`EACCES`/`EPERM` and then returned
+  the same value from both arms, so the condition — and the
+  `as NodeJS.ErrnoException` cast it needed — did nothing at all. Falling back
+  to the path as written is the right answer for every failure here, and the
+  code now says so.
+- The pseudo-scheme guard that keeps `javascript:`, `data:` and `vbscript:`
+  values from being extracted as file paths existed as two identical copies,
+  one in the HTML extractor and one in CSS, each commented as a copy of the
+  other. It is now defined once, with tests covering the case-insensitivity
+  and leading-whitespace cases the original CodeQL finding
+  (`js/incomplete-url-scheme-check`) was actually about. Adding a scheme to
+  one copy and not the other would have reintroduced the bug in one format
+  only, and the extractors are tested separately, so nothing would have caught
+  it.
+- The status bar tooltip was never localized.
+
+### Fixed
+
+- The canonical-path security warning was never localized. It is the dialog
+  that decides whether absolute filesystem paths end up in the extracted
+  output, and it — along with its three buttons and the progress label — was
+  English in all twelve locales. The button labels are now bound to constants
+  and compared by reference: `showWarningMessage` returns the label that was
+  clicked, so localizing them without binding would have made every answer
+  read as "dismissed" in every non-English locale, silently skipping the
+  extraction.
+
 ### Changed
+
+- Test coverage raised from 74.04% to 83.87% of branches (82.20% to 90.72% of
+  statements). Four files sat below one of the repo's own floors; none do now.
+  `commands/extract.ts` was the least-covered file in the family at 40%
+  statements — nearly all of it sits behind guards or behind the
+  canonical-resolution dialog, so the default happy path exercised none of it.
+  `utils/pathResolver.ts` had its workspace-relative resolution and its cache
+  untested.
+
 
 - CI gains fleet-wide checks that no single repo can perform: shared config is
   compared across all ten extensions, and every README link is verified —

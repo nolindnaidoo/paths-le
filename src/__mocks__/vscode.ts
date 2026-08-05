@@ -285,7 +285,14 @@ export const window = {
 	},
 	showQuickPick: async (items: unknown[], _options?: unknown) =>
 		quickPickResponder ? quickPickResponder(items) : undefined,
-	showTextDocument: async (_document: unknown, _column?: unknown) => undefined,
+	showTextDocument: async (_document: unknown, options?: unknown) => {
+		// Recorded so tests can assert placement — openResultsSideBySide sets
+		// viewColumn, which is otherwise unobservable.
+		shownDocumentOptions.push(
+			(options as { viewColumn?: number } | undefined) ?? {},
+		);
+		return undefined;
+	},
 	createOutputChannel: (_name: string) => {
 		const linesOut: string[] = [];
 		return {
@@ -398,7 +405,14 @@ export const FileType = {
 };
 
 /** Reset all mutable mock state between tests. */
+const shownDocumentOptions: Array<{ viewColumn?: number }> = [];
+
+export function _shownDocumentOptions(): readonly { viewColumn?: number }[] {
+	return shownDocumentOptions;
+}
+
 export function _resetMockState(): void {
+	shownDocumentOptions.length = 0;
 	configStore.clear();
 	configUpdates.length = 0;
 	configListeners.length = 0;
@@ -412,3 +426,18 @@ export function _resetMockState(): void {
 	clipboard.value = '';
 	workspace.workspaceFolders = undefined;
 }
+
+export const l10n = {
+	t(message: string, ...args: unknown[]): string {
+		if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
+			const named = args[0] as Record<string, unknown>;
+			return message.replace(/\{(\w+)\}/g, (whole, key) =>
+				key in named ? String(named[key]) : whole,
+			);
+		}
+		return message.replace(/\{(\d+)\}/g, (whole, index) => {
+			const value = args[Number(index)];
+			return value === undefined ? whole : String(value);
+		});
+	},
+};
