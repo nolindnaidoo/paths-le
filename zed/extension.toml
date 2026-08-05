@@ -1,7 +1,7 @@
 id = "paths-le"
 name = "Paths-LE"
 description = "Extract file and directory paths from config files and code, with their kind and position."
-version = "2.2.2"
+version = "2.2.3"
 schema_version = 1
 authors = ["nolindnaidoo"]
 repository = "https://github.com/nolindnaidoo/paths-le"

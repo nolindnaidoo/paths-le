@@ -1,18 +1,28 @@
 {
 	"name": "paths-le-mcp",
-	"version": "2.2.2",
+	"version": "2.2.3",
 	"mcpName": "io.github.nolindnaidoo/paths-le",
 	"description": "Extract file and directory paths from config files and code, with their kind and position.",
 	"keywords": [
 		"mcp",
 		"modelcontextprotocol",
 		"model-context-protocol",
-		"paths-le"
+		"mcp-server",
+		"ai-agent",
+		"claude",
+		"cursor",
+		"zed",
+		"vscode",
+		"llm-tools",
+		"paths-le",
+		"paths-le-mcp",
+		"nolindnaidoo",
+		"letools"
 	],
 	"license": "MIT",
 	"author": {
-		"name": "nolindnaidoo",
-		"url": "https://github.com/nolindnaidoo"
+		"name": "Nolin Naidoo",
+		"url": "https://nolindnaidoo.com"
 	},
 	"homepage": "https://letools.dev",
 	"repository": {
@@ -34,5 +44,9 @@
 	],
 	"engines": {
 		"node": ">=20"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
 	}
 }
