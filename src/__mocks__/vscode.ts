@@ -369,10 +369,20 @@ export const executedBuiltins: Array<{ id: string; args: unknown[] }> = [];
 // --------------------------------------------------------------- env
 
 const clipboard = { value: '' };
+let clipboardError: Error | undefined;
+
+/** Make the next clipboard write reject. */
+export function _setClipboardError(error: Error | undefined): void {
+	clipboardError = error;
+}
 
 export const env = {
 	clipboard: {
 		writeText: async (text: string) => {
+			// The clipboard is the one output the OS can refuse — a remote or
+			// headless session. Without a way to fail it, every handler for that
+			// case was unreachable.
+			if (clipboardError) throw clipboardError;
 			clipboard.value = text;
 		},
 		readText: async () => clipboard.value,
@@ -421,6 +431,7 @@ export function _shownDocumentOptions(): readonly { viewColumn?: number }[] {
 }
 
 export function _resetMockState(): void {
+	clipboardError = undefined;
 	applyEditResult = true;
 	shownDocumentOptions.length = 0;
 	configStore.clear();

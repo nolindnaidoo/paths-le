@@ -267,13 +267,21 @@ async function displayResults(
 	const pathsContent = formattedPaths.join('\n');
 
 	if (config.openResultsSideBySide) {
-		await openInSideBySide(pathsContent, config.copyToClipboardEnabled);
+		await openInSideBySide(
+			pathsContent,
+			config.copyToClipboardEnabled,
+			deps.notifier,
+		);
 		showSuccessMessage(pathCount, document.languageId, deps);
 		return;
 	}
 
 	if (config.postProcessOpenInNewFile) {
-		await openInNewFile(pathsContent, config.copyToClipboardEnabled);
+		await openInNewFile(
+			pathsContent,
+			config.copyToClipboardEnabled,
+			deps.notifier,
+		);
 		showSuccessMessage(pathCount, document.languageId, deps);
 		return;
 	}
@@ -282,6 +290,7 @@ async function displayResults(
 		document,
 		pathsContent,
 		config.copyToClipboardEnabled,
+		deps.notifier,
 	);
 	if (!replaced) {
 		deps.notifier.showError(
@@ -297,6 +306,7 @@ async function displayResults(
 async function openInSideBySide(
 	content: string,
 	copyToClipboard: boolean,
+	notifier: Notifier,
 ): Promise<void> {
 	const doc = await vscode.workspace.openTextDocument({
 		content,
@@ -305,13 +315,14 @@ async function openInSideBySide(
 	await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
 
 	if (copyToClipboard) {
-		await vscode.env.clipboard.writeText(content);
+		await copyResults(content, notifier);
 	}
 }
 
 async function openInNewFile(
 	content: string,
 	copyToClipboard: boolean,
+	notifier: Notifier,
 ): Promise<void> {
 	const doc = await vscode.workspace.openTextDocument({
 		content,
@@ -320,7 +331,7 @@ async function openInNewFile(
 	await vscode.window.showTextDocument(doc);
 
 	if (copyToClipboard) {
-		await vscode.env.clipboard.writeText(content);
+		await copyResults(content, notifier);
 	}
 }
 
@@ -329,6 +340,7 @@ async function replaceCurrentDocument(
 	document: vscode.TextDocument,
 	content: string,
 	copyToClipboard: boolean,
+	notifier: Notifier,
 ): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
 	edit.replace(document.uri, fullDocumentRange(document), content);
@@ -341,9 +353,31 @@ async function replaceCurrentDocument(
 	}
 
 	if (copyToClipboard) {
-		await vscode.env.clipboard.writeText(content);
+		await copyResults(content, notifier);
 	}
 	return true;
+}
+
+/**
+ * Copy to the clipboard, reporting a failure as a warning.
+ *
+ * The results are already in an editor by the time this runs, so a clipboard
+ * that is unavailable — a remote or headless session — must not surface as
+ * "Failed to extract paths": that misattributes the failure and reads as
+ * though nothing happened.
+ */
+async function copyResults(content: string, notifier: Notifier): Promise<void> {
+	try {
+		await vscode.env.clipboard.writeText(content);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'Unknown error';
+		notifier.showWarning(
+			vscode.l10n.t(
+				'Extracted the paths, but could not copy them to the clipboard: {0}',
+				message,
+			),
+		);
+	}
 }
 
 function showSuccessMessage(

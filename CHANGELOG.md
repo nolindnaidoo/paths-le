@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A clipboard that could not be written failed the whole extraction. The
+  results are already in an editor by the time the copy runs, so an
+  unavailable clipboard — a remote or headless session — surfaced as "Failed
+  to extract paths" for work that had succeeded. It is now a warning, and the
+  three copy sites share one guarded helper.
 - Extract, dedupe and sort all reported success over documents they had not
   touched. `vscode.workspace.applyEdit` resolves `false` when an edit is
   rejected — a read-only document, or one that changed underneath the command

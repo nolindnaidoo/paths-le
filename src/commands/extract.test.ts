@@ -7,6 +7,7 @@ import {
 	_respondToWarning,
 	_setActiveEditor,
 	_setApplyEditResult,
+	_setClipboardError,
 	_setConfig,
 	_shownMessages,
 } from '../__mocks__/vscode';
@@ -229,6 +230,23 @@ describe('extract: rejected in-place edit', () => {
 		_setConfig('paths-le.postProcess.openInNewFile', false);
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(false);
+		expect(events).toContain('extract-success');
+	});
+});
+
+describe('extract: clipboard failure', () => {
+	it('warns instead of failing the extraction', async () => {
+		// The results are already in an editor by the time the copy runs, so an
+		// unavailable clipboard — a remote or headless session — must not surface
+		// as "Failed to extract paths" for work that succeeded.
+		const events: string[] = [];
+		registerExtractCommand(makeContext(), makeDeps(events));
+		_setConfig('paths-le.copyToClipboardEnabled', true);
+		_setClipboardError(new Error('clipboard unavailable'));
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownMessages().some((m) => m.kind === 'warning')).toBe(true);
 		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(false);
 		expect(events).toContain('extract-success');
 	});
