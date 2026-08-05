@@ -277,11 +277,19 @@ async function displayResults(
 		return;
 	}
 
-	await replaceCurrentDocument(
+	const replaced = await replaceCurrentDocument(
 		document,
 		pathsContent,
 		config.copyToClipboardEnabled,
 	);
+	if (!replaced) {
+		deps.notifier.showError(
+			vscode.l10n.t(
+				'Could not replace the document contents: the edit was rejected.',
+			),
+		);
+		return;
+	}
 	showSuccessMessage(pathCount, document.languageId, deps);
 }
 
@@ -315,22 +323,30 @@ async function openInNewFile(
 	}
 }
 
+/** Returns false when the workspace rejected the edit. */
 async function replaceCurrentDocument(
 	document: vscode.TextDocument,
 	content: string,
 	copyToClipboard: boolean,
-): Promise<void> {
+): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
 	edit.replace(
 		document.uri,
 		new vscode.Range(0, 0, document.lineCount, 0),
 		content,
 	);
-	await vscode.workspace.applyEdit(edit);
+	// applyEdit resolves false for a read-only document, or one that changed
+	// underneath the command. Discarding it announced "Extracted N paths" over
+	// a document that still held its original text.
+	const applied = await vscode.workspace.applyEdit(edit);
+	if (!applied) {
+		return false;
+	}
 
 	if (copyToClipboard) {
 		await vscode.env.clipboard.writeText(content);
 	}
+	return true;
 }
 
 function showSuccessMessage(

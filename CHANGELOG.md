@@ -26,6 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Extract, dedupe and sort all reported success over documents they had not
+  touched. `vscode.workspace.applyEdit` resolves `false` when an edit is
+  rejected — a read-only document, or one that changed underneath the command
+  — and all three discarded that value, then announced "Extracted 12 paths
+  from document", "Removed 3 duplicate paths" or "Sorted 12 paths". The
+  rejection is now reported as a failure and nothing is announced.
 - Symlink resolution branched on `ENOENT`/`EACCES`/`EPERM` and then returned
   the same value from both arms, so the condition — and the
   `as NodeJS.ErrnoException` cast it needed — did nothing at all. Falling back

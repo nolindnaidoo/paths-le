@@ -30,7 +30,13 @@ export function registerSortCommand(
 			const lines = extractLines(document.getText());
 			const sorted = sortLines(lines, sortOption.value);
 
-			await replaceDocumentContent(document, sorted);
+			const replaced = await replaceDocumentContent(document, sorted);
+			if (!replaced) {
+				notifier.showError(
+					vscode.l10n.t('Could not sort: the edit was rejected.'),
+				);
+				return;
+			}
 
 			notifier.showInfo(
 				vscode.l10n.t(
@@ -81,15 +87,18 @@ function sortLines(lines: string[], order: SortOrder): string[] {
 	return [...lines].sort((a, b) => b.localeCompare(a));
 }
 
+/** Returns false when the workspace rejected the edit. */
 async function replaceDocumentContent(
 	document: vscode.TextDocument,
 	lines: string[],
-): Promise<void> {
+): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
 	const fullRange = new vscode.Range(
 		document.positionAt(0),
 		document.lineAt(document.lineCount - 1).range.end,
 	);
 	edit.replace(document.uri, fullRange, lines.join('\n'));
-	await vscode.workspace.applyEdit(edit);
+	// applyEdit resolves false for a read-only document, or one that changed
+	// underneath the command.
+	return await vscode.workspace.applyEdit(edit);
 }

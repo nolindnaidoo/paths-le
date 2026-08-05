@@ -29,7 +29,15 @@ export function registerDedupeCommand(
 				fullDocumentRange(document),
 				deduped.join('\n'),
 			);
-			await vscode.workspace.applyEdit(edit);
+			// applyEdit resolves false for a read-only document, or one that
+			// changed underneath the command.
+			const applied = await vscode.workspace.applyEdit(edit);
+			if (!applied) {
+				notifier.showError(
+					vscode.l10n.t('Could not deduplicate: the edit was rejected.'),
+				);
+				return;
+			}
 
 			const removedCount = lines.length - deduped.length;
 			notifier.showInfo(

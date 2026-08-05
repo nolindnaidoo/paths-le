@@ -6,6 +6,7 @@ import {
 	_resetMockState,
 	_respondToWarning,
 	_setActiveEditor,
+	_setApplyEditResult,
 	_setConfig,
 	_shownMessages,
 } from '../__mocks__/vscode';
@@ -198,5 +199,37 @@ describe('activation', () => {
 
 	it('deactivate is a no-op that does not throw', () => {
 		expect(() => deactivate()).not.toThrow();
+	});
+});
+
+describe('extract: rejected in-place edit', () => {
+	it('reports a failure instead of a count', async () => {
+		// The replace route is the one that writes to the user's document.
+		// applyEdit resolves false for a read-only document, or one that changed
+		// underneath the command, and that value was discarded — so "Extracted N
+		// paths from document" was shown over unchanged text.
+		const events: string[] = [];
+		registerExtractCommand(makeContext(), makeDeps(events));
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setApplyEditResult(false);
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(true);
+		expect(
+			_shownMessages().some((m) => String(m.message).includes('Extracted')),
+		).toBe(false);
+		expect(events).not.toContain('extract-success');
+	});
+
+	it('announces the count when the edit applies', async () => {
+		const events: string[] = [];
+		registerExtractCommand(makeContext(), makeDeps(events));
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(false);
+		expect(events).toContain('extract-success');
 	});
 });

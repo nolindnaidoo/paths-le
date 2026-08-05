@@ -5,6 +5,7 @@ import {
 	_resetMockState,
 	_respondToQuickPick,
 	_setActiveEditor,
+	_setApplyEditResult,
 	_setConfig,
 	_shownMessages,
 	appliedEdits,
@@ -170,5 +171,36 @@ describe('paths-le.extractPaths', () => {
 
 		expect(events.some((e) => e.startsWith('info:Path extraction'))).toBe(true);
 		expect(events.some((e) => e.startsWith('error:'))).toBe(false);
+	});
+});
+
+describe('post-process: rejected edits', () => {
+	// applyEdit resolves false for a read-only document, or one that changed
+	// underneath the command. Both commands discarded that value and announced
+	// a result over a document they had not touched.
+
+	it('dedupe reports a failure instead of a count', async () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerDedupeCommand(makeContext(), createNotifier());
+		_setApplyEditResult(false);
+		_setActiveEditor(_createDocument({ content: './a.ts\n./a.ts\n./b.ts\n' }));
+		await runCommand('paths-le.postProcess.dedupe');
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(true);
+		expect(
+			_shownMessages().some((m) => String(m.message).startsWith('Removed')),
+		).toBe(false);
+	});
+
+	it('sort reports a failure instead of a count', async () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerSortCommand(makeContext(), createNotifier());
+		_setApplyEditResult(false);
+		_respondToQuickPick((items) => items[0]);
+		_setActiveEditor(_createDocument({ content: './b.ts\n./a.ts\n./c.ts\n' }));
+		await runCommand('paths-le.postProcess.sort');
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(true);
+		expect(
+			_shownMessages().some((m) => String(m.message).startsWith('Sorted')),
+		).toBe(false);
 	});
 });
