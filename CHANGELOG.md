@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   — and all three discarded that value, then announced "Extracted 12 paths
   from document", "Removed 3 duplicate paths" or "Sorted 12 paths". The
   rejection is now reported as a failure and nothing is announced.
+- `fullDocumentRange` is defined once, in `utils/document.ts`. It had three
+  forms across three commands, one of them `Range(0, 0, lineCount, 0)` — which
+  covers the whole document only because VS Code clamps the out-of-range
+  position, and reads as though it might drop the final line. Behaviour is
+  unchanged; verified against a real extension host before touching it.
 - Symlink resolution branched on `ENOENT`/`EACCES`/`EPERM` and then returned
   the same value from both arms, so the condition — and the
   `as NodeJS.ErrnoException` cast it needed — did nothing at all. Falling back

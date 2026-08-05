@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { Notifier } from '../ui/notifier';
+import { fullDocumentRange } from '../utils/document';
 
 type SortOrder = 'asc' | 'desc' | 'length-asc' | 'length-desc';
 
@@ -93,11 +94,7 @@ async function replaceDocumentContent(
 	lines: string[],
 ): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
-	const fullRange = new vscode.Range(
-		document.positionAt(0),
-		document.lineAt(document.lineCount - 1).range.end,
-	);
-	edit.replace(document.uri, fullRange, lines.join('\n'));
+	edit.replace(document.uri, fullDocumentRange(document), lines.join('\n'));
 	// applyEdit resolves false for a read-only document, or one that changed
 	// underneath the command.
 	return await vscode.workspace.applyEdit(edit);

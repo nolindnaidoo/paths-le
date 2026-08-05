@@ -4,6 +4,7 @@ import { extractPaths } from '../extraction/extract';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
+import { fullDocumentRange } from '../utils/document';
 import { sanitizeErrorMessage } from '../utils/errors';
 import {
 	getWorkspaceFolderForPath,
@@ -330,11 +331,7 @@ async function replaceCurrentDocument(
 	copyToClipboard: boolean,
 ): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
-	edit.replace(
-		document.uri,
-		new vscode.Range(0, 0, document.lineCount, 0),
-		content,
-	);
+	edit.replace(document.uri, fullDocumentRange(document), content);
 	// applyEdit resolves false for a read-only document, or one that changed
 	// underneath the command. Discarding it announced "Extracted N paths" over
 	// a document that still held its original text.

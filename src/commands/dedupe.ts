@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { Notifier } from '../ui/notifier';
+import { fullDocumentRange } from '../utils/document';
 
 export function registerDedupeCommand(
 	context: vscode.ExtensionContext,
@@ -63,11 +64,4 @@ function deduplicateLines(lines: readonly string[]): string[] {
 	}
 
 	return deduped;
-}
-
-function fullDocumentRange(document: vscode.TextDocument): vscode.Range {
-	return new vscode.Range(
-		document.positionAt(0),
-		document.lineAt(document.lineCount - 1).range.end,
-	);
 }
