@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ ADVERTENCIA DE SEGURIDAD**: Habilitar esta configuración puede exponer rutas sensibles del sistema de archivos en la salida extraída. Habilítela solo en entornos de confianza. Resuelve symlinks a sus rutas canónicas para un mejor soporte de monorepos.",
 	"manifest.settings.resolution.workspace.desc": "Resolver rutas relativas a las carpetas del área de trabajo en monorepos",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ ADVERTENCIA DE SEGURIDAD**: Habilitar esta configuración puede exponer rutas sensibles del sistema de archivos en la salida extraída. Habilítela solo en entornos de confianza. Resuelve rutas relativas a las carpetas del área de trabajo en monorepos.",
-	"manifest.capability.untrusted-workspaces.desc": "Funcionalidad limitada en espacios de trabajo no confiables"
+	"manifest.capability.untrusted-workspaces.desc": "Funcionalidad limitada en espacios de trabajo no confiables",
+	"manifest.mcp.label": "Herramientas de extracción de rutas Paths-LE para el modo de agente"
 }

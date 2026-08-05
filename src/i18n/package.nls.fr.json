@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ AVERTISSEMENT DE SÉCURITÉ** : L'activation de ce paramètre peut exposer des chemins sensibles du système de fichiers dans la sortie extraite. À activer uniquement dans des environnements de confiance. Résout les liens symboliques vers leurs chemins canoniques pour une meilleure prise en charge des monorepos.",
 	"manifest.settings.resolution.workspace.desc": "Résoudre les chemins relatifs aux dossiers de l'espace de travail dans les monorepos",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ AVERTISSEMENT DE SÉCURITÉ** : L'activation de ce paramètre peut exposer des chemins sensibles du système de fichiers dans la sortie extraite. À activer uniquement dans des environnements de confiance. Résout les chemins relatifs aux dossiers de l'espace de travail dans les monorepos.",
-	"manifest.capability.untrusted-workspaces.desc": "Fonctionnalités limitées dans les espaces de travail non fiables"
+	"manifest.capability.untrusted-workspaces.desc": "Fonctionnalités limitées dans les espaces de travail non fiables",
+	"manifest.mcp.label": "Outils d'extraction de chemins Paths-LE pour le mode agent"
 }

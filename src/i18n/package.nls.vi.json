@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ CẢNH BÁO BẢO MẬT**: Bật cài đặt này có thể làm lộ các đường dẫn hệ thống tệp nhạy cảm trong kết quả trích xuất. Chỉ bật trong môi trường đáng tin cậy. Phân giải symlink thành đường dẫn chuẩn để hỗ trợ monorepo tốt hơn.",
 	"manifest.settings.resolution.workspace.desc": "Phân giải đường dẫn tương đối với các thư mục không gian làm việc trong monorepo",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ CẢNH BÁO BẢO MẬT**: Bật cài đặt này có thể làm lộ các đường dẫn hệ thống tệp nhạy cảm trong kết quả trích xuất. Chỉ bật trong môi trường đáng tin cậy. Phân giải đường dẫn tương đối với các thư mục không gian làm việc trong monorepo.",
-	"manifest.capability.untrusted-workspaces.desc": "Chức năng giới hạn trong không gian làm việc không tin cậy"
+	"manifest.capability.untrusted-workspaces.desc": "Chức năng giới hạn trong không gian làm việc không tin cậy",
+	"manifest.mcp.label": "Các công cụ trích xuất đường dẫn Paths-LE dành cho chế độ tác nhân"
 }

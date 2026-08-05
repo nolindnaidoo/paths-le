@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ セキュリティ警告**: この設定を有効にすると、抽出結果に機密性の高いファイルシステムパスが含まれる可能性があります。信頼できる環境でのみ有効にしてください。 モノレポのサポート向上のため、シンボリックリンクを正規パスに解決します。",
 	"manifest.settings.resolution.workspace.desc": "モノレポでワークスペースフォルダーからの相対パスを解決します",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ セキュリティ警告**: この設定を有効にすると、抽出結果に機密性の高いファイルシステムパスが含まれる可能性があります。信頼できる環境でのみ有効にしてください。 モノレポでワークスペースフォルダーからの相対パスを解決します。",
-	"manifest.capability.untrusted-workspaces.desc": "信頼されていないワークスペースでの機能制限"
+	"manifest.capability.untrusted-workspaces.desc": "信頼されていないワークスペースでの機能制限",
+	"manifest.mcp.label": "エージェントモード向け Paths-LE パス抽出ツール"
 }

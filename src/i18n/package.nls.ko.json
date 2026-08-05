@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ 보안 경고**: 이 설정을 활성화하면 추출된 출력에 민감한 파일 시스템 경로가 노출될 수 있습니다. 신뢰할 수 있는 환경에서만 활성화하세요. 모노레포 지원 향상을 위해 심볼릭 링크를 정식 경로로 확인합니다.",
 	"manifest.settings.resolution.workspace.desc": "모노레포에서 작업 영역 폴더 기준의 상대 경로를 확인합니다",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ 보안 경고**: 이 설정을 활성화하면 추출된 출력에 민감한 파일 시스템 경로가 노출될 수 있습니다. 신뢰할 수 있는 환경에서만 활성화하세요. 모노레포에서 작업 영역 폴더 기준의 상대 경로를 확인합니다.",
-	"manifest.capability.untrusted-workspaces.desc": "신뢰할 수 없는 작업 공간에서 제한된 기능"
+	"manifest.capability.untrusted-workspaces.desc": "신뢰할 수 없는 작업 공간에서 제한된 기능",
+	"manifest.mcp.label": "에이전트 모드용 Paths-LE 경로 추출 도구"
 }

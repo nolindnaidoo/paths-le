@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ AVVISO DI SICUREZZA**: L'attivazione di questa impostazione può esporre percorsi sensibili del file system nell'output estratto. Abilitare solo in ambienti attendibili. Risolve i symlink nei loro percorsi canonici per un migliore supporto dei monorepo.",
 	"manifest.settings.resolution.workspace.desc": "Risolvi i percorsi relativi alle cartelle dell'area di lavoro nei monorepo",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ AVVISO DI SICUREZZA**: L'attivazione di questa impostazione può esporre percorsi sensibili del file system nell'output estratto. Abilitare solo in ambienti attendibili. Risolve i percorsi relativi alle cartelle dell'area di lavoro nei monorepo.",
-	"manifest.capability.untrusted-workspaces.desc": "Funzionalità limitate in aree di lavoro non attendibili"
+	"manifest.capability.untrusted-workspaces.desc": "Funzionalità limitate in aree di lavoro non attendibili",
+	"manifest.mcp.label": "Strumenti di estrazione dei percorsi Paths-LE per la modalità agente"
 }

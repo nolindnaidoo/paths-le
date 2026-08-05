@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ SECURITY WARNING**: Enabling this setting may expose sensitive file system paths in extracted output. Only enable in trusted environments. Resolves symlinks to their canonical paths for better monorepo support.",
 	"manifest.settings.resolution.workspace.desc": "Resolve paths relative to workspace folders in monorepos",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ SECURITY WARNING**: Enabling this setting may expose sensitive file system paths in extracted output. Only enable in trusted environments. Resolves paths relative to workspace folders in monorepos.",
-	"manifest.capability.untrusted-workspaces.desc": "Limited functionality in untrusted workspaces"
+	"manifest.capability.untrusted-workspaces.desc": "Limited functionality in untrusted workspaces",
+	"manifest.mcp.label": "Paths-LE path extraction tools for agent mode"
 }

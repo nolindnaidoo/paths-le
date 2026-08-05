@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ 安全警告**：启用此设置可能会在提取结果中暴露敏感的文件系统路径。请仅在受信任的环境中启用。 将符号链接解析为其规范路径，以更好地支持 monorepo。",
 	"manifest.settings.resolution.workspace.desc": "在 monorepo 中解析相对于工作区文件夹的路径",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ 安全警告**：启用此设置可能会在提取结果中暴露敏感的文件系统路径。请仅在受信任的环境中启用。 在 monorepo 中解析相对于工作区文件夹的路径。",
-	"manifest.capability.untrusted-workspaces.desc": "不受信任工作区功能受限"
+	"manifest.capability.untrusted-workspaces.desc": "不受信任工作区功能受限",
+	"manifest.mcp.label": "Paths-LE 代理模式路径提取工具"
 }

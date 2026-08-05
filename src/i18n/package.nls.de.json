@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ SICHERHEITSWARNUNG**: Das Aktivieren dieser Einstellung kann sensible Dateisystempfade in der extrahierten Ausgabe offenlegen. Nur in vertrauenswürdigen Umgebungen aktivieren. Löst Symlinks zu ihren kanonischen Pfaden auf für bessere Monorepo-Unterstützung.",
 	"manifest.settings.resolution.workspace.desc": "Pfade relativ zu Arbeitsbereichsordnern in Monorepos auflösen",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ SICHERHEITSWARNUNG**: Das Aktivieren dieser Einstellung kann sensible Dateisystempfade in der extrahierten Ausgabe offenlegen. Nur in vertrauenswürdigen Umgebungen aktivieren. Löst Pfade relativ zu Arbeitsbereichsordnern in Monorepos auf.",
-	"manifest.capability.untrusted-workspaces.desc": "Eingeschränkte Funktionalität in nicht vertrauenswürdigen Arbeitsbereichen"
+	"manifest.capability.untrusted-workspaces.desc": "Eingeschränkte Funktionalität in nicht vertrauenswürdigen Arbeitsbereichen",
+	"manifest.mcp.label": "Paths-LE-Tools zur Pfadextraktion für den Agentenmodus"
 }

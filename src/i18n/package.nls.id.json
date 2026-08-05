@@ -22,5 +22,6 @@
 	"manifest.settings.resolution.symlinks.markdown": "**⚠️ PERINGATAN KEAMANAN**: Mengaktifkan pengaturan ini dapat mengekspos jalur sistem file sensitif dalam keluaran ekstraksi. Aktifkan hanya di lingkungan tepercaya. Menyelesaikan symlink ke jalur kanoniknya untuk dukungan monorepo yang lebih baik.",
 	"manifest.settings.resolution.workspace.desc": "Selesaikan jalur relatif terhadap folder ruang kerja dalam monorepo",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ PERINGATAN KEAMANAN**: Mengaktifkan pengaturan ini dapat mengekspos jalur sistem file sensitif dalam keluaran ekstraksi. Aktifkan hanya di lingkungan tepercaya. Menyelesaikan jalur relatif terhadap folder ruang kerja dalam monorepo.",
-	"manifest.capability.untrusted-workspaces.desc": "Fungsi terbatas di ruang kerja yang tidak tepercaya"
+	"manifest.capability.untrusted-workspaces.desc": "Fungsi terbatas di ruang kerja yang tidak tepercaya",
+	"manifest.mcp.label": "Alat ekstraksi jalur Paths-LE untuk mode agen"
 }
