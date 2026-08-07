@@ -1,6 +1,6 @@
 {
 	"name": "paths-le-mcp",
-	"version": "2.2.3",
+	"version": "2.2.4",
 	"mcpName": "io.github.nolindnaidoo/paths-le",
 	"description": "Extract file and directory paths from config files and code, with their kind and position.",
 	"keywords": [
@@ -24,7 +24,7 @@
 		"name": "Nolin Naidoo",
 		"url": "https://nolindnaidoo.com"
 	},
-	"homepage": "https://letools.dev",
+	"homepage": "https://letools.dev/tools/paths-le",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/nolindnaidoo/paths-le.git",

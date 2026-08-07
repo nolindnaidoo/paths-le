@@ -3,7 +3,7 @@
 	"name": "io.github.nolindnaidoo/paths-le",
 	"title": "Paths-LE",
 	"description": "Extract file and directory paths from config files and code, with their kind and position.",
-	"websiteUrl": "https://letools.dev",
+	"websiteUrl": "https://letools.dev/tools/paths-le",
 	"icons": [
 		{
 			"src": "https://raw.githubusercontent.com/nolindnaidoo/paths-le/main/src/assets/images/icon.png",
@@ -17,13 +17,13 @@
 		"url": "https://github.com/nolindnaidoo/paths-le",
 		"source": "github"
 	},
-	"version": "2.2.3",
+	"version": "2.2.4",
 	"packages": [
 		{
 			"registryType": "npm",
 			"registryBaseUrl": "https://registry.npmjs.org",
 			"identifier": "paths-le-mcp",
-			"version": "2.2.3",
+			"version": "2.2.4",
 			"runtimeHint": "npx",
 			"transport": {
 				"type": "stdio"
