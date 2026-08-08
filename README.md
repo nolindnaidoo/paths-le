@@ -17,6 +17,9 @@
   <a href="https://www.npmjs.com/package/paths-le-mcp">
     <img src="https://img.shields.io/npm/v/paths-le-mcp?style=for-the-badge&label=MCP%20server&color=blue&logo=npm" alt="paths-le-mcp on npm" />
   </a>
+  <a href="https://crates.io/crates/paths-le">
+    <img src="https://img.shields.io/crates/v/paths-le?style=for-the-badge&label=Rust%20CLI&color=blue&logo=rust" alt="paths-le on crates.io" />
+  </a>
   <a href="https://letools.dev/tools/paths-le">
     <img src="https://img.shields.io/badge/LE%20Tools-letools.dev-blue?style=for-the-badge" alt="LE Tools" />
   </a>
@@ -101,6 +104,42 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | npx -y paths-le-mcp
 That prints the tool list and exits — if you see `extract_paths`, the server works.
 
 </details>
+
+## The CLI
+
+The same extraction runs from a terminal or an agent loop: a Rust CLI in
+[`crate/`](crate/) of this repository, sharing one corpus with the extension —
+[`crate/fixtures/`](crate/fixtures/) — so CI fails if the two ever read a
+document differently.
+
+It also does the half an editor cannot: **resolve what it found against the
+filesystem it is standing in.** Every path gets a verdict — exists, missing,
+escapes the audited tree, non-canonical, or a symlink with its target named.
+
+```bash
+paths-le .                    # audit a tree; JSON on stdout, summary on stderr
+paths-le --strict .           # count sloppily-written paths too
+paths-le --no-resolve src/    # just list what is written, touch nothing
+paths-le mcp                  # the same audit over MCP on stdio
+```
+
+The exit code is the answer: **0 clear · 1 findings · 2 the question was
+malformed** — so `paths-le --strict .` is a CI step as it stands.
+
+Install it with `cargo install paths-le`
+([crates.io](https://crates.io/crates/paths-le)). The spec
+([`crate/SPEC.md`](crate/SPEC.md)) and the engineering standard
+([`crate/AGENTS.md`](crate/AGENTS.md)) live alongside it in
+[`crate/`](crate/README.md), and it keeps its own
+[CHANGELOG](crate/CHANGELOG.md) — the two products in this repository
+release on their own cadence.
+
+**Two MCP servers, one tool.** `paths-le mcp` offers `extract_paths`
+exactly as [`paths-le-mcp`](https://www.npmjs.com/package/paths-le-mcp)
+does — [`crate/fixtures/mcp-extract-paths.json`](crate/fixtures/mcp-extract-paths.json)
+runs against both and CI fails if they diverge. Take the npm one if Node
+is already there; take the binary if you want no runtime, or if you want
+`paths_le_audit` too.
 
 ## Supported formats
 
@@ -218,7 +257,7 @@ run. Reproduce with `bun run test:coverage`.
 
 Every tool in the family, one page: **[letools.dev](https://letools.dev)**
 
-All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same engine.
+All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same engine. Two go further and ship a Rust CLI as well: **Paths-LE** (`cargo install paths-le`) and **Scrape-LE** (`cargo install scrape-le`).
 
 - **[String-LE](https://letools.dev/tools/string-le)** - Extract string values for i18n from JSON, YAML, CSV, TOML, INI, and .env
 - **[Numbers-LE](https://letools.dev/tools/numbers-le)** - Extract numeric values from JSON, YAML, CSV, TOML, INI, and .env
@@ -238,6 +277,8 @@ All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same e
   [pixelcoords.dev](https://pixelcoords.dev) · [crates.io](https://crates.io/crates/pixelcoords) · [docs.rs](https://docs.rs/pixelcoords)
 - **[pixelactions](https://github.com/nolindnaidoo/pixelactions)** — Consume human-verified coordinates, perform the interaction, confirm it landed
   [pixelactions.dev](https://pixelactions.dev) · [crates.io](https://crates.io/crates/pixelactions) · [docs.rs](https://docs.rs/pixelactions)
+- **[paths-le](https://github.com/nolindnaidoo/paths-le/tree/main/crate)** — This extension's own CLI: find every path in a codebase and report whether it still points at anything
+  [crates.io](https://crates.io/crates/paths-le)
 - **[scrape-le](https://github.com/nolindnaidoo/scrape-le/tree/main/crate)** — Check whether a page is scrapeable before the scraper is written, from a terminal or an agent
   [crates.io](https://crates.io/crates/scrape-le)
 

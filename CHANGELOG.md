@@ -5,6 +5,42 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
+separate product on its own cadence and keeps its own
+[CHANGELOG](crate/CHANGELOG.md).
+
+## [Unreleased]
+
+### Added
+
+- A **Rust CLI and MCP server**, in [`crate/`](crate/README.md), published
+  to crates.io as [`paths-le`](https://crates.io/crates/paths-le). It runs
+  the same extraction from a terminal and adds what an editor cannot do:
+  resolving each path against the filesystem it is standing in, and
+  reporting whether it still points at anything — missing, escaping the
+  audited tree, non-canonical, or a symlink with its target named. Exit
+  codes are the API, so `paths-le --strict .` is a CI step as it stands.
+
+  The extension stays the reference implementation for extraction. The
+  corpus both frontends build against lives in
+  [`crate/fixtures/`](crate/fixtures/), `scripts/check-extraction-parity.ts`
+  runs it against this extension, `cargo test` runs it against the crate,
+  and `ci-crate.yml` watches `src/extraction/**` so neither side can drift
+  green.
+
+### Changed
+
+- Documentation only for the extension itself — no behaviour change.
+
+  The README, the npm server's README and the manifest now cross-reference
+  the CLI, and the CLI references them back, so a reader arriving at any
+  one of the five channels can find the other four.
+
+- The npm server's README documented arguments and a response shape that
+  were never this tool's — `format: "markdown"`, a `protocol` field, a URL
+  in the example. They were carried over from a sibling package. The
+  documented tool is now the tool that ships.
+
 ## [2.2.4] - 2026-08-07
 
 ### Changed

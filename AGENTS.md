@@ -2,6 +2,8 @@
 
 Technical source of truth for this repo. README.md is the user-facing doc; this file is for anyone (human or agent) changing the code.
 
+This repo hosts **two products**: the extension at the root (this document's scope) and the Rust CLI in `crate/` (its own `AGENTS.md` + `SPEC.md`). The shared extraction corpus lives at `crate/fixtures/`; `scripts/check-extraction-parity.ts` fails CI when this extension drifts from it.
+
 ## What this is
 
 A VS Code extension that extracts file paths from the active document (JS/TS, JSON/JSONC, HTML, CSS/SCSS/LESS, TOML, CSV, dotenv) into a results editor, with dedupe/sort post-processing. No network access, no filesystem writes outside optional opt-in canonical path resolution (reads only).
@@ -193,6 +195,8 @@ most valuable line in the file, and it is what keeps the next person from
 - **Extension-internal flags go in `context.globalState`,** never in undeclared `paths-le.*` config keys (VS Code rejects writes to unregistered keys).
 - **nls catalogues stay in key-parity:** all 12 locale files carry exactly the keys of `package.nls.json`.
 - **Heuristics live in one place** (`extraction/heuristics.ts`). Never re-implement `isPathLike`/`classifyPathType` inside a format extractor.
+- **`src/extraction/**` is the reference implementation for a second frontend.** The Rust CLI in `crate/` reproduces its output exactly, and `crate/fixtures/` is the contract: `bun scripts/check-extraction-parity.ts` runs the corpus against *this* code, `cargo test` runs it against the crate's. A behaviour change here is a behaviour change for both frontends — update the corpus and both implementations in the same commit, with a CHANGELOG entry. `ci-crate.yml` watches `src/extraction/**` and `src/mcp/**` for exactly this reason, so a drift cannot land green.
+- **`extract_paths` is offered by two MCP servers**, this one (`src/mcp/tools.ts`) and the crate's. Same schema, same envelope, byte-identical output; `crate/fixtures/mcp-extract-paths.json` runs against both. Changing the tool means changing both.
 
 - **The MCP server must never reference `vscode`.** It runs in Zed, in Claude Code and from `npx`, where the import would fail in a user's session rather than in CI. `scripts/check-mcp-bundle.js` fails the build on any non-builtin require, holds the bundle under a 600 KB ceiling, and completes a real stdio handshake asserting extracted values — the SDK was rejected at 5.9 MB and without a ceiling that decision quietly rots.
 - **Launching the server needs `ELECTRON_RUN_AS_NODE=1`.** In the extension host `process.execPath` is the editor binary, so without it the definition starts a second editor and fails silently. `scripts/e2e-vsix.js` spawns the installed server exactly as `provider.ts` does and asserts it answers.

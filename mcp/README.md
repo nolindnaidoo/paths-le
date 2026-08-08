@@ -52,6 +52,15 @@ carries this server and registers it for you:
 · [Open VSX](https://open-vsx.org/extension/OffensiveEdge/paths-le)
 · [Zed](https://github.com/zed-industries/extensions/pull/7081) *(pending review)*
 
+**No Node?** The same `extract_paths` tool ships in a static Rust binary:
+`cargo install paths-le`, then `paths-le mcp`
+([crates.io](https://crates.io/crates/paths-le)). The two servers answer
+identically — one fixture corpus runs against both and CI fails if they
+diverge — so pick on runtime, not behaviour. The binary additionally
+offers `paths_le_audit`, which resolves the paths it finds against the
+filesystem; **this server deliberately reads no files**, which is what
+lets an agent call it anywhere.
+
 Prefer a global install to `npx` on every launch:
 
 ```bash
@@ -82,29 +91,42 @@ If that prints the tool name, the server works.
 | argument | type | |
 |---|---|---|
 | `content` | string | **required.** The text to scan. |
-| `format` | string | The language: `markdown`, `yaml`, `json`, `typescript`… Required unless `filename` is given. |
-| `filename` | string | Used to infer `format` when it is absent — `README.md` resolves to `markdown`. |
-| `dedupe` | boolean | Collapse repeats. Default `false`. |
+| `format` | string | One of `csv`, `toml`, `dotenv`, `javascript`, `typescript`, `json`, `html`, `css`. Common extensions and aliases (`ts`, `tsx`, `jsonc`, `scss`, `env`…) are accepted. Required unless `filename` is given. |
+| `filename` | string | Used to infer `format` when it is absent — `tsconfig.json` resolves to `json`, and `.env` to `dotenv`. |
+| `dedupe` | boolean | Collapse repeats to the first occurrence. Default `false`. |
 | `maxResults` | number | Default `500`, ceiling `5000`. |
 
-Returns each URL with its protocol and 1-based line and column, plus
-`meta.truncated` so a capped result is never mistaken for a complete one.
+Returns each path with its kind — `file`, `relative`, `absolute` or
+`url` — and 1-based line and column, plus `meta.truncated` so a capped
+result is never mistaken for a complete one. **Columns count UTF-16 code
+units**, which is what an editor reports, so a position lines up with
+the file open in front of you.
 
 ```json
 {
   "ok": true,
   "data": {
     "paths": [
-      { "value": "https://example.com/guide", "protocol": "https", "line": 2, "column": 15 }
-    ]
+      { "value": "./dist/index.js", "type": "relative", "line": 2, "column": 12 },
+      { "value": "guide/setup.md", "type": "file", "line": 3, "column": 12 }
+    ],
+    "fileType": "json"
   },
-  "meta": { "count": 1, "truncated": false }
+  "diagnostics": [],
+  "meta": { "tool": "extract_paths", "count": 2, "truncated": false }
 }
 ```
 
+**Paths are reported as written.** Nothing is resolved against a
+workspace or the filesystem, and this server reads no files — that is
+the property that lets an agent call it anywhere. If you want to know
+whether a path still *points* at anything, that is the Rust CLI's
+`paths_le_audit` tool, above.
+
 Extraction is heuristic, and what it deliberately does **not** match is
 documented as carefully as what it does — see the
-[extension README](https://github.com/nolindnaidoo/paths-le#readme).
+[extension README](https://github.com/nolindnaidoo/paths-le#readme) and
+the CLI's [SPEC.md](https://github.com/nolindnaidoo/paths-le/blob/main/crate/SPEC.md).
 
 ## Also in the MCP registry
 
@@ -128,6 +150,12 @@ filesystem. Every one is on npm as `<name>-mcp` and in the MCP registry as
 | [`secrets-le-mcp`](https://www.npmjs.com/package/secrets-le-mcp) | `detect_secrets` | credentials, masked — never the value |
 | [`envsync-le-mcp`](https://www.npmjs.com/package/envsync-le-mcp) | `compare_env_files` | dotenv key drift, names only |
 | [`scrape-le-mcp`](https://www.npmjs.com/package/scrape-le-mcp) | `analyze_robots_txt` | whether a path may be crawled |
+
+Two of them also ship a Rust CLI, which carries the same MCP tool in a
+static binary: `cargo install paths-le`
+([crates.io](https://crates.io/crates/paths-le)) and
+`cargo install scrape-le`
+([crates.io](https://crates.io/crates/scrape-le)).
 
 Every tool in the family, one page: **[letools.dev](https://letools.dev)**
 
