@@ -26,9 +26,10 @@ Options:
   --no-resolve         report paths as written; skip the filesystem
                        entirely. No path can then be a finding.
   --root <dir>         the boundary a relative path may not escape
-                       (default: the directory argument, else the
-                       working directory)
-  --strict             treat a non-canonical path as a finding too
+                       (default: the enclosing git repository, else the
+                       directory argument, else the working directory)
+  --deny-symlinks      treat a symlink as a finding too (it is
+                       reported either way)
   --format <format>    force a format instead of inferring it from the
                        file name; required with --stdin
   --stdin              read one document from stdin
@@ -47,7 +48,7 @@ For a run over many files, the exit code is the worst outcome in it.";
 const FLAGS: [&str; 8] = [
     "--no-resolve",
     "--root",
-    "--strict",
+    "--deny-symlinks",
     "--format",
     "--stdin",
     "--follow-symlinks",
@@ -62,7 +63,7 @@ struct Options {
     format: Option<&'static str>,
     root: Option<String>,
     resolve: bool,
-    strict: bool,
+    deny_symlinks: bool,
     walk: WalkOptions,
 }
 
@@ -118,7 +119,7 @@ fn audit_inputs(options: &Options) -> Result<Vec<FileReport>, String> {
     let audit_options = AuditOptions {
         resolve: options.resolve,
         root: choose_root(options.root.as_deref(), &options.inputs)?,
-        strict: options.strict,
+        deny_symlinks: options.deny_symlinks,
     };
     Ok(targets
         .iter()
@@ -150,7 +151,7 @@ fn audit_stdin(options: &Options) -> Result<FileReport, String> {
     let audit_options = AuditOptions {
         resolve: options.resolve,
         root: choose_root(options.root.as_deref(), &[working])?,
-        strict: options.strict,
+        deny_symlinks: options.deny_symlinks,
     };
     let mut report = audit::audit_content(&content, &target, &audit_options);
     report.file = "<stdin>".to_string();
@@ -158,6 +159,15 @@ fn audit_stdin(options: &Options) -> Result<FileReport, String> {
 }
 
 /// The boundary a relative path may not escape.
+///
+/// **The enclosing git repository, when there is one.** The extension's
+/// `resolveWorkspaceRelative` resolves against the *workspace folder* —
+/// the project, not the file's directory — and a repository is what a
+/// workspace folder is on a command line. Defaulting to the directory
+/// argument instead made every cross-package import in a monorepo an
+/// escape: auditing one package of this very family produced three
+/// `escapes-root` findings for `../../shared/...`, all of them correct
+/// code.
 ///
 /// Canonical, always: the escape check compares a resolved target
 /// against this, and two spellings of the same directory would make it
@@ -171,15 +181,29 @@ pub(crate) fn choose_root(explicit: Option<&str>, inputs: &[PathBuf]) -> Result<
         return std::fs::canonicalize(&path).map_err(|error| format!("{root}: {error}"));
     }
 
-    if let [only] = inputs
-        && only.is_dir()
-    {
-        return std::fs::canonicalize(only).map_err(|error| format!("{}: {error}", only.display()));
-    }
+    let start = match inputs {
+        [only] if only.is_dir() => only.clone(),
+        [only] => only
+            .parent()
+            .map_or_else(|| PathBuf::from("."), PathBuf::from),
+        _ => std::env::current_dir()
+            .map_err(|error| format!("could not read the working directory: {error}"))?,
+    };
+    let start =
+        std::fs::canonicalize(&start).map_err(|error| format!("{}: {error}", start.display()))?;
 
-    let working = std::env::current_dir()
-        .map_err(|error| format!("could not read the working directory: {error}"))?;
-    std::fs::canonicalize(&working).map_err(|error| format!("{}: {error}", working.display()))
+    Ok(enclosing_repository(&start).unwrap_or(start))
+}
+
+/// The nearest ancestor holding a `.git`, if any.
+///
+/// A worktree and a submodule carry `.git` as a file rather than a
+/// directory, so the test is existence, not kind.
+fn enclosing_repository(start: &std::path::Path) -> Option<PathBuf> {
+    start
+        .ancestors()
+        .find(|ancestor| ancestor.join(".git").exists())
+        .map(PathBuf::from)
 }
 
 fn parse(args: &[String]) -> Result<Options, String> {
@@ -189,7 +213,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
         format: None,
         root: None,
         resolve: true,
-        strict: false,
+        deny_symlinks: false,
         walk: WalkOptions::default(),
     };
 
@@ -209,7 +233,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
 
         match arg.as_str() {
             "--no-resolve" => options.resolve = false,
-            "--strict" => options.strict = true,
+            "--deny-symlinks" => options.deny_symlinks = true,
             "--stdin" => options.stdin = true,
             "--hidden" => options.walk.hidden = true,
             "--no-ignore" => options.walk.respect_ignore = false,
@@ -281,8 +305,8 @@ fn summarise(reports: &[FileReport], resolved: bool) {
     };
     // `findings` counts every verdict that could be one; `counted`
     // counts the ones this run is set to act on. Saying both keeps the
-    // tally honest when --strict is off and non-canonical paths were
-    // listed above but do not move the exit code.
+    // tally honest when symlinks were listed above but do not move the
+    // exit code.
     let noted = findings - counted.min(findings);
     let noted = if noted > 0 {
         format!(", {noted} noted but not counted")
@@ -391,23 +415,59 @@ mod tests {
     }
 
     #[test]
-    fn a_single_directory_argument_becomes_the_root() {
+    fn a_single_directory_argument_becomes_the_root_outside_a_repository() {
         let tree = TempTree::new("cli-root-dir");
         let root = choose_root(None, &[tree.path().to_path_buf()]).expect("a root");
         assert_eq!(root, tree.path());
     }
 
-    /// Several inputs have no single obvious root, so the working
-    /// directory is used rather than picking one of them arbitrarily.
+    /// The monorepo case: auditing one package must not make every
+    /// cross-package import an escape. Verified against this family,
+    /// where it produced three false findings before the change.
     #[test]
-    fn several_inputs_fall_back_to_the_working_directory() {
+    fn the_enclosing_repository_wins_over_the_directory_argument() {
+        let tree = TempTree::new("cli-root-git");
+        tree.mkdir(".git");
+        let package = tree.mkdir("packages/app");
+        assert_eq!(choose_root(None, &[package]).expect("a root"), tree.path());
+    }
+
+    /// A worktree and a submodule carry `.git` as a file.
+    #[test]
+    fn a_git_file_marks_a_repository_too() {
+        let tree = TempTree::new("cli-root-worktree");
+        tree.write(".git", "gitdir: /elsewhere\n");
+        let package = tree.mkdir("packages/app");
+        assert_eq!(choose_root(None, &[package]).expect("a root"), tree.path());
+    }
+
+    /// A file argument roots at its repository, not at its own
+    /// directory — the same rule, so naming a file and naming its
+    /// folder cannot disagree.
+    #[test]
+    fn a_file_argument_roots_at_its_repository() {
+        let tree = TempTree::new("cli-root-file");
+        tree.mkdir(".git");
+        let file = tree.write("packages/app/a.json", "{}");
+        assert_eq!(choose_root(None, &[file]).expect("a root"), tree.path());
+    }
+
+    /// Several inputs have no single obvious root, so the run starts
+    /// from the working directory rather than picking one of them
+    /// arbitrarily — and then the same repository rule applies.
+    #[test]
+    fn several_inputs_start_from_the_working_directory() {
         let tree = TempTree::new("cli-root-many");
         let a = tree.write("a.json", "{}");
         let b = tree.write("b.json", "{}");
         let root = choose_root(None, &[a, b]).expect("a root");
         let working = std::fs::canonicalize(std::env::current_dir().expect("a cwd"))
             .expect("a canonical cwd");
-        assert_eq!(root, working);
+        let expected = working
+            .ancestors()
+            .find(|ancestor| ancestor.join(".git").exists())
+            .map_or(working.clone(), std::path::Path::to_path_buf);
+        assert_eq!(root, expected);
     }
 
     #[test]

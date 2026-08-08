@@ -214,8 +214,8 @@ worse than no finding at all.
 ### Exit codes are the API
 
 - **0** — every path examined is fine, or nothing was found to examine.
-- **1** — at least one finding: a path that is `missing` or
-  `escapes-root`, plus `non-canonical` under `--strict`.
+- **1** — at least one finding: `missing`, `escapes-root` or
+  `non-canonical`, plus `symlinked` under `--deny-symlinks`.
 - **2** — the question was malformed: an unknown flag, an unreadable
   input, a path that does not exist, a `--root` that is not a directory.
 
@@ -238,9 +238,10 @@ Options:
   --no-resolve         report paths as written; skip the filesystem
                        entirely. No path can then be a finding.
   --root <dir>         the boundary a relative path may not escape
-                       (default: the directory argument, else the
-                       working directory)
-  --strict             treat a non-canonical path as a finding too
+                       (default: the enclosing git repository, else the
+                       directory argument, else the working directory)
+  --deny-symlinks      treat a symlink as a finding too (it is reported
+                       either way)
   --format <format>    force a format instead of inferring from the
                        extension; required with --stdin
   --stdin              read one document from stdin
@@ -267,8 +268,8 @@ Each extracted path gets exactly one verdict:
 | verdict | meaning |
 |---|---|
 | `ok` | exists, canonical, and inside the root |
-| `symlinked` | exists, but the path or a component is a symlink. The target is reported. |
-| `non-canonical` | exists, but the written form is not the canonical one |
+| `symlinked` | exists, but the path or a component is a symlink. The target is reported. A finding only with `--deny-symlinks`. |
+| `non-canonical` | exists, but the written form is not the canonical one — **a finding by default** |
 | `missing` | does not exist |
 | `escapes-root` | a **relative** path that resolves above the root |
 | `unresolved` | resolution did not run, or the path is not a filesystem path |
@@ -278,6 +279,19 @@ Rules that keep this honest:
 - **A relative path resolves against the directory of the file it was
   found in**, never against the working directory. That is what the path
   means to the code that contains it.
+
+  This is the one place the CLI departs from the extension, which
+  resolves against the *workspace folder*. That is right for a path
+  written relative to a project root and wrong for `./helper` in
+  `src/app.ts` — which is the dominant case — so the base is the file
+  and the departure is recorded here rather than left to be discovered.
+- **The root defaults to the enclosing git repository.** The extension's
+  `resolveWorkspaceRelative` works against the workspace folder, and a
+  repository is what a workspace folder is on a command line. Rooting at
+  the directory argument instead made every cross-package import in a
+  monorepo an escape — measured: auditing one package of this family
+  produced three `escapes-root` findings for correct code. `--root`
+  overrides; outside a repository the directory argument is used.
 - **An absolute path never `escapes-root`.** It is absolute by intent;
   its verdict is decided by existence alone. Flagging every absolute path
   as an escape would be noise dressed as rigour.
@@ -324,9 +338,19 @@ Rules that keep this honest:
 - **Resolution never mutates anything.** There is no `--fix`. A tool that
   rewrites source files needs a confirmation story this one does not have
   yet; see Not in v1.
-- **`symlinked` is a fact, not a failure.** It does not set exit 1 on its
-  own. In a trusted environment the point is to *see* the links, and a
-  tool that treats every link as a problem gets muted.
+- **The two defaults come from the extension, not from taste.**
+  `normalizePath` in `src/utils/pathResolver.ts` *is* the definition of
+  canonical form — separators forward, duplicates collapsed, no trailing
+  slash — and `path.resolve` collapses embedded traversal on top of it.
+  A path that deviates is one the extension would have rewritten, so
+  **`non-canonical` counts by default**: an audit that stayed quiet
+  about it would be withholding the thing it was asked for.
+
+  The same file treats symlink resolution as an ordinary step rather
+  than an anomaly, so **a link is a fact by default** and
+  `--deny-symlinks` is how you say otherwise. It exists because catching
+  an unexpected link is exactly what some trusted-environment audits are
+  for, and "grep the JSON" is not an answer for a CI step.
 
 ## The MCP surface
 

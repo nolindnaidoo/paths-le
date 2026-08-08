@@ -185,15 +185,41 @@ fn without_resolution_a_broken_tree_still_exits_clear() {
     assert!(run.stderr.contains("not resolved"), "{}", run.stderr);
 }
 
+/// Canonicalisation is the audit, so it counts without being asked for.
 #[test]
-fn strict_turns_a_non_canonical_path_into_a_finding() {
-    let tree = Tree::new("strict");
+fn a_non_canonical_path_fails_the_run_by_default() {
+    let tree = Tree::new("canon");
     tree.write("src/helper.ts", "");
     tree.write("src/app.ts", "import './/helper.ts';\n");
-    let lenient = run(&[&tree.path().to_string_lossy()]);
-    assert_eq!(lenient.code, 0);
-    let strict = run(&["--strict", &tree.path().to_string_lossy()]);
-    assert_eq!(strict.code, 1);
+    assert_eq!(run(&[&tree.path().to_string_lossy()]).code, 1);
+}
+
+/// A link is a fact until asked about — and asking is the point of a
+/// symlink audit, so the flag has to reach the exit code.
+#[cfg(unix)]
+#[test]
+fn a_symlink_fails_the_run_only_when_denied() {
+    let tree = Tree::new("denylinks");
+    tree.write("src/real.ts", "");
+    std::os::unix::fs::symlink("real.ts", tree.path().join("src/link.ts")).expect("a symlink");
+    tree.write("src/app.ts", "import './link.ts';\n");
+
+    let quiet = run(&[&tree.path().to_string_lossy()]);
+    assert_eq!(quiet.code, 0, "{}", quiet.stderr);
+    let denied = run(&["--deny-symlinks", &tree.path().to_string_lossy()]);
+    assert_eq!(denied.code, 1, "{}", denied.stderr);
+}
+
+/// The monorepo case, end to end: a cross-package import is not an
+/// escape when the repository is the root.
+#[test]
+fn a_cross_package_import_is_not_an_escape_inside_a_repository() {
+    let tree = Tree::new("monorepo");
+    std::fs::create_dir_all(tree.path().join(".git")).expect("a git dir");
+    tree.write("packages/shared/logger.ts", "");
+    tree.write("packages/app/index.ts", "import '../shared/logger.ts';\n");
+    let run = run(&[&tree.path().join("packages/app").to_string_lossy()]);
+    assert_eq!(run.code, 0, "{}", run.stderr);
 }
 
 #[test]

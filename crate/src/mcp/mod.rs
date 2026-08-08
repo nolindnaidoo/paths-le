@@ -117,10 +117,11 @@ fn tool_definitions() -> Value {
                         "description": "the directory a relative path may not escape; the \
                                         audited directory is used when omitted",
                     },
-                    "strict": {
+                    "denySymlinks": {
                         "type": "boolean",
                         "default": false,
-                        "description": "count a non-canonical path as a finding too",
+                        "description": "count a symlink as a finding too; it is reported \
+                                        either way",
                     },
                 },
             },
@@ -165,8 +166,8 @@ fn audit_tool(arguments: &Value) -> Result<Value, String> {
         .get("resolve")
         .and_then(Value::as_bool)
         .unwrap_or(true);
-    let strict = arguments
-        .get("strict")
+    let deny_symlinks = arguments
+        .get("denySymlinks")
         .and_then(Value::as_bool)
         .unwrap_or(false);
 
@@ -176,7 +177,7 @@ fn audit_tool(arguments: &Value) -> Result<Value, String> {
     let options = AuditOptions {
         resolve,
         root,
-        strict,
+        deny_symlinks,
     };
 
     let reports: Vec<Value> = targets

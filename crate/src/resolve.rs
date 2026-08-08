@@ -29,18 +29,28 @@ pub(crate) enum Verdict {
 }
 
 impl Verdict {
-    /// Whether this verdict counts against the exit code. `--strict`
-    /// adds `non-canonical`; nothing else moves.
+    /// Whether this verdict counts against the exit code.
     ///
-    /// `symlinked` deliberately never counts. In a trusted environment
-    /// the point is to *see* the links, and a tool that treats every
-    /// link as a problem gets muted — after which it reports nothing at
-    /// all.
-    pub(crate) fn is_finding(self, strict: bool) -> bool {
+    /// **`non-canonical` counts by default**, and that follows the
+    /// extension rather than a preference. `normalizePath` in
+    /// `src/utils/pathResolver.ts` *is* the definition of canonical form
+    /// — separators forward, duplicates collapsed, no trailing slash —
+    /// and `path.resolve` collapses embedded traversal on top of it. A
+    /// path that deviates is one the extension would have rewritten, so
+    /// an audit that stayed quiet about it would be withholding the
+    /// thing it was asked for.
+    ///
+    /// **`symlinked` counts only when asked.** The extension pairs
+    /// symlink resolution with canonicalisation as one ordinary step,
+    /// not as an anomaly, so a link is a fact by default. It is also the
+    /// thing some trusted-environment audits exist to catch, which is
+    /// why `deny_symlinks` exists at all rather than the answer being
+    /// "grep the JSON".
+    pub(crate) fn is_finding(self, deny_symlinks: bool) -> bool {
         match self {
-            Verdict::Missing | Verdict::EscapesRoot => true,
-            Verdict::NonCanonical => strict,
-            Verdict::Ok | Verdict::Symlinked | Verdict::Unresolved => false,
+            Verdict::Missing | Verdict::EscapesRoot | Verdict::NonCanonical => true,
+            Verdict::Symlinked => deny_symlinks,
+            Verdict::Ok | Verdict::Unresolved => false,
         }
     }
 }
@@ -674,15 +684,19 @@ mod tests {
         }
     }
 
+    /// Canonicalisation is the audit; a link is a fact until asked
+    /// about. Both defaults are the extension's, not a preference.
     #[test]
-    fn findings_are_the_two_verdicts_that_mean_something_is_wrong() {
-        assert!(Verdict::Missing.is_finding(false));
-        assert!(Verdict::EscapesRoot.is_finding(false));
-        assert!(!Verdict::NonCanonical.is_finding(false));
-        assert!(Verdict::NonCanonical.is_finding(true));
-        assert!(!Verdict::Symlinked.is_finding(true));
-        assert!(!Verdict::Ok.is_finding(true));
-        assert!(!Verdict::Unresolved.is_finding(true));
+    fn canonicalisation_counts_by_default_and_links_count_on_request() {
+        for denied in [false, true] {
+            assert!(Verdict::Missing.is_finding(denied));
+            assert!(Verdict::EscapesRoot.is_finding(denied));
+            assert!(Verdict::NonCanonical.is_finding(denied));
+            assert!(!Verdict::Ok.is_finding(denied));
+            assert!(!Verdict::Unresolved.is_finding(denied));
+        }
+        assert!(!Verdict::Symlinked.is_finding(false));
+        assert!(Verdict::Symlinked.is_finding(true));
     }
 
     #[cfg(unix)]
@@ -706,14 +720,15 @@ mod tests {
             );
         }
 
-        /// A link is a fact, not a failure — the exit code must not
-        /// move for one.
+        /// A link is a fact until someone asks about it.
         #[test]
-        fn a_symlink_is_not_a_finding() {
+        fn a_symlink_is_not_a_finding_unless_denied() {
             let tree = TempTree::new("resolve-symlink-ok");
             tree.write("real/file.txt", "x");
             tree.symlink("real/file.txt", "link.txt");
-            assert!(!resolve_in(&tree, "link.txt").verdict.is_finding(true));
+            let verdict = resolve_in(&tree, "link.txt").verdict;
+            assert!(!verdict.is_finding(false), "a link is a fact by default");
+            assert!(verdict.is_finding(true), "and a finding when denied");
         }
 
         /// A broken link is missing, and still names what it pointed

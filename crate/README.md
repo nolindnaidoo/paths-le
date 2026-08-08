@@ -69,7 +69,7 @@ All ten LE tools are on **[letools.dev](https://letools.dev)**.
 
 ```bash
 paths-le .                      # audit a tree
-paths-le --strict .             # count sloppily-written paths too
+paths-le --deny-symlinks .      # fail on an unexpected symlink too
 paths-le --no-resolve src/      # just list what is written, touch nothing
 cat pkg.json | paths-le --stdin --format json
 ```
@@ -78,7 +78,7 @@ cat pkg.json | paths-le --stdin --format json
 ./pkg.json:3:12  ./docs//guide.md  [non-canonical — contains a duplicate separator]
 ./src/app.ts:2:16  ./gone.ts  [missing — no such file or directory]
 ./src/app.ts:3:16  ../../escape/out  [escapes root — resolves outside /repo]
-5 paths in 3 files — 2 findings, 1 noted but not counted
+5 paths in 3 files — 3 findings
 ```
 
 The report is JSON on stdout — one object per line, one line per file —
@@ -117,8 +117,8 @@ has nothing to say about, and naming one means you expected otherwise.
 | verdict | meaning | counts as a finding |
 |---|---|---|
 | `ok` | exists, canonical, inside the root | no |
-| `symlinked` | exists; the path or a component is a link, target reported | no |
-| `non-canonical` | exists, but the written form is not how it resolves | only with `--strict` |
+| `symlinked` | exists; the path or a component is a link, target reported | with `--deny-symlinks` |
+| `non-canonical` | exists, but the written form is not how it resolves | **yes** |
 | `missing` | does not exist | **yes** |
 | `escapes-root` | a relative path that resolves above the root | **yes** |
 | `unresolved` | not checked, or not a filesystem path | no |
@@ -146,9 +146,17 @@ technically true and practically useless:
   of a path.
 - **An absolute path never "escapes".** It is absolute by intent; it is
   judged on existence alone.
-- **A symlink is a fact, not a failure.** It never moves the exit code on
-  its own. In a trusted environment the point is to *see* the links, and
-  a tool that treats every link as a problem gets muted.
+- **A symlink is a fact by default, and a finding when you ask.** The
+  extension treats resolving a link as an ordinary step, so that is the
+  default here; `--deny-symlinks` is for the audits that exist to catch
+  an unexpected one.
+- **Canonicalisation counts without being asked.** `normalizePath` in
+  the extension defines canonical form, so a path that deviates is one
+  it would have rewritten — an audit that stayed quiet about that would
+  be withholding the thing it was asked for.
+- **The root is the enclosing git repository.** Rooting at the directory
+  you named instead makes every cross-package import in a monorepo an
+  escape.
 
 Run over the eleven repositories these rules were developed against,
 six report zero findings and the rest report one or two — each of which
@@ -162,7 +170,8 @@ shape is also how bare module specifiers are written.
 ```
 --no-resolve         report paths as written; skip the filesystem entirely
 --root <dir>         the boundary a relative path may not escape
---strict             treat a non-canonical path as a finding too
+                     (default: the enclosing git repository)
+--deny-symlinks      treat a symlink as a finding too
 --format <format>    force a format instead of inferring it from the name
 --stdin              read one document from stdin
 --follow-symlinks    resolve through symlinks when walking a tree
@@ -178,7 +187,7 @@ that contains it.
 
 ```yaml
 - name: No broken paths
-  run: paths-le --strict .
+  run: paths-le .
 ```
 
 Exit 1 fails the step on a real finding. Exit 2 means the tool could not

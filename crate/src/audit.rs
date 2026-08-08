@@ -21,7 +21,9 @@ pub(crate) struct AuditOptions {
     /// canonical, or the escape check compares two spellings of the
     /// same directory.
     pub(crate) root: PathBuf,
-    pub(crate) strict: bool,
+    /// Promote a symlink to a finding. Off by default: the extension
+    /// treats resolving a link as an ordinary step, not an anomaly.
+    pub(crate) deny_symlinks: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -143,7 +145,7 @@ pub(crate) fn audit_content(content: &str, target: &Target, options: &AuditOptio
 
     let findings = paths
         .iter()
-        .filter(|audited| audited.resolution.verdict.is_finding(options.strict))
+        .filter(|audited| audited.resolution.verdict.is_finding(options.deny_symlinks))
         .count();
 
     FileReport {
@@ -201,7 +203,7 @@ mod tests {
         AuditOptions {
             resolve: true,
             root: tree.path().to_path_buf(),
-            strict: false,
+            deny_symlinks: false,
         }
     }
 
@@ -276,24 +278,42 @@ mod tests {
         assert_eq!(exit_code(&[report]), 0);
     }
 
+    /// Canonicalisation is the audit, so a non-canonical path counts
+    /// without being asked for. `normalizePath` in the extension is the
+    /// definition being held to.
     #[test]
-    fn strict_promotes_a_non_canonical_path_to_a_finding() {
-        let tree = TempTree::new("audit-strict");
+    fn a_non_canonical_path_is_a_finding_by_default() {
+        let tree = TempTree::new("audit-canon");
         tree.write("src/helper.ts", "");
         tree.write("src/app.ts", "import './/helper.ts';\n");
-        let lenient = audit_one(&tree, "src/app.ts", &options(&tree));
-        assert_eq!(lenient.paths[0].resolution.verdict, Verdict::NonCanonical);
-        assert_eq!(lenient.summary.findings, 0);
+        let report = audit_one(&tree, "src/app.ts", &options(&tree));
+        assert_eq!(report.paths[0].resolution.verdict, Verdict::NonCanonical);
+        assert_eq!(report.summary.findings, 1);
+    }
 
-        let strict = audit_one(
+    /// A link is a fact until someone asks — and asking is the point of
+    /// a symlink audit, so it has to be askable.
+    #[cfg(unix)]
+    #[test]
+    fn a_symlink_counts_only_when_denied() {
+        let tree = TempTree::new("audit-denylinks");
+        tree.write("src/real.ts", "");
+        tree.symlink("real.ts", "src/link.ts");
+        tree.write("src/app.ts", "import './link.ts';\n");
+
+        let quiet = audit_one(&tree, "src/app.ts", &options(&tree));
+        assert_eq!(quiet.paths[0].resolution.verdict, Verdict::Symlinked);
+        assert_eq!(quiet.summary.findings, 0);
+
+        let denied = audit_one(
             &tree,
             "src/app.ts",
             &AuditOptions {
-                strict: true,
+                deny_symlinks: true,
                 ..options(&tree)
             },
         );
-        assert_eq!(strict.summary.findings, 1);
+        assert_eq!(denied.summary.findings, 1);
     }
 
     #[test]
