@@ -1,0 +1,424 @@
+[
+	{
+		"name": "format given explicitly",
+		"file": "paths.json",
+		"arguments": {
+			"format": "json"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./dist/index.js",
+						"type": "relative",
+						"line": 2,
+						"column": 11
+					},
+					{
+						"value": "https://example.com/docs",
+						"type": "url",
+						"line": 4,
+						"column": 15
+					},
+					{
+						"value": "example.com",
+						"type": "file",
+						"line": 5,
+						"column": 13
+					},
+					{
+						"value": "/var/log/app.log",
+						"type": "absolute",
+						"line": 7,
+						"column": 14
+					},
+					{
+						"value": "C:\\Temp\\cache",
+						"type": "absolute",
+						"line": 8,
+						"column": 12
+					},
+					{
+						"value": "src/app.ts",
+						"type": "file",
+						"line": 12,
+						"column": 13
+					},
+					{
+						"value": "assets/logo.png",
+						"type": "file",
+						"line": 12,
+						"column": 27
+					},
+					{
+						"value": "../scripts/run.sh",
+						"type": "relative",
+						"line": 16,
+						"column": 15
+					}
+				],
+				"fileType": "json"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 8,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "format inferred from a filename",
+		"file": "paths.toml",
+		"arguments": {
+			"filename": "config.toml"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "/var/lib/appdata",
+						"type": "absolute",
+						"line": 5,
+						"column": 13
+					},
+					{
+						"value": "./logs/app.log",
+						"type": "relative",
+						"line": 6,
+						"column": 13
+					},
+					{
+						"value": "C:\\Backups\\daily",
+						"type": "absolute",
+						"line": 7,
+						"column": 11
+					},
+					{
+						"value": "https://example.org/start",
+						"type": "url",
+						"line": 8,
+						"column": 13
+					},
+					{
+						"value": "./relative/key.sh",
+						"type": "relative",
+						"line": 10,
+						"column": 9
+					},
+					{
+						"value": "configs/alpha.toml",
+						"type": "file",
+						"line": 15,
+						"column": 11
+					}
+				],
+				"fileType": "toml"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 6,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "format inferred from a dotfile name",
+		"file": "paths.env",
+		"arguments": {
+			"filename": ".env"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "/var/log/service.log",
+						"type": "absolute",
+						"line": 2,
+						"column": 10
+					},
+					{
+						"value": "./cache/primary",
+						"type": "relative",
+						"line": 3,
+						"column": 12
+					},
+					{
+						"value": "https://api.example.com/v2",
+						"type": "url",
+						"line": 4,
+						"column": 9
+					},
+					{
+						"value": "C:\\Temp\\work",
+						"type": "absolute",
+						"line": 5,
+						"column": 13
+					},
+					{
+						"value": "./quoted/value.js",
+						"type": "relative",
+						"line": 9,
+						"column": 20
+					},
+					{
+						"value": "./quoted/key.js",
+						"type": "relative",
+						"line": 9,
+						"column": 2
+					},
+					{
+						"value": "./unquoted/key.sh",
+						"type": "relative",
+						"line": 10,
+						"column": 1
+					}
+				],
+				"fileType": "dotenv"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 7,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "an alias resolves to its language id",
+		"file": "paths.js",
+		"arguments": {
+			"format": "tsx"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./utils/helper",
+						"type": "relative",
+						"line": 2,
+						"column": 25
+					},
+					{
+						"value": "../config/app.config.js",
+						"type": "relative",
+						"line": 3,
+						"column": 29
+					},
+					{
+						"value": "https://cdn.example.com/lib.js",
+						"type": "url",
+						"line": 4,
+						"column": 9
+					},
+					{
+						"value": "./styles/global.css",
+						"type": "relative",
+						"line": 5,
+						"column": 9
+					},
+					{
+						"value": "./legacy/module.js",
+						"type": "relative",
+						"line": 6,
+						"column": 25
+					},
+					{
+						"value": "./dynamic/loader.js",
+						"type": "relative",
+						"line": 8,
+						"column": 24
+					},
+					{
+						"value": "./exports/thing",
+						"type": "relative",
+						"line": 9,
+						"column": 24
+					},
+					{
+						"value": "/absolute/path/module",
+						"type": "absolute",
+						"line": 10,
+						"column": 16
+					},
+					{
+						"value": "./multiline/import-target.js",
+						"type": "relative",
+						"line": 14,
+						"column": 9
+					},
+					{
+						"value": "C:\\\\Program Files\\\\app\\\\main.js",
+						"type": "absolute",
+						"line": 16,
+						"column": 26
+					},
+					{
+						"value": "file:///opt/data/blob.bin",
+						"type": "url",
+						"line": 17,
+						"column": 26
+					}
+				],
+				"fileType": "typescript"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 11,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "dedupe collapses repeats to the first occurrence",
+		"file": "paths.html",
+		"arguments": {
+			"format": "html",
+			"dedupe": true
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./css/site.css",
+						"type": "relative",
+						"line": 4,
+						"column": 31
+					},
+					{
+						"value": "/js/app.bundle.js",
+						"type": "absolute",
+						"line": 5,
+						"column": 15
+					},
+					{
+						"value": "images/logo.png",
+						"type": "file",
+						"line": 8,
+						"column": 12
+					},
+					{
+						"value": "images/logo@2x.png",
+						"type": "file",
+						"line": 8,
+						"column": 57
+					},
+					{
+						"value": "https://example.com/about",
+						"type": "url",
+						"line": 9,
+						"column": 11
+					},
+					{
+						"value": "/media/poster.jpg",
+						"type": "absolute",
+						"line": 12,
+						"column": 17
+					},
+					{
+						"value": "/media/clip.mp4",
+						"type": "absolute",
+						"line": 12,
+						"column": 41
+					},
+					{
+						"value": "../submit/handler.php",
+						"type": "relative",
+						"line": 13,
+						"column": 16
+					},
+					{
+						"value": "./split/across/lines.png",
+						"type": "relative",
+						"line": 15,
+						"column": 9
+					}
+				],
+				"fileType": "html"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 9,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "maxResults truncates and says so",
+		"file": "paths.html",
+		"arguments": {
+			"format": "html",
+			"maxResults": 3
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./css/site.css",
+						"type": "relative",
+						"line": 4,
+						"column": 31
+					},
+					{
+						"value": "/js/app.bundle.js",
+						"type": "absolute",
+						"line": 5,
+						"column": 15
+					},
+					{
+						"value": "images/logo.png",
+						"type": "file",
+						"line": 8,
+						"column": 12
+					}
+				],
+				"fileType": "html"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 3,
+				"truncated": true
+			}
+		}
+	},
+	{
+		"name": "an unrecognised format is refused by name",
+		"content": "print(\"hi\")",
+		"arguments": {
+			"format": "python"
+		},
+		"expectedError": "Provide `format` (one of: csv, toml, dotenv, javascript, typescript, json, html, css) or a `filename` with a recognised extension."
+	},
+	{
+		"name": "neither format nor filename",
+		"content": "{}",
+		"arguments": {},
+		"expectedError": "Provide `format` (one of: csv, toml, dotenv, javascript, typescript, json, html, css) or a `filename` with a recognised extension."
+	},
+	{
+		"name": "content must be a string",
+		"arguments": {
+			"format": "json"
+		},
+		"expectedError": "content is required and must be a string"
+	},
+	{
+		"name": "a nonsensical maxResults is rejected",
+		"content": "{}",
+		"arguments": {
+			"format": "json",
+			"maxResults": 0
+		},
+		"expectedError": "maxResults must be a positive integer"
+	}
+]

@@ -1,0 +1,7 @@
+name,path,size
+report,/srv/reports/q1.pdf,2048
+avatar,"./images/avatar with space.png",512
+site,https://example.net/index.html,0
+version,3.4.5,1
+plain,not-a-path,9
+win,C:\Users\dev\file.txt,77

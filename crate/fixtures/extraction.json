@@ -1,0 +1,555 @@
+[
+	{
+		"name": "paths.js as javascript",
+		"file": "paths.js",
+		"languageId": "javascript",
+		"expected": [
+			{
+				"value": "./utils/helper",
+				"type": "relative",
+				"line": 2,
+				"column": 25,
+				"context": "JS import"
+			},
+			{
+				"value": "../config/app.config.js",
+				"type": "relative",
+				"line": 3,
+				"column": 29,
+				"context": "JS import"
+			},
+			{
+				"value": "https://cdn.example.com/lib.js",
+				"type": "url",
+				"line": 4,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "./styles/global.css",
+				"type": "relative",
+				"line": 5,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "./legacy/module.js",
+				"type": "relative",
+				"line": 6,
+				"column": 25,
+				"context": "JS require"
+			},
+			{
+				"value": "./dynamic/loader.js",
+				"type": "relative",
+				"line": 8,
+				"column": 24,
+				"context": "JS dynamic import"
+			},
+			{
+				"value": "./exports/thing",
+				"type": "relative",
+				"line": 9,
+				"column": 24,
+				"context": "JS export"
+			},
+			{
+				"value": "/absolute/path/module",
+				"type": "absolute",
+				"line": 10,
+				"column": 16,
+				"context": "JS export"
+			},
+			{
+				"value": "./multiline/import-target.js",
+				"type": "relative",
+				"line": 14,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "C:\\\\Program Files\\\\app\\\\main.js",
+				"type": "absolute",
+				"line": 16,
+				"column": 26,
+				"context": "JS require"
+			},
+			{
+				"value": "file:///opt/data/blob.bin",
+				"type": "url",
+				"line": 17,
+				"column": 26,
+				"context": "JS require"
+			}
+		]
+	},
+	{
+		"name": "paths.js as typescript",
+		"file": "paths.js",
+		"languageId": "typescript",
+		"expected": [
+			{
+				"value": "./utils/helper",
+				"type": "relative",
+				"line": 2,
+				"column": 25,
+				"context": "JS import"
+			},
+			{
+				"value": "../config/app.config.js",
+				"type": "relative",
+				"line": 3,
+				"column": 29,
+				"context": "JS import"
+			},
+			{
+				"value": "https://cdn.example.com/lib.js",
+				"type": "url",
+				"line": 4,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "./styles/global.css",
+				"type": "relative",
+				"line": 5,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "./legacy/module.js",
+				"type": "relative",
+				"line": 6,
+				"column": 25,
+				"context": "JS require"
+			},
+			{
+				"value": "./dynamic/loader.js",
+				"type": "relative",
+				"line": 8,
+				"column": 24,
+				"context": "JS dynamic import"
+			},
+			{
+				"value": "./exports/thing",
+				"type": "relative",
+				"line": 9,
+				"column": 24,
+				"context": "JS export"
+			},
+			{
+				"value": "/absolute/path/module",
+				"type": "absolute",
+				"line": 10,
+				"column": 16,
+				"context": "JS export"
+			},
+			{
+				"value": "./multiline/import-target.js",
+				"type": "relative",
+				"line": 14,
+				"column": 9,
+				"context": "JS import"
+			},
+			{
+				"value": "C:\\\\Program Files\\\\app\\\\main.js",
+				"type": "absolute",
+				"line": 16,
+				"column": 26,
+				"context": "JS require"
+			},
+			{
+				"value": "file:///opt/data/blob.bin",
+				"type": "url",
+				"line": 17,
+				"column": 26,
+				"context": "JS require"
+			}
+		]
+	},
+	{
+		"name": "paths.json as json",
+		"file": "paths.json",
+		"languageId": "json",
+		"expected": [
+			{
+				"value": "./dist/index.js",
+				"type": "relative",
+				"line": 2,
+				"column": 11,
+				"context": "JSON main"
+			},
+			{
+				"value": "https://example.com/docs",
+				"type": "url",
+				"line": 4,
+				"column": 15,
+				"context": "JSON homepage"
+			},
+			{
+				"value": "example.com",
+				"type": "file",
+				"line": 5,
+				"column": 13,
+				"context": "JSON domain"
+			},
+			{
+				"value": "/var/log/app.log",
+				"type": "absolute",
+				"line": 7,
+				"column": 14,
+				"context": "JSON config.output"
+			},
+			{
+				"value": "C:\\Temp\\cache",
+				"type": "absolute",
+				"line": 8,
+				"column": 12,
+				"context": "JSON config.temp"
+			},
+			{
+				"value": "src/app.ts",
+				"type": "file",
+				"line": 12,
+				"column": 13,
+				"context": "JSON files.[0]"
+			},
+			{
+				"value": "assets/logo.png",
+				"type": "file",
+				"line": 12,
+				"column": 27,
+				"context": "JSON files.[1]"
+			},
+			{
+				"value": "../scripts/run.sh",
+				"type": "relative",
+				"line": 16,
+				"column": 15,
+				"context": "JSON nested.deep.script"
+			}
+		]
+	},
+	{
+		"name": "comments.jsonc as jsonc",
+		"file": "comments.jsonc",
+		"languageId": "jsonc",
+		"expected": [
+			{
+				"value": "./src/main.ts",
+				"type": "relative",
+				"line": 3,
+				"column": 12,
+				"context": "JSON entry"
+			},
+			{
+				"value": "images/bg.png",
+				"type": "file",
+				"line": 4,
+				"column": 14,
+				"context": "JSON assets.[0]"
+			}
+		]
+	},
+	{
+		"name": "unicode.json as json",
+		"file": "unicode.json",
+		"languageId": "json",
+		"expected": [
+			{
+				"value": "./naïve/path.txt",
+				"type": "relative",
+				"line": 2,
+				"column": 11,
+				"context": "JSON café"
+			},
+			{
+				"value": "../über/straße.md",
+				"type": "relative",
+				"line": 3,
+				"column": 17,
+				"context": "JSON emoji🎯key"
+			}
+		]
+	},
+	{
+		"name": "paths.toml as toml",
+		"file": "paths.toml",
+		"languageId": "toml",
+		"expected": [
+			{
+				"value": "/var/lib/appdata",
+				"type": "absolute",
+				"line": 5,
+				"column": 13,
+				"context": "TOML value"
+			},
+			{
+				"value": "./logs/app.log",
+				"type": "relative",
+				"line": 6,
+				"column": 13,
+				"context": "TOML value"
+			},
+			{
+				"value": "C:\\Backups\\daily",
+				"type": "absolute",
+				"line": 7,
+				"column": 11,
+				"context": "TOML value"
+			},
+			{
+				"value": "https://example.org/start",
+				"type": "url",
+				"line": 8,
+				"column": 13,
+				"context": "TOML value"
+			},
+			{
+				"value": "./relative/key.sh",
+				"type": "relative",
+				"line": 10,
+				"column": 9,
+				"context": "TOML key"
+			},
+			{
+				"value": "configs/alpha.toml",
+				"type": "file",
+				"line": 15,
+				"column": 11,
+				"context": "TOML value"
+			}
+		]
+	},
+	{
+		"name": "paths.csv as csv",
+		"file": "paths.csv",
+		"languageId": "csv",
+		"expected": [
+			{
+				"value": "/srv/reports/q1.pdf",
+				"type": "absolute",
+				"line": 2,
+				"column": 2,
+				"context": "CSV cell [2,2]"
+			},
+			{
+				"value": "./images/avatar with space.png",
+				"type": "relative",
+				"line": 3,
+				"column": 2,
+				"context": "CSV cell [3,2]"
+			},
+			{
+				"value": "https://example.net/index.html",
+				"type": "url",
+				"line": 4,
+				"column": 2,
+				"context": "CSV cell [4,2]"
+			},
+			{
+				"value": "C:\\Users\\dev\\file.txt",
+				"type": "absolute",
+				"line": 7,
+				"column": 2,
+				"context": "CSV cell [7,2]"
+			}
+		]
+	},
+	{
+		"name": "paths.env as dotenv",
+		"file": "paths.env",
+		"languageId": "dotenv",
+		"expected": [
+			{
+				"value": "/var/log/service.log",
+				"type": "absolute",
+				"line": 2,
+				"column": 10,
+				"context": "Environment variable: LOG_FILE"
+			},
+			{
+				"value": "./cache/primary",
+				"type": "relative",
+				"line": 3,
+				"column": 12,
+				"context": "Environment variable: CACHE_DIR"
+			},
+			{
+				"value": "https://api.example.com/v2",
+				"type": "url",
+				"line": 4,
+				"column": 9,
+				"context": "Environment variable: API_URL"
+			},
+			{
+				"value": "C:\\Temp\\work",
+				"type": "absolute",
+				"line": 5,
+				"column": 13,
+				"context": "Environment variable: WINDOWS_TMP"
+			},
+			{
+				"value": "./quoted/value.js",
+				"type": "relative",
+				"line": 9,
+				"column": 20,
+				"context": "Environment variable: ./quoted/key.js"
+			},
+			{
+				"value": "./quoted/key.js",
+				"type": "relative",
+				"line": 9,
+				"column": 2,
+				"context": "Environment variable name"
+			},
+			{
+				"value": "./unquoted/key.sh",
+				"type": "relative",
+				"line": 10,
+				"column": 1,
+				"context": "Environment variable name"
+			}
+		]
+	},
+	{
+		"name": "paths.css as css",
+		"file": "paths.css",
+		"languageId": "css",
+		"expected": [
+			{
+				"value": "./base/reset.css",
+				"type": "relative",
+				"line": 1,
+				"column": 10,
+				"context": "CSS @import"
+			},
+			{
+				"value": "../themes/dark.css",
+				"type": "relative",
+				"line": 2,
+				"column": 14,
+				"context": "CSS @import"
+			},
+			{
+				"value": "/assets/bg/hero.jpg",
+				"type": "absolute",
+				"line": 5,
+				"column": 19,
+				"context": "CSS url()"
+			},
+			{
+				"value": "images/cursor.png",
+				"type": "file",
+				"line": 6,
+				"column": 14,
+				"context": "CSS url()"
+			},
+			{
+				"value": "https://cdn.example.com/mask.svg",
+				"type": "url",
+				"line": 11,
+				"column": 13,
+				"context": "CSS url()"
+			}
+		]
+	},
+	{
+		"name": "paths.html as html",
+		"file": "paths.html",
+		"languageId": "html",
+		"expected": [
+			{
+				"value": "./css/site.css",
+				"type": "relative",
+				"line": 4,
+				"column": 31,
+				"context": "HTML href"
+			},
+			{
+				"value": "/js/app.bundle.js",
+				"type": "absolute",
+				"line": 5,
+				"column": 15,
+				"context": "HTML src"
+			},
+			{
+				"value": "images/logo.png",
+				"type": "file",
+				"line": 8,
+				"column": 12,
+				"context": "HTML src"
+			},
+			{
+				"value": "images/logo.png",
+				"type": "file",
+				"line": 8,
+				"column": 37,
+				"context": "HTML srcset"
+			},
+			{
+				"value": "images/logo@2x.png",
+				"type": "file",
+				"line": 8,
+				"column": 57,
+				"context": "HTML srcset"
+			},
+			{
+				"value": "https://example.com/about",
+				"type": "url",
+				"line": 9,
+				"column": 11,
+				"context": "HTML href"
+			},
+			{
+				"value": "/media/poster.jpg",
+				"type": "absolute",
+				"line": 12,
+				"column": 17,
+				"context": "HTML poster"
+			},
+			{
+				"value": "/media/clip.mp4",
+				"type": "absolute",
+				"line": 12,
+				"column": 41,
+				"context": "HTML src"
+			},
+			{
+				"value": "../submit/handler.php",
+				"type": "relative",
+				"line": 13,
+				"column": 16,
+				"context": "HTML action"
+			},
+			{
+				"value": "./split/across/lines.png",
+				"type": "relative",
+				"line": 15,
+				"column": 9,
+				"context": "HTML src"
+			}
+		]
+	},
+	{
+		"name": "srcset-data-uri.html as html",
+		"file": "srcset-data-uri.html",
+		"languageId": "html",
+		"expected": [
+			{
+				"value": "R0lGOD=",
+				"type": "unknown",
+				"line": 1,
+				"column": 36,
+				"context": "HTML srcset"
+			},
+			{
+				"value": "./real/image.png",
+				"type": "relative",
+				"line": 1,
+				"column": 48,
+				"context": "HTML srcset"
+			}
+		]
+	}
+]

@@ -1,0 +1,270 @@
+{
+	"isPathLike": [
+		{
+			"input": "/var/log/app.log",
+			"expected": true
+		},
+		{
+			"input": "./relative/file.ts",
+			"expected": true
+		},
+		{
+			"input": "../up/one.md",
+			"expected": true
+		},
+		{
+			"input": "C:\\Users\\dev\\file.txt",
+			"expected": true
+		},
+		{
+			"input": "C:/Users/dev/file.txt",
+			"expected": true
+		},
+		{
+			"input": "https://example.com/a/b",
+			"expected": true
+		},
+		{
+			"input": "file:///opt/data.bin",
+			"expected": true
+		},
+		{
+			"input": "src/app.ts",
+			"expected": true
+		},
+		{
+			"input": "logo.png",
+			"expected": true
+		},
+		{
+			"input": "name.ext",
+			"expected": true
+		},
+		{
+			"input": "/path/with space/file.txt",
+			"expected": true
+		},
+		{
+			"input": "has space/file.txt",
+			"expected": false
+		},
+		{
+			"input": "1.8.1",
+			"expected": false
+		},
+		{
+			"input": "3.4.5",
+			"expected": false
+		},
+		{
+			"input": "192.168.1.1",
+			"expected": false
+		},
+		{
+			"input": "a",
+			"expected": false
+		},
+		{
+			"input": "",
+			"expected": false
+		},
+		{
+			"input": "ab",
+			"expected": false
+		},
+		{
+			"input": "my-package",
+			"expected": false
+		},
+		{
+			"input": "example.com",
+			"expected": true
+		},
+		{
+			"input": "has\"quote.txt",
+			"expected": false
+		},
+		{
+			"input": "has'quote.txt",
+			"expected": false
+		},
+		{
+			"input": "has<angle.txt",
+			"expected": false
+		},
+		{
+			"input": "has|pipe.txt",
+			"expected": false
+		},
+		{
+			"input": "has*star.txt",
+			"expected": false
+		},
+		{
+			"input": "has?q.txt",
+			"expected": false
+		},
+		{
+			"input": "#anchor",
+			"expected": false
+		},
+		{
+			"input": "//host/share",
+			"expected": true
+		},
+		{
+			"input": "///triple",
+			"expected": true
+		},
+		{
+			"input": "noextension",
+			"expected": false
+		},
+		{
+			"input": "trailing/",
+			"expected": false
+		},
+		{
+			"input": ".hidden",
+			"expected": false
+		},
+		{
+			"input": ".env",
+			"expected": false
+		}
+	],
+	"classifyPathType": [
+		{
+			"input": "/var/log/app.log",
+			"expected": "absolute"
+		},
+		{
+			"input": "./relative/file.ts",
+			"expected": "relative"
+		},
+		{
+			"input": "../up/one.md",
+			"expected": "relative"
+		},
+		{
+			"input": "C:\\Users\\dev\\file.txt",
+			"expected": "absolute"
+		},
+		{
+			"input": "C:/Users/dev/file.txt",
+			"expected": "absolute"
+		},
+		{
+			"input": "https://example.com/a/b",
+			"expected": "url"
+		},
+		{
+			"input": "file:///opt/data.bin",
+			"expected": "url"
+		},
+		{
+			"input": "src/app.ts",
+			"expected": "file"
+		},
+		{
+			"input": "logo.png",
+			"expected": "file"
+		},
+		{
+			"input": "name.ext",
+			"expected": "file"
+		},
+		{
+			"input": "/path/with space/file.txt",
+			"expected": "absolute"
+		},
+		{
+			"input": "has space/file.txt",
+			"expected": "file"
+		},
+		{
+			"input": "1.8.1",
+			"expected": "file"
+		},
+		{
+			"input": "3.4.5",
+			"expected": "file"
+		},
+		{
+			"input": "192.168.1.1",
+			"expected": "file"
+		},
+		{
+			"input": "a",
+			"expected": "unknown"
+		},
+		{
+			"input": "",
+			"expected": "unknown"
+		},
+		{
+			"input": "ab",
+			"expected": "unknown"
+		},
+		{
+			"input": "my-package",
+			"expected": "unknown"
+		},
+		{
+			"input": "example.com",
+			"expected": "file"
+		},
+		{
+			"input": "has\"quote.txt",
+			"expected": "file"
+		},
+		{
+			"input": "has'quote.txt",
+			"expected": "file"
+		},
+		{
+			"input": "has<angle.txt",
+			"expected": "file"
+		},
+		{
+			"input": "has|pipe.txt",
+			"expected": "file"
+		},
+		{
+			"input": "has*star.txt",
+			"expected": "file"
+		},
+		{
+			"input": "has?q.txt",
+			"expected": "file"
+		},
+		{
+			"input": "#anchor",
+			"expected": "unknown"
+		},
+		{
+			"input": "//host/share",
+			"expected": "url"
+		},
+		{
+			"input": "///triple",
+			"expected": "absolute"
+		},
+		{
+			"input": "noextension",
+			"expected": "unknown"
+		},
+		{
+			"input": "trailing/",
+			"expected": "unknown"
+		},
+		{
+			"input": ".hidden",
+			"expected": "file"
+		},
+		{
+			"input": ".env",
+			"expected": "file"
+		}
+	]
+}
