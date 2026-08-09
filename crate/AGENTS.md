@@ -61,9 +61,10 @@ crate/src/
   with the rest of the family.** pixelcoords/pixelactions split because
   pixelactions genuinely consumes `pixelcoords-core`; there is no second
   consumer here. `extract/` as a `pub(crate)` module gives the
-  architectural separation without the packaging ceremony. Code two
-  crates in the family both need is **copied, with a drift check** —
-  that is the family's existing idiom, not a workaround.
+  architectural separation without the packaging ceremony. Where two crates in the family need the same
+  thing it is copied, and nothing holds the copies equal — where they
+  agree it is because the same answer was right twice, and where they
+  diverge that is the point.
 - **Two regex engines, on purpose.** `regex` for patterns that need no
   backtracking, because its matching cannot fail and needs no error
   path; `fancy-regex` for the extension's quote-matching patterns, which
