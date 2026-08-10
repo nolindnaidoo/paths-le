@@ -7,6 +7,19 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Every absolute path was `non-canonical` on Windows.** The
+  separator rule fired on any backslash rather than on a genuine mix of
+  both, and `std::fs::canonicalize` there returns a verbatim
+  `\\?\C:\...` prefix — so the platform's own canonical form was
+  reported as deviating from canonical form. An ordinary Windows
+  relative path, `src\lib\a.ts`, was called non-canonical for the same
+  reason. Found by a Windows CI job; it cannot reproduce on macOS or
+  Linux.
+
 ## [0.1.0] - 2026-08-08
 
 First release. The extension's extraction engine, ported and pinned

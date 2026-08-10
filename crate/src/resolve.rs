@@ -302,7 +302,12 @@ fn non_canonical_reason(value: &str) -> Option<String> {
     if value.len() > 1 && value.ends_with('/') {
         return Some("ends with a separator".to_string());
     }
-    if value.contains('\\') && !is_windows_path(value) {
+    // Both separators, not merely one. A path that uses only
+    // backslashes is ordinary on Windows — `src\\lib\\a.ts` is how it is
+    // written there — and `std::fs::canonicalize` hands back a verbatim
+    // `\\\\?\\C:\\...` prefix, so testing for a single backslash called
+    // every absolute path on Windows non-canonical.
+    if value.contains('\\') && value.contains('/') {
         return Some("mixes backslash and forward-slash separators".to_string());
     }
     has_embedded_traversal(value).then(|| "traverses upward mid-path".to_string())
@@ -423,6 +428,26 @@ mod tests {
         std::fs::create_dir_all(&base).expect("a directory");
         let resolution = resolve("../a/x.txt", PathType::Relative, &base, tree.path());
         assert_eq!(resolution.verdict, Verdict::Ok);
+    }
+
+    /// The rule is a *mix* of separators, not the presence of a
+    /// backslash. `std::fs::canonicalize` on Windows hands back a
+    /// verbatim `\\?\C:\...` prefix, so testing for one backslash
+    /// called every absolute path there non-canonical — which is how
+    /// this was found, on a Windows CI job and nowhere else.
+    #[test]
+    fn a_backslash_alone_is_not_non_canonical() {
+        assert_eq!(non_canonical_reason(r"\\?\C:\tmp\x.txt"), None);
+        assert_eq!(non_canonical_reason(r"src\lib\a.ts"), None);
+        assert_eq!(non_canonical_reason(r"C:\tmp\x.txt"), None);
+    }
+
+    #[test]
+    fn genuinely_mixed_separators_are_non_canonical() {
+        assert_eq!(
+            non_canonical_reason(r"src\lib/a.ts").as_deref(),
+            Some("mixes backslash and forward-slash separators")
+        );
     }
 
     /// An absolute path is absolute by intent, so it is judged on
