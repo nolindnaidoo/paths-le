@@ -227,7 +227,7 @@ function getHelpHtml(): string {
         <li><strong>Documentation</strong> - <a href="https://github.com/nolindnaidoo/paths-le#readme">Complete documentation</a></li>
         <li><strong>LE Tools</strong> - <a href="https://letools.dev">https://letools.dev</a></li>
         <li><strong>Rate on VS Code Marketplace</strong> - <a href="https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le&ssr=false#review-details">Leave a rating</a></li>
-        <li><strong>Rate on Open VSX</strong> - <a href="https://open-vsx.org/extension/nolindnaidoo/paths-le/reviews">Leave a rating</a></li>
+        <li><strong>Rate on Open VSX</strong> - <a href="https://open-vsx.org/extension/OffensiveEdge/paths-le/reviews">Leave a rating</a></li>
     </ul>
 
     <h2>👤 Built by</h2>
