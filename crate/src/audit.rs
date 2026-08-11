@@ -59,7 +59,24 @@ impl FileReport {
     /// Whether this file could not be examined at all. A run containing
     /// one exits 2: a report that silently skipped a file would be
     /// claiming coverage it does not have.
-    pub(crate) fn is_unexamined(&self) -> bool {
+    /// Whether this file was not read at all — not text, or not
+    /// openable.
+    ///
+    /// Reported rather than swallowed, because a report that quietly
+    /// skipped a file would be claiming coverage it does not have. It
+    /// does **not** fail the run on its own: every repository has a PNG
+    /// and a zip in it, and exiting 2 on those makes the tool unusable
+    /// in CI, which is the one place it is most worth running.
+    pub(crate) fn was_skipped(&self) -> bool {
+        self.diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.code == "skipped")
+    }
+
+    /// Whether the audit of this file gave up part way. Unlike a skip
+    /// this **does** fail the run: reporting no findings for a file it
+    /// never finished reading would overstate coverage.
+    pub(crate) fn is_incomplete(&self) -> bool {
         self.diagnostics
             .iter()
             .any(|diagnostic| diagnostic.severity == Severity::Error)
@@ -69,30 +86,36 @@ impl FileReport {
 pub(crate) fn audit_file(target: &Target, options: &AuditOptions) -> FileReport {
     let file = target.path.to_string_lossy().into_owned();
 
-    let content = match std::fs::read_to_string(&target.path) {
-        Ok(content) => content,
-        Err(error) => {
-            return FileReport {
-                file,
-                format: target.language_id.to_string(),
-                paths: Vec::new(),
-                diagnostics: vec![Diagnostic {
-                    severity: Severity::Error,
-                    code: "unreadable".to_string(),
-                    // A `.json` that is not UTF-8 is genuinely broken,
-                    // so naming the reason is more useful than guessing
-                    // at an encoding.
-                    message: format!("could not be read: {error}"),
-                }],
-                summary: Summary {
-                    paths: 0,
-                    findings: 0,
-                },
-            };
-        }
+    let skipped = |reason: String| FileReport {
+        file: file.clone(),
+        format: target.language_id.to_string(),
+        paths: Vec::new(),
+        diagnostics: vec![Diagnostic {
+            // The extension's vocabulary has two levels and `Error` is
+            // reserved for an audit that gave up part way. A file that
+            // was never text is not that, so the `skipped` code carries
+            // the meaning and the severity stays out of the exit code.
+            severity: Severity::Info,
+            code: "skipped".to_string(),
+            message: reason,
+        }],
+        summary: Summary {
+            paths: 0,
+            findings: 0,
+        },
     };
 
-    audit_content(&content, target, options)
+    let bytes = match std::fs::read(&target.path) {
+        Ok(bytes) => bytes,
+        Err(error) => return skipped(error.to_string()),
+    };
+    // Named rather than dropped. A file that vanishes from the report
+    // is a file the reader believes was covered.
+    let Ok(content) = String::from_utf8(bytes) else {
+        return skipped("not UTF-8 text".to_string());
+    };
+
+    audit_content(without_bom(&content), target, options)
 }
 
 /// The same audit over content already in hand. Split out so the MCP
@@ -163,8 +186,13 @@ pub(crate) fn audit_content(content: &str, target: &Target, options: &AuditOptio
 /// The exit code for a whole run: 0 clear, 1 findings, 2 the question
 /// could not be answered. A run over many files reports the worst
 /// outcome in it.
-pub(crate) fn exit_code(reports: &[FileReport]) -> u8 {
-    if reports.iter().any(FileReport::is_unexamined) {
+pub(crate) fn exit_code(reports: &[FileReport], strict: bool) -> u8 {
+    // An audit that gave up part way always fails: it would otherwise
+    // report "nothing found" for a file it never finished reading.
+    if reports.iter().any(FileReport::is_incomplete) {
+        return 2;
+    }
+    if strict && reports.iter().any(FileReport::was_skipped) {
         return 2;
     }
     u8::from(reports.iter().any(|report| report.summary.findings > 0))
@@ -230,7 +258,7 @@ mod tests {
         tree.write("src/app.ts", "import './gone.ts';\n");
         let report = audit_one(&tree, "src/app.ts", &options(&tree));
         assert_eq!(report.summary.findings, 1);
-        assert_eq!(exit_code(&[report]), 1);
+        assert_eq!(exit_code(&[report], false), 1);
     }
 
     /// The base directory is the file's own, so the same written path
@@ -275,7 +303,7 @@ mod tests {
             report.paths[0].resolution.reason.as_deref(),
             Some("resolution was not requested")
         );
-        assert_eq!(exit_code(&[report]), 0);
+        assert_eq!(exit_code(&[report], false), 0);
     }
 
     /// Canonicalisation is the audit, so a non-canonical path counts
@@ -316,16 +344,21 @@ mod tests {
         assert_eq!(denied.summary.findings, 1);
     }
 
+    /// Changed deliberately: a file that is not text is reported and
+    /// does not fail the run, because every repository has one and
+    /// exiting 2 on it meant the tool never got run in CI at all.
     #[test]
-    fn an_unreadable_file_is_reported_and_ends_the_run_at_two() {
+    fn a_file_that_is_not_text_is_reported_and_does_not_end_the_run() {
         let tree = TempTree::new("audit-unreadable");
         let path = tree.path().join("broken.json");
         std::fs::write(&path, [0xff, 0xfe, 0x00]).expect("a file");
         let targets = collect(&[path], &WalkOptions::default()).expect("the walk succeeds");
         let report = audit_file(&targets[0], &options(&tree));
-        assert!(report.is_unexamined());
-        assert_eq!(report.diagnostics[0].code, "unreadable");
-        assert_eq!(exit_code(&[report]), 2);
+        assert!(report.was_skipped());
+        assert_eq!(report.diagnostics[0].code, "skipped");
+        assert_eq!(report.diagnostics[0].message, "not UTF-8 text");
+        assert_eq!(exit_code(std::slice::from_ref(&report), false), 0);
+        assert_eq!(exit_code(&[report], true), 2, "--strict is opt-in");
     }
 
     #[test]
@@ -339,12 +372,12 @@ mod tests {
             .iter()
             .map(|target| audit_file(target, &options(&tree)))
             .collect();
-        assert_eq!(exit_code(&reports), 1);
+        assert_eq!(exit_code(&reports, false), 1);
     }
 
     #[test]
     fn nothing_to_examine_exits_clear() {
-        assert_eq!(exit_code(&[]), 0);
+        assert_eq!(exit_code(&[], false), 0);
     }
 
     /// A regression, found by running the binary rather than the tests.
@@ -398,6 +431,31 @@ mod tests {
         assert_eq!(report.diagnostics.len(), 1);
         assert_eq!(report.diagnostics[0].code, "format");
         assert_eq!(report.diagnostics[0].severity, Severity::Info);
-        assert!(!report.is_unexamined(), "info is not an error");
+        assert!(!report.was_skipped(), "info is not an error");
+    }
+}
+
+/// Drop a leading byte-order mark.
+///
+/// No editor shows it and VS Code strips it before the extension ever
+/// sees a document, so without this the two frontends read the same file
+/// differently the moment anything on Windows saves it — Notepad, Excel,
+/// a PowerShell redirect. Three invisible bytes shift every column on
+/// the first line, and before a `{` they make a JSON parser reject the
+/// whole document, which is indistinguishable from a file with no paths
+/// in it.
+pub(crate) fn without_bom(content: &str) -> &str {
+    content.strip_prefix('\u{feff}').unwrap_or(content)
+}
+
+#[cfg(test)]
+mod hazards {
+    use super::*;
+
+    #[test]
+    fn a_byte_order_mark_is_not_part_of_the_document() {
+        assert_eq!(without_bom("\u{feff}abc"), "abc");
+        assert_eq!(without_bom("abc"), "abc");
+        assert_eq!(without_bom("a\u{feff}b"), "a\u{feff}b");
     }
 }

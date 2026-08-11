@@ -32,6 +32,8 @@ Options:
                        reported either way)
   --format <format>    force a format instead of inferring it from the
                        file name; required with --stdin
+  --strict             exit 2 if any file could not be read, rather than
+                       reporting it and carrying on
   --stdin              read one document from stdin
   --follow-symlinks    resolve through symlinks when walking a tree
                        (default: report the link, do not descend it)
@@ -45,7 +47,8 @@ For a run over many files, the exit code is the worst outcome in it.";
 /// USAGE by a test, because a flag documented and not implemented — or
 /// implemented and not documented — is the failure nobody notices until
 /// a user hits it.
-const FLAGS: [&str; 8] = [
+const FLAGS: [&str; 9] = [
+    "--strict",
     "--no-resolve",
     "--root",
     "--deny-symlinks",
@@ -58,6 +61,8 @@ const FLAGS: [&str; 8] = [
 
 #[derive(Debug)]
 struct Options {
+    /// Fail the run if any file could not be read.
+    strict: bool,
     inputs: Vec<PathBuf>,
     stdin: bool,
     format: Option<&'static str>,
@@ -111,7 +116,7 @@ fn execute(args: &[String]) -> Result<u8, String> {
     drop(stdout);
 
     summarise(&reports, options.resolve);
-    Ok(audit::exit_code(&reports))
+    Ok(audit::exit_code(&reports, options.strict))
 }
 
 fn audit_inputs(options: &Options) -> Result<Vec<FileReport>, String> {
@@ -210,6 +215,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
     let mut options = Options {
         inputs: Vec::new(),
         stdin: false,
+        strict: false,
         format: None,
         root: None,
         resolve: true,
@@ -235,6 +241,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
             "--no-resolve" => options.resolve = false,
             "--deny-symlinks" => options.deny_symlinks = true,
             "--stdin" => options.stdin = true,
+            "--strict" => options.strict = true,
             "--hidden" => options.walk.hidden = true,
             "--no-ignore" => options.walk.respect_ignore = false,
             "--follow-symlinks" => options.walk.follow_symlinks = true,

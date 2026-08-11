@@ -94,3 +94,8 @@ cast_precision_loss = "allow"
 must_use_candidate = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
+# The parsed command line is a flat record of the flags that were typed,
+# and it has more than three of them. Grouping booleans into sub-structs
+# to satisfy a lint would put the shape of the type ahead of the shape
+# of the interface it mirrors.
+struct_excessive_bools = "allow"

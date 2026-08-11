@@ -157,18 +157,26 @@ fn a_flag_without_its_value_exits_two() {
     assert_eq!(run.code, 2);
 }
 
-/// A file that cannot be read means the audit does not cover it, so the
-/// run reports that it could not answer rather than a clean result that
-/// silently skipped something.
+/// A file that cannot be read means the audit does not cover it, so it
+/// is named — but it does not fail the run by itself. Every repository
+/// has one, and exiting 2 on it meant the tool never got run in CI at
+/// all, which is where an audit is worth the most. `--strict` is there
+/// for a pipeline that wants zero tolerance.
 #[test]
-fn an_unreadable_file_exits_two_and_says_so() {
+fn an_unreadable_file_is_named_and_does_not_end_the_run() {
     let tree = Tree::new("unreadable");
     std::fs::write(tree.path().join("broken.json"), [0xff, 0xfe, 0x00]).expect("a file");
-    let run = run(&[&tree.path().to_string_lossy()]);
-    assert_eq!(run.code, 2);
-    assert!(run.stderr.contains("could not be read"), "{}", run.stderr);
+    let lenient = run(&[&tree.path().to_string_lossy()]);
+    assert_eq!(lenient.code, 0);
     // The report still lands on stdout: the caller learns which file.
-    assert_eq!(reports(&run)[0]["diagnostics"][0]["code"], "unreadable");
+    assert_eq!(reports(&lenient)[0]["diagnostics"][0]["code"], "skipped");
+    assert_eq!(
+        reports(&lenient)[0]["diagnostics"][0]["message"],
+        "not UTF-8 text"
+    );
+
+    let strict = run(&["--strict", &tree.path().to_string_lossy()]);
+    assert_eq!(strict.code, 2);
 }
 
 #[test]
