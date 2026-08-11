@@ -257,7 +257,7 @@ run. Reproduce with `bun run test:coverage`.
 
 Every tool in the family, one page: **[letools.dev](https://letools.dev)**
 
-All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same engine. Five go further and ship a Rust CLI: **Paths-LE**, **Secrets-LE**, **URLs-LE**, **Regex-LE** and **Scrape-LE**, each installed with `cargo install <that-name>`.
+All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same engine. Six go further and ship a Rust CLI: **Paths-LE**, **Secrets-LE**, **URLs-LE**, **Regex-LE**, **String-LE** and **Scrape-LE**, each installed with `cargo install <that-name>`.
 
 - **[String-LE](https://letools.dev/tools/string-le)** - Extract string values for i18n from JSON, YAML, CSV, TOML, INI, and .env
 - **[Numbers-LE](https://letools.dev/tools/numbers-le)** - Extract numeric values from JSON, YAML, CSV, TOML, INI, and .env
@@ -285,6 +285,8 @@ All ten also ship as MCP servers — `npx <name>-mcp` gives any agent the same e
   [crates.io](https://crates.io/crates/urls-le)
 - **[regex-le](https://github.com/nolindnaidoo/regex-le/tree/main/crate)** — Find every regex in a codebase and report which can be driven into catastrophic backtracking
   [crates.io](https://crates.io/crates/regex-le)
+- **[string-le](https://github.com/nolindnaidoo/string-le/tree/main/crate)** — Get every string in a codebase out where a person can read them
+  [crates.io](https://crates.io/crates/string-le)
 - **[scrape-le](https://github.com/nolindnaidoo/scrape-le/tree/main/crate)** — Check whether a page is scrapeable before the scraper is written
   [crates.io](https://crates.io/crates/scrape-le)
 
