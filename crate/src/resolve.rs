@@ -824,12 +824,26 @@ mod tests {
     /// Withholding the negative is not withholding the answer: a
     /// composite that really names something still resolves.
     #[test]
+    // Windows cannot hold this file at all: `:` is the drive and
+    // alternate-data-stream separator, so creating `a:b.txt` fails with
+    // "The system cannot find the path specified" before the resolver is
+    // ever reached. The rule under test — a name containing `:` that is
+    // genuinely on disk resolves rather than being dismissed as a
+    // `host:path` composite — is a statement about filesystems that allow
+    // the character, so it is asserted only where one does.
+    #[cfg(unix)]
     fn a_composite_that_is_actually_there_still_resolves() {
         let tree = TempTree::new("resolve-composite");
         tree.write("a:b.txt", "");
         let resolution = resolve_in(&tree, "./a:b.txt");
         assert_eq!(resolution.verdict, Verdict::Ok);
+    }
 
+    /// The other half of the composite rule needs no file, so it holds on
+    /// every platform: a `:` name that is not on disk stays unresolved.
+    #[test]
+    fn a_composite_that_is_not_there_stays_unresolved() {
+        let tree = TempTree::new("resolve-composite-absent");
         let absent = resolve_in(&tree, "./nope:also-nope.txt");
         assert_eq!(absent.verdict, Verdict::Unresolved);
     }
