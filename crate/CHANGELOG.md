@@ -7,136 +7,135 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.0] - 2026-08-12
+
+Point it at a repository and it reads the repository. 0.1.0 read the
+eight formats it had a parser for and walked past everything else, which
+is most of a codebase.
 
 ### Added
 
-- **A YAML extractor.** Every CI config, Kubernetes manifest and compose
-  file in a repository was previously invisible to this tool. `saphyr`
-  reads it here where `js-yaml` reads it in the extension, and positions
-  come from a forward-moving text search rather than from either parser
-  — the same design TOML's positions use, and the reason the two
-  frontends can agree without `js-yaml` exposing offsets it does not
-  have. Keys count as well as values.
+- **Every text file in the tree is read now.** Python, Go, Markdown,
+  XML, a Dockerfile, a Makefile, a shell script — anything that is text
+  and not a binary. A file whose extension means nothing to this tool is
+  no longer skipped by the walk or refused when you name it.
 
-- **A generic text scan for every other format.** A document the engine
-  has no extractor for is read rather than refused: Python, Go,
-  Markdown, XML, a Dockerfile, a Makefile. Measured over two real
-  repositories, the paths found went from 1,930 to 6,598 and from 487 to
-  6,555.
+  **Your finding count will move, and it may move a long way.** Over two
+  real codebases the paths reported went from 1,930 to 6,598 and from
+  487 to 6,555. Most of that is coverage you did not have; some of it is
+  one file. In the second case 5,367 of those 6,555 came out of a single
+  committed lockfile, and on the 501-file tree this crate's own budget
+  test scans, a lockfile accounts for 2,000 of 3,000 paths. Nothing in a
+  lockfile can become a finding — the resolver declines to claim about a
+  value that does not commit to being a path — but they are rows. The
+  walker is ripgrep's, so an `.ignore` file naming `bun.lock` is the
+  lever, and it is the same lever you already use for `rg`.
 
-  The scan makes the delimited tokens raw text does not have. A quoted
-  run gets the whole path heuristic; an undelimited run must carry a
-  path separator, which is what keeps `os.path`, `np.array` and
-  `logger.info` out of the results — an extension and an attribute are
-  the same shape, and only the quoting tells them apart.
-  `fixtures/documents/paths.py` pins exactly what it claims and does not.
+  A file read this way has its paths reported as written and **not**
+  checked against the filesystem unless you ask with `--resolve`
+  (`resolveScanned` on the MCP audit tool). A raw-text scan is generous
+  by construction, and resolving what it finds would turn a false
+  positive into a `missing` finding — a claim — rather than a quiet
+  extra row. `--no-resolve` still wins over both.
 
-- **`fixtures/documents/paths.md`**, so `markdown` — advertised in the
-  `extract_paths` schema — is finally pinned by a shared corpus case
-  rather than promised. Both frontends run it.
+  Two shapes are claimed and nothing else: a **quoted** token, which
+  gets the full path heuristic, and an **undelimited** run that carries
+  a path separator. That second rule is why `os.path` in a Python file
+  is not reported as a file — an extension and an attribute are the same
+  shape, and only the quoting tells them apart.
+  `fixtures/documents/paths.py` pins exactly what it claims and what it
+  does not.
 
-- **`--resolve`**, and `resolveScanned` on the MCP audit tool. A file
-  read by the generic scan has its paths reported as written unless one
-  of these is given, because a scan is generous by construction and
-  resolving what it finds would turn a false positive into a `missing`
-  finding rather than a quiet extra row. `--no-resolve` still wins over
-  both.
+- **YAML is read by a real parser.** Every CI config, Kubernetes
+  manifest and compose file in a repository was invisible to this tool
+  and is now ordinary. Keys count as well as values, an alias resolves
+  to its anchor, and a multi-document file is read through. `saphyr`
+  reads it here where `js-yaml` reads it in the extension; positions
+  come from a forward-moving text search rather than from either parser,
+  which is the same design TOML's positions use and the reason the two
+  frontends can agree at all.
+
+- **Markdown is pinned by the shared corpus**
+  (`fixtures/documents/paths.md`). It was advertised in the
+  `extract_paths` schema with nothing holding the two servers to reading
+  it the same way. Both run the case now.
 
 ### Changed
-
-- **Every file in a tree is now examined, not just the recognised
-  formats**, and naming a file whose extension means nothing is no
-  longer refused — naming a file is an instruction.
 
 - **`--format` accepts any name.** One this engine does not recognise
   reads the document with the generic scan instead of refusing it. The
   report's `format` field names what was actually used, which is where a
   typo shows up.
 
-- **`extract_paths` no longer refuses a call with neither `format` nor
-  `filename`**, on either server. It scans the content and answers
-  `fileType: "unknown"`. Both corpus cases that pinned the refusal now
-  pin the scan.
+- **`extract_paths` answers a call with neither `format` nor
+  `filename`** instead of refusing it, on both servers. It scans the
+  content and reports `fileType: "unknown"`.
 
-- **A binary file produces no report line at all.** A NUL byte in the
-  first 8KB — ripgrep's heuristic — means the file was never a text
-  candidate, and before the walk widened it was never opened. Reporting
-  each one as `skipped` made `--strict` exit 2 on every repository
-  holding an image. They are counted instead: the stderr summary ends
-  `, 16 binary files skipped`, and the MCP audit carries a `binary`
-  diagnostic. A file that looked like text and could not be read as it
-  keeps its named `skipped` diagnostic and still fails `--strict`.
+- **A binary file gets no report line at all.** A NUL byte in the first
+  8KB — ripgrep's own test — means the file was never a text candidate.
+  Reporting each one as skipped made `--strict` exit 2 on every
+  repository holding an image, which is every repository. They are
+  counted instead: the summary ends `, 16 binary files skipped`, and the
+  MCP audit carries a `binary` diagnostic. A file that looked like text
+  and could not be read as it keeps its named `skipped` diagnostic and
+  still fails `--strict`.
 
-- **The `format` error category is gone**, having existed for the one
-  message the generic scan replaced.
-
-### Fixed
-
-- **Every path in a report spells its separators forward, on every
-  platform.** `file`, `resolution.canonical` and `resolution.symlink`
-  came back with `\` on Windows and a `\\?\` verbatim prefix on anything
-  `canonicalize` touched, so the same tree audited on two machines
-  produced two reports that could not be diffed — and neither matched
-  the `/` the source it read them from was written with. A sibling crate
-  shipped that for a whole release because the only machine that could
-  see it was the only machine nothing asserted on.
-
-- **A CSV cell was trimmed with Rust's idea of whitespace, not
-  JavaScript's.** The reader was asked to trim, and its trim strips
-  U+0085 and keeps U+FEFF — the exact two characters this crate spells
-  out by hand because the two languages disagree about them. A cell led
-  by U+0085 came back as `/a.txt` here and `\u{85}/a.txt` from the npm
-  server, classified `absolute` against `file`. Found by the generated
-  differential; both servers now answer identically.
-
-- **A format name was trimmed the same wrong way.** `\u{feff}json`
-  resolved to `json` on the npm server and fell through to the generic
-  scan here, so one name read a document two ways depending on which
-  server an agent reached.
-
-- **A colon-joined composite is no longer claimed to be a missing
-  path.** A compose volume (`/etc/localtime:/etc/localtime:ro`), a
-  `PATH` entry, an `scp` target and a `file:line` reference all start
-  with `/` and so had evidence enough for a `missing` verdict, about a
-  string that was never one path. Found by running the binary over a
-  tree of compose files: five findings, all five wrong. The value still
-  resolves to `ok` when something by that whole name is really there.
+- **The unsupported-format diagnostic is gone**, having existed for the
+  one message the scan replaced.
 
 ### Fixed
 
-- **Every absolute path was `non-canonical` on Windows.** The
+- **Paths were reported with backslashes on Windows.** `file`,
+  `resolution.canonical` and `resolution.symlink` all came back spelled
+  `\`, with a `\\?\` prefix on anything resolved — so the same tree
+  audited on two machines produced two reports that could not be
+  diffed, and neither matched the `/` the source files were written
+  with. Every path in a report now spells its separators forward, on
+  every platform.
+
+- **Every absolute path was called `non-canonical` on Windows.** The
   separator rule fired on any backslash rather than on a genuine mix of
-  both, and `std::fs::canonicalize` there returns a verbatim
-  `\\?\C:\...` prefix — so the platform's own canonical form was
-  reported as deviating from canonical form. An ordinary Windows
-  relative path, `src\lib\a.ts`, was called non-canonical for the same
-  reason. Found by a Windows CI job; it cannot reproduce on macOS or
-  Linux.
+  both, so the platform's own canonical form was reported as deviating
+  from canonical form — and an ordinary `src\lib\a.ts` with it.
 
-### Fixed
+- **A file your editor saved with a byte-order mark read differently
+  here than in the editor.** Three invisible bytes, added by Notepad,
+  Excel and a PowerShell redirect and stripped by VS Code before the
+  extension ever sees a file. They shifted every column on line one, and
+  in front of a `{` they made the parser reject the whole document —
+  which is indistinguishable from a file with no paths in it.
 
-- **A leading byte-order mark is no longer part of the document.** Three
-  invisible bytes, added by Notepad, Excel and a PowerShell redirect, and
-  stripped by VS Code before the extension ever sees a file — so the two
-  frontends read the same file differently. It shifted every column on
-  line one, and before a `{` it made a structured parser reject the whole
-  document, which is indistinguishable from a file with no paths in it.
+- **A CSV cell could lose its first character.** A cell led by U+0085
+  came back as `/a.txt` here and `\u{85}/a.txt` from the npm server,
+  classified `absolute` against `file`, because the reader trimmed with
+  Rust's idea of whitespace rather than JavaScript's. The two languages
+  disagree about exactly two characters and both of them are reachable.
 
-- **A file that cannot be read no longer fails the run.** Every
-  repository has a PNG, a zip and something the runner lacks permission
-  for. Exiting 2 on those made the tool unusable in CI, which is the one
-  place it is most worth running. Such a file is now named on stderr and
-  carried in the report with a `skipped` diagnostic, and the exit code
-  reflects what was found. `--strict` restores the old behaviour for a
-  pipeline that wants zero tolerance.
+- **A format name with an invisible character around it resolved two
+  ways.** `\u{feff}json` was read as JSON by the npm server and fell
+  through to the generic scan here, so the same argument produced
+  different answers depending on which server an agent reached.
 
-  An audit that gives up part way through a file still fails without
-  asking.
+- **Five findings on a tree of compose files, all five wrong.** A
+  colon-joined composite — a volume mount
+  (`/etc/localtime:/etc/localtime:ro`), a `PATH` entry, an `scp` target,
+  a `file:line` reference — starts with `/` and so had evidence enough
+  for a `missing` verdict about a string that was never one path. It
+  still resolves to `ok` when something by that whole name is really
+  there; only the unprovable negative is withheld.
 
-- **A file that is not text is named rather than dropped.** It used to
-  vanish from the report entirely, which reads to whoever ran it as
-  "that file was clean".
+- **A run failed because the repository contained a PNG.** Every
+  repository has one, plus a zip and something the runner cannot read,
+  and exiting 2 on those made the tool unusable in CI — the one place it
+  is worth the most. Such a file is named on stderr and carried in the
+  report with a `skipped` diagnostic, and the exit code reflects what
+  was found. `--strict` restores zero tolerance for a pipeline that
+  wants it. An audit that gives up part way through a file still fails
+  without being asked.
+
+- **A file that is text but undecodable used to vanish from the
+  report** — which reads, to whoever ran it, as a file that was clean.
+  It is named instead.
 
 ## [0.1.0] - 2026-08-08
 
@@ -186,4 +185,5 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.2.0]: https://github.com/nolindnaidoo/paths-le/releases/tag/crate-v0.2.0
 [0.1.0]: https://github.com/nolindnaidoo/paths-le/releases/tag/crate-v0.1.0

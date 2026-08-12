@@ -9,49 +9,32 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
-## [Unreleased]
+## [2.3.0] - 2026-08-12
+
+Run it on the file you have open and it reads the file you have open.
+Until now it refused anything outside eight formats, which on most days
+is the file you are actually looking at.
 
 ### Added
 
-- **A YAML extractor** (`yaml`), reading path-like scalar values and keys
-  across every document in a file. Every CI config, Kubernetes manifest
-  and compose file was previously a document this extension refused.
+- **YAML** (`yaml`), read by a real parser: path-like scalar values and
+  keys, across every document in a file. Every CI config, Kubernetes
+  manifest and compose file was a document this extension used to
+  refuse.
 
-- **Every other language is now read too**, by a text scan:
-  Python, Go, Markdown, XML, a Dockerfile, a Makefile. It makes the
-  delimited tokens raw text does not have — a quoted run gets the whole
-  path heuristic, and an undelimited run has to carry a path separator.
-  That second rule is what keeps `os.path`, `np.array` and `logger.info`
-  out of the results: an extension and an attribute are the same shape,
-  and only the quoting tells them apart.
+- **Every other language too**, by a text scan: Python, Go, Markdown,
+  XML, a Dockerfile, a Makefile, a shell script. **Expect more results
+  than before** — a scan claims two shapes and nothing else: a quoted
+  token, which gets the whole path heuristic, and an undelimited run
+  that carries a path separator. That second rule is what keeps
+  `os.path`, `np.array` and `logger.info` out of the list — an extension
+  and an attribute are the same shape, and only the quoting tells them
+  apart.
 
-- **A markdown document in the shared corpus**
-  (`crate/fixtures/documents/paths.md`). `markdown` is advertised in the
-  `extract_paths` schema and nothing held the two servers to reading it
-  the same way; now a case does. No behaviour changed — this pins what
-  both already answer.
-
-### Changed
-
-- **The unsupported-format notice is gone.** `Path extraction is not
-  supported for {languageId} files` was the honest answer while there was
-  nothing to fall through to; the command now extracts from whatever
-  document is open. The `format` error category went with it, having
-  existed only for that message.
-
-- **`extract_paths` no longer refuses a call with neither `format` nor
-  `filename`.** It scans the content and answers `fileType: "unknown"`.
-  `resolveFormat` returns that instead of `null`, and `SUPPORTED_FORMATS`
-  gains `yaml` and `markdown`.
-
-- The context menu entry is no longer gated on a list of language IDs,
-  and `activationEvents` covers the languages the new formats bring.
-
-### Added
-
-- A **Rust CLI and MCP server**, in [`crate/`](crate/README.md), published
-  to crates.io as [`paths-le`](https://crates.io/crates/paths-le). It runs
-  the same extraction from a terminal and adds what an editor cannot do:
+- A **Rust CLI and MCP server**, in [`crate/`](crate/README.md),
+  published to crates.io as
+  [`paths-le`](https://crates.io/crates/paths-le). It runs the same
+  extraction from a terminal and adds what an editor cannot do:
   resolving each path against the filesystem it is standing in, and
   reporting whether it still points at anything — missing, escaping the
   audited tree, non-canonical, or a symlink with its target named. Exit
@@ -59,23 +42,42 @@ separate product on its own cadence and keeps its own
 
   The extension stays the reference implementation for extraction. The
   corpus both frontends build against lives in
-  [`crate/fixtures/`](crate/fixtures/), `scripts/check-extraction-parity.ts`
-  runs it against this extension, `cargo test` runs it against the crate,
-  and `ci-crate.yml` watches `src/extraction/**` so neither side can drift
-  green.
+  [`crate/fixtures/`](crate/fixtures/),
+  `scripts/check-extraction-parity.ts` runs it against this extension,
+  `cargo test` runs it against the crate, and `ci-crate.yml` watches
+  `src/extraction/**` so neither side can drift green.
+
+- **Markdown is pinned by the shared corpus**
+  (`crate/fixtures/documents/paths.md`). It was advertised in the
+  `extract_paths` schema with nothing holding the two servers to reading
+  it the same way. No behaviour changed — this pins what both already
+  answer.
 
 ### Changed
 
-- Documentation only for the extension itself — no behaviour change.
+- **"Path extraction is not supported for … files" is gone.** It was the
+  honest answer while there was nothing to fall through to; the command
+  now extracts from whatever document is open. The `format` error
+  category went with it, having existed only for that message.
 
-  The README, the npm server's README and the manifest now cross-reference
-  the CLI, and the CLI references them back, so a reader arriving at any
-  one of the five channels can find the other four.
+- **The context menu entry is no longer gated on a list of language
+  IDs**, so it appears on the files it can now read, and
+  `activationEvents` covers the languages the new formats bring.
+
+- **`extract_paths` answers a call with neither `format` nor
+  `filename`** instead of refusing it. It scans the content and reports
+  `fileType: "unknown"`. `SUPPORTED_FORMATS` gains `yaml` and
+  `markdown`, so an agent asking for either is told the ask is
+  understood.
 
 - The npm server's README documented arguments and a response shape that
-  were never this tool's — `format: "markdown"`, a `protocol` field, a URL
-  in the example. They were carried over from a sibling package. The
+  were never this tool's — `format: "markdown"`, a `protocol` field, a
+  URL in the example — carried over from a sibling package. The
   documented tool is now the tool that ships.
+
+- The README, the npm server's README and the manifest cross-reference
+  the CLI, and the CLI references them back, so a reader arriving at any
+  one of the five channels can find the other four.
 
 ## [2.2.4] - 2026-08-07
 
