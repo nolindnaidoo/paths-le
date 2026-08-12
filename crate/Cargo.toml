@@ -5,12 +5,12 @@ edition = "2024"
 rust-version = "1.88"
 license = "MIT"
 readme = "README.md"
-description = "Find every path in a codebase and report whether it still points at anything"
+description = "Find every file path in a codebase and report whether it still points at anything — broken paths, dead symlinks and stale references, resolved on disk"
 authors = ["Nolin D Naidoo"]
 homepage = "https://letools.dev/tools/paths-le"
 repository = "https://github.com/nolindnaidoo/paths-le"
-keywords = ["paths", "audit", "symlink", "canonicalize", "cli"]
-categories = ["command-line-utilities", "filesystem", "development-tools"]
+keywords = ["paths", "broken-links", "symlink", "filesystem", "link-checker"]
+categories = ["command-line-utilities", "filesystem", "development-tools", "text-processing", "parsing"]
 # What a consumer gets, and why.
 #
 # Ships: src/, Cargo.toml, Cargo.lock, LICENSE, README.md — needed to
