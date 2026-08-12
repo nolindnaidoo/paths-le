@@ -20,9 +20,13 @@ with its own `CLAUDE.md`.
   `walk.rs` only when it needs the filesystem. A `std::fs` call in
   `extract/` fails a CI job.
 - `fixtures/` is shared with the extension — changing it changes both
-  frontends and needs a CHANGELOG entry. The extension is the reference
-  implementation for extraction; a difference is a regression until
-  SPEC.md says otherwise.
+  frontends and needs a CHANGELOG entry. **What it holds equal is the
+  shared `extract_paths` MCP tool**, which must answer identically from
+  either server; a difference there is a bug. The surfaces themselves
+  are IDE-first and terminal-first and are meant to differ —
+  the walk, `--resolve`, `--strict`, the symlink flags, the exit codes and JSON Lines have no
+  editor equivalent and are not drift. SPEC.md's "Deliberate
+  divergences" is the bar for a new one.
 - Write regression tests for every bug you fix; keep unit tests free of
   clocks, randomness, and the filesystem outside `resolve`/`walk`/
   `audit`.

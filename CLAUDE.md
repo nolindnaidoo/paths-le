@@ -42,11 +42,16 @@ artifact users actually install.
   byte-identical across the family; a change here needs copying to the other
   nine. See `../CLAUDE.md`. `ci-crate.yml` and `release-crate.yml` are the
   exception — they exist only in the repos that ship a crate.
-- **Extraction is shared with the Rust CLI.** `src/extraction/**` is the
-  reference implementation for `crate/`, and `crate/fixtures/` is the contract
-  between them. Changing extraction behaviour means running
+- **Extraction is shared with the Rust CLI**, and the corpus under `crate/` is
+  the contract. Changing extraction behaviour means running
   `bun scripts/check-extraction-parity.ts` and updating the corpus — on both
   sides, in the same commit. CI fails when either drifts.
+- **What the contract holds equal is the shared `extract_paths` MCP tool**,
+  which both servers offer and must answer identically; a difference there
+  is a bug. **The surfaces are meant to differ.** This one is IDE-first —
+  the active buffer, read by a person. The CLI is terminal-first: a tree walk,
+  exit codes and JSON Lines, none of which has an editor equivalent. That
+  is not drift, and nothing holds them equal — see `crate/SPEC.md`.
 - **Localization is two mechanisms, and they fail separately.** `src/i18n/package.nls.*.json`
   covers the manifest; `l10n/bundle.l10n.*.json` covers runtime strings through
   `vscode.l10n.t()`. Twelve locales each, held in exact key parity by the
