@@ -27,8 +27,9 @@ reproduces.
 
 ```
 crate/src/
-├── extract/      pure: heuristics, positions, the eight format
-│                 extractors. No filesystem, pub(crate).
+├── extract/      pure: heuristics, positions, the nine format
+│                 extractors and the generic scan. No filesystem,
+│                 pub(crate).
 ├── resolve.rs    the filesystem half — canonicalize, symlinks, roots
 ├── walk.rs       ignore-aware tree walking and format detection
 ├── audit.rs      one file end to end — the only path either surface calls
@@ -51,7 +52,10 @@ crate/src/
   tree.
 - **`walk.rs` selects, it does not decide.** Its one rule — a file named
   explicitly is read whatever the ignore rules say — is why intent beats
-  configuration.
+  configuration. It applies no format filter: a file no typed extractor
+  reads falls through to the generic scan, and what a file *is not* is
+  decided in `audit.rs`, which drops a binary file and reports a text
+  one it could not read.
 - Keep modules flat. No layers, registries, managers, or services. No
   trait with a single implementation.
 
@@ -125,7 +129,7 @@ pixelactions and scrape-le:
 - **No async runtime.** This tool reads files and asks the filesystem
   about them. There is nothing to await.
 - **`unsafe` is forbidden crate-wide** (`[lints.rust]`).
-- **Dependencies are a cost.** Four format parsers and two regex engines
+- **Dependencies are a cost.** Five format parsers and two regex engines
   is already more than most tools carry, and every one of them is
   justified by a comment in `Cargo.toml`. Justify any addition; prefer
   the standard library; prefer what is already in the tree.

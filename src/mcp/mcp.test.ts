@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 import { describe, expect, it } from 'vitest';
 import type { ExtractionResult } from '../types';
 import { capped, isOk, readMaxResults, toDiagnostics } from './envelope';
-import { resolveFormat, SUPPORTED_FORMATS } from './fileType';
+import { FALLBACK_FORMAT, resolveFormat, SUPPORTED_FORMATS } from './fileType';
 import { TOOLS } from './tools';
 import { createResponder, serve } from './transport';
 
@@ -26,7 +26,7 @@ const withError = (severity: 'info' | 'warning' | 'error') => ({
 	...emptyResult,
 	errors: [
 		{
-			category: 'format' as const,
+			category: 'parsing' as const,
 			severity,
 			message: 'bad',
 			recoverable: false,
@@ -100,14 +100,24 @@ describe('fileType: tolerant resolution', () => {
 		expect(resolveFormat(undefined, 'Cargo.toml')).toBe('toml');
 	});
 
-	it('returns null when neither input resolves', () => {
-		expect(resolveFormat('klingon', 'a.klingon')).toBeNull();
-		expect(resolveFormat(undefined, undefined)).toBeNull();
+	it('falls back to the generic scan when neither input resolves', () => {
+		// Changed deliberately: this used to return null and the tool refused.
+		// Every name resolves now, so a document nobody can name is still read.
+		expect(resolveFormat('klingon', 'a.klingon')).toBe(FALLBACK_FORMAT);
+		expect(resolveFormat(undefined, undefined)).toBe(FALLBACK_FORMAT);
+	});
+
+	it('resolves yaml under both of its spellings', () => {
+		expect(resolveFormat(undefined, 'ci.yml')).toBe('yaml');
+		expect(resolveFormat(undefined, 'deployment.yaml')).toBe('yaml');
 	});
 
 	it('advertises only formats the engine supports', () => {
 		expect(SUPPORTED_FORMATS).toContain('json');
-		expect(SUPPORTED_FORMATS).not.toContain('unknown');
+		expect(SUPPORTED_FORMATS).toContain('yaml');
+		// The generic scan is what a caller gets by naming nothing, never a
+		// format to name — offering it would be offering "no format".
+		expect(SUPPORTED_FORMATS).not.toContain(FALLBACK_FORMAT);
 	});
 });
 
@@ -139,7 +149,10 @@ describe('extract_paths', () => {
 		if (!tool) throw new Error('no tool');
 		return (await tool.handler(args)) as {
 			ok: boolean;
-			data: { paths: { value: string; type: string; line?: number }[] };
+			data: {
+				fileType: string;
+				paths: { value: string; type: string; line?: number }[];
+			};
 			meta: { count: number; truncated: boolean };
 		};
 	};
@@ -174,10 +187,24 @@ describe('extract_paths', () => {
 		expect(result.meta.truncated).toBe(true);
 	});
 
-	it('names the fix when no usable format is given', async () => {
-		await expect(call({ content: './src/index.ts' })).rejects.toThrow(
-			/Provide `format`/,
-		);
+	it('scans generically when no usable format is given', async () => {
+		// Changed deliberately: this used to refuse with "Provide `format`".
+		const result = await call({ content: 'run ./src/index.ts' });
+		expect(result.data.fileType).toBe(FALLBACK_FORMAT);
+		expect(result.data.paths).toEqual([
+			{ value: './src/index.ts', type: 'relative', line: 1, column: 5 },
+		]);
+	});
+
+	it('reads a yaml document with its own extractor', async () => {
+		const result = await call({
+			content: 'steps:\n  - run: ./scripts/build.sh\n',
+			filename: 'ci.yml',
+		});
+		expect(result.data.fileType).toBe('yaml');
+		expect(result.data.paths).toEqual([
+			{ value: './scripts/build.sh', type: 'relative', line: 2, column: 10 },
+		]);
 	});
 
 	it('requires content', async () => {
@@ -231,12 +258,13 @@ describe('protocol', () => {
 
 	it('returns a tool failure as a result, not a protocol error', async () => {
 		// A model can read an isError result and correct itself; a JSON-RPC error
-		// reads as "the server is broken".
+		// reads as "the server is broken". Missing `content` is the remaining
+		// argument failure — an unnamed format is scanned rather than refused.
 		const reply = await respond({
 			jsonrpc: '2.0',
 			id: 4,
 			method: 'tools/call',
-			params: { name: 'extract_paths', arguments: { content: 'x' } },
+			params: { name: 'extract_paths', arguments: {} },
 		});
 		expect(reply?.error).toBeUndefined();
 		expect(reply?.result?.isError).toBe(true);

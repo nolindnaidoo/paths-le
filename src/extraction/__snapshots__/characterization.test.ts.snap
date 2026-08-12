@@ -594,6 +594,78 @@ exports[`extraction characterization > paths.json as json 1`] = `
 }
 `;
 
+exports[`extraction characterization > paths.py as python 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 22,
+        "line": 7,
+      },
+      "type": "absolute",
+      "value": "/var/data",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 16,
+        "line": 8,
+      },
+      "type": "relative",
+      "value": "./config/app.yaml",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 12,
+        "line": 9,
+      },
+      "type": "absolute",
+      "value": "/var/log/service",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 12,
+        "line": 10,
+      },
+      "type": "absolute",
+      "value": "C:\\\\Temp\\\\out",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 7,
+        "line": 12,
+      },
+      "type": "file",
+      "value": "docs/architecture.md",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 61,
+        "line": 12,
+      },
+      "type": "relative",
+      "value": "./setup.sh",
+    },
+    {
+      "context": "Text scan",
+      "position": {
+        "column": 37,
+        "line": 20,
+      },
+      "type": "file",
+      "value": "reports/summary.json",
+    },
+  ],
+  "success": true,
+}
+`;
+
 exports[`extraction characterization > paths.toml as toml 1`] = `
 {
   "errors": [],
@@ -651,6 +723,114 @@ exports[`extraction characterization > paths.toml as toml 1`] = `
       },
       "type": "file",
       "value": "configs/alpha.toml",
+    },
+  ],
+  "success": true,
+}
+`;
+
+exports[`extraction characterization > paths.yml as yaml 1`] = `
+{
+  "errors": [],
+  "paths": [
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 9,
+        "line": 7,
+      },
+      "type": "relative",
+      "value": "./scripts/ci.sh",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 14,
+        "line": 9,
+      },
+      "type": "absolute",
+      "value": "/var/cache/build",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 11,
+        "line": 10,
+      },
+      "type": "relative",
+      "value": "./out/report.json",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 15,
+        "line": 14,
+      },
+      "type": "unknown",
+      "value": "actions/checkout@v5",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 28,
+        "line": 16,
+      },
+      "type": "unknown",
+      "value": "packages/app",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 17,
+        "line": 19,
+      },
+      "type": "file",
+      "value": "dist/bundle.js",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 16,
+        "line": 20,
+      },
+      "type": "url",
+      "value": "https://example.com/upload",
+    },
+    {
+      "context": "YAML key",
+      "position": {
+        "column": 3,
+        "line": 22,
+      },
+      "type": "file",
+      "value": "config/app.yaml",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 20,
+        "line": 22,
+      },
+      "type": "absolute",
+      "value": "/etc/app/config.yaml",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 17,
+        "line": 24,
+      },
+      "type": "relative",
+      "value": "./shared/lib.ts",
+    },
+    {
+      "context": "YAML value",
+      "position": {
+        "column": 17,
+        "line": 24,
+      },
+      "type": "relative",
+      "value": "./shared/lib.ts",
     },
   ],
   "success": true,

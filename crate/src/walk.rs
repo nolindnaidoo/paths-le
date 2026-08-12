@@ -5,10 +5,18 @@
 //! the answer a person auditing a repository already has in their head.
 //! A file named explicitly is always read, ignore rules included: you
 //! asked for it.
+//!
+//! **There is no format filter, and that is now the point rather than an
+//! oversight.** A file no typed extractor reads falls through to the
+//! generic scan, so a `.py`, a `.yml` and a `Dockerfile` are read by the
+//! walk instead of skipped by it — and naming one explicitly no longer
+//! draws a refusal, because naming a file is an instruction, not a
+//! question. What a file is not is decided later, by `audit.rs`, which
+//! reports a non-text file rather than pretending it was clean.
 
 use std::path::{Path as StdPath, PathBuf};
 
-use crate::extract::format::resolve_format;
+use crate::extract::format::{FALLBACK_FORMAT, resolve_format};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Target {
@@ -52,20 +60,10 @@ pub(crate) fn collect(inputs: &[PathBuf], options: &WalkOptions) -> Result<Vec<T
 
         if metadata.is_file() {
             // Named explicitly, so it is read whatever the ignore rules
-            // say. Only an unrecognised format refuses it, and that
-            // refusal names the problem rather than returning nothing.
-            let language_id = options
-                .format
-                .or_else(|| language_for(input))
-                .ok_or_else(|| {
-                    format!(
-                        "{}: no format could be inferred from the name; name one explicitly",
-                        input.display()
-                    )
-                })?;
+            // say, and whatever its name suggests it is.
             targets.push(Target {
                 path: input.clone(),
-                language_id,
+                language_id: options.format.unwrap_or_else(|| language_for(input)),
             });
             continue;
         }
@@ -95,24 +93,22 @@ fn walk_directory(root: &StdPath, options: &WalkOptions) -> Result<Vec<Target>, 
         if !entry.file_type().is_some_and(|kind| kind.is_file()) {
             continue;
         }
-        let Some(language_id) = options.format.or_else(|| language_for(entry.path())) else {
-            continue;
-        };
         targets.push(Target {
             path: entry.path().to_path_buf(),
-            language_id,
+            language_id: options.format.unwrap_or_else(|| language_for(entry.path())),
         });
     }
     Ok(targets)
 }
 
-/// A walked file with no recognisable format is skipped silently; one
-/// named explicitly is refused loudly. The difference is intent — a
-/// repository is full of files this tool has nothing to say about, and
-/// naming one means you expected it to.
-fn language_for(path: &StdPath) -> Option<&'static str> {
-    let name = path.file_name()?.to_str()?;
-    resolve_format(None, Some(name))
+/// The language id a file's name implies, or the generic scan.
+///
+/// A name that resolves to nothing is not a reason to skip the file. It
+/// is the reason the scan exists.
+fn language_for(path: &StdPath) -> &'static str {
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .map_or(FALLBACK_FORMAT, |name| resolve_format(None, Some(name)))
 }
 
 #[cfg(test)]
@@ -134,16 +130,29 @@ mod tests {
             .collect()
     }
 
+    /// Changed deliberately in 0.2.0: the walk used to yield only the
+    /// formats it had an extractor for, which left four fifths of a
+    /// repository unexamined. Every file is a target now, and the
+    /// language id says which extractor will read it.
     #[test]
-    fn a_directory_yields_only_the_formats_it_understands() {
+    fn a_directory_yields_every_file_and_names_what_will_read_it() {
         let tree = TempTree::new("walk-formats");
         tree.write("a.json", "{}");
         tree.write("b.toml", "");
         tree.write("c.md", "# no");
         tree.write("d.py", "pass");
+        tree.write("e.yml", "a: 1");
         let targets = collect(&[tree.path().to_path_buf()], &WalkOptions::default())
             .expect("the walk succeeds");
-        assert_eq!(names(&targets), ["a.json", "b.toml"]);
+        assert_eq!(
+            names(&targets),
+            ["a.json", "b.toml", "c.md", "d.py", "e.yml"]
+        );
+        let languages: Vec<&str> = targets.iter().map(|target| target.language_id).collect();
+        assert_eq!(
+            languages,
+            ["json", "toml", "markdown", FALLBACK_FORMAT, "yaml"]
+        );
     }
 
     #[test]
@@ -232,13 +241,16 @@ mod tests {
         assert_eq!(names(&targets), ["skipped.json"]);
     }
 
+    /// Changed deliberately in 0.2.0: naming a file used to be refused
+    /// when its name implied no format. Naming a file is an instruction,
+    /// and the scan is what carries it out.
     #[test]
-    fn an_explicitly_named_file_of_unknown_format_is_refused_by_name() {
+    fn an_explicitly_named_file_of_unknown_format_is_read_by_the_scan() {
         let tree = TempTree::new("walk-unknown");
-        let file = tree.write("notes.md", "# x");
-        let error = collect(&[file], &WalkOptions::default()).expect_err("a refusal");
-        assert!(error.contains("notes.md"), "{error}");
-        assert!(error.contains("no format could be inferred"), "{error}");
+        let file = tree.write("Dockerfile", "COPY ./src /app\n");
+        let targets = collect(&[file], &WalkOptions::default()).expect("the walk succeeds");
+        assert_eq!(names(&targets), ["Dockerfile"]);
+        assert_eq!(targets[0].language_id, FALLBACK_FORMAT);
     }
 
     #[test]

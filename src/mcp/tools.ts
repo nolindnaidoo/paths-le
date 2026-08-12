@@ -49,14 +49,11 @@ async function extract(args: Record<string, unknown>): Promise<unknown> {
 	const filename =
 		typeof args.filename === 'string' ? args.filename : undefined;
 
-	// Requiring one of the two up front gives a message naming the problem,
-	// instead of the engine returning an empty result for an unknown language.
+	// Neither one given is no longer a refusal. It used to be, because the
+	// engine had nothing to do with a document it could not name; now the
+	// answer is the generic scan, and `fileType` in the result says which one
+	// ran.
 	const languageId = resolveFormat(format, filename);
-	if (!languageId) {
-		throw new Error(
-			`Provide \`format\` (one of: ${SUPPORTED_FORMATS.join(', ')}) or a \`filename\` with a recognised extension.`,
-		);
-	}
 
 	const result = await extractPaths(content, languageId);
 	const values = result.paths.map((path) => ({
@@ -89,7 +86,7 @@ export const TOOLS: readonly ToolDefinition[] = Object.freeze([
 	Object.freeze({
 		name: 'extract_paths',
 		description:
-			'Extract every file and directory path from a document, with its kind and 1-based line and column. Supports JSON, TOML, CSV, dotenv, JavaScript, TypeScript, HTML and CSS. Each path is classified as file, relative, absolute or url. Paths are reported as written — nothing is resolved against a workspace or the filesystem.',
+			'Extract every file and directory path from a document, with its kind and 1-based line and column. Reads JSON, YAML, TOML, CSV, dotenv, JavaScript, TypeScript, HTML and CSS with a parser for that format, and anything else — Python, Go, Markdown, a Dockerfile — by scanning its text, which finds paths that carry a separator or a quoted filename. Each path is classified as file, relative, absolute or url. Paths are reported as written — nothing is resolved against a workspace or the filesystem.',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -101,7 +98,7 @@ export const TOOLS: readonly ToolDefinition[] = Object.freeze([
 					type: 'string',
 					enum: SUPPORTED_FORMATS,
 					description:
-						'Document format. Provide this or `filename`. Common extensions and aliases are accepted.',
+						'Document format. Common extensions and aliases are accepted. Omit it and `filename` to scan the text generically.',
 				},
 				filename: {
 					type: 'string',

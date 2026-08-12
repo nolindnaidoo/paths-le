@@ -6,7 +6,7 @@ This repo hosts **two products**: the extension at the root (this document's sco
 
 ## What this is
 
-A VS Code extension that extracts file paths from the active document (JS/TS, JSON/JSONC, HTML, CSS/SCSS/LESS, TOML, CSV, dotenv) into a results editor, with dedupe/sort post-processing. No network access, no filesystem writes outside optional opt-in canonical path resolution (reads only).
+A VS Code extension that extracts file paths from the active document — JS/TS, JSON/JSONC, YAML, HTML, CSS/SCSS/LESS, TOML, CSV and dotenv through a parser, every other language through a text scan — into a results editor, with dedupe/sort post-processing. No network access, no filesystem writes outside optional opt-in canonical path resolution (reads only).
 
 ## Architecture
 

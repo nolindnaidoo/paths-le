@@ -1,0 +1,26 @@
+# A CI config, which is where most of the YAML paths in a repository live.
+name: build
+on:
+  push:
+    paths:
+      - src/**/*.ts
+      - ./scripts/ci.sh
+env:
+  CACHE_DIR: /var/cache/build
+  REPORT: ./out/report.json
+jobs:
+  build:
+    steps:
+      - uses: actions/checkout@v5
+      - run: node ./scripts/build.js
+        working-directory: packages/app
+      - name: upload
+        with:
+          path: dist/bundle.js
+          url: https://example.com/upload
+volumes:
+  config/app.yaml: /etc/app/config.yaml
+anchors:
+  base: &shared ./shared/lib.ts
+  reuse: *shared
+version: 1.8.1

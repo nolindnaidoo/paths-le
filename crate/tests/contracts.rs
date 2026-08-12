@@ -165,7 +165,9 @@ fn a_flag_without_its_value_exits_two() {
 #[test]
 fn an_unreadable_file_is_named_and_does_not_end_the_run() {
     let tree = Tree::new("unreadable");
-    std::fs::write(tree.path().join("broken.json"), [0xff, 0xfe, 0x00]).expect("a file");
+    // No NUL byte: this is a text candidate that could not be read, not
+    // a binary file. The distinction is pinned by the test below.
+    std::fs::write(tree.path().join("broken.json"), [0xff, 0xfe, 0x41]).expect("a file");
     let lenient = run(&[&tree.path().to_string_lossy()]);
     assert_eq!(lenient.code, 0);
     // The report still lands on stdout: the caller learns which file.
@@ -177,6 +179,44 @@ fn an_unreadable_file_is_named_and_does_not_end_the_run() {
 
     let strict = run(&["--strict", &tree.path().to_string_lossy()]);
     assert_eq!(strict.code, 2);
+}
+
+/// A binary file is not a skipped file, and `--strict` is where the
+/// difference shows. Widening the walk brought every PNG in a repository
+/// into the reader; reporting each as skipped made `--strict` exit 2 on
+/// any tree holding an image, which is every tree.
+#[test]
+fn a_binary_file_is_skipped_silently_and_does_not_fail_strict() {
+    let tree = Tree::new("binary");
+    tree.write("app.json", "{\"a\":\"./there.ts\"}");
+    tree.write("there.ts", "");
+    std::fs::write(
+        tree.path().join("logo.png"),
+        [0x89, b'P', b'N', b'G', 0x00, 0x1a],
+    )
+    .expect("a file");
+
+    let lenient = run(&[&tree.path().to_string_lossy()]);
+    assert_eq!(lenient.code, 0);
+    let files: Vec<String> = reports(&lenient)
+        .iter()
+        .map(|report| report["file"].as_str().expect("a file").to_string())
+        .collect();
+    assert_eq!(files.len(), 2, "{files:?}");
+    assert!(
+        files.iter().all(|file| !file.ends_with("logo.png")),
+        "{files:?}"
+    );
+    // Counted rather than listed: coverage narrower than the tree is
+    // said out loud, or the tally reads as coverage it does not have.
+    assert!(
+        lenient.stderr.contains("1 binary files skipped"),
+        "{}",
+        lenient.stderr
+    );
+
+    let strict = run(&["--strict", &tree.path().to_string_lossy()]);
+    assert_eq!(strict.code, 0, "a binary file is not a strict failure");
 }
 
 #[test]

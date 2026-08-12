@@ -4,7 +4,7 @@
 <h1 align="center">Paths-LE: Zero Hassle Path Extraction</h1>
 <p align="center">
   <b>Pull every file path out of the current file in one keystroke</b><br/>
-  <i>JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and Environment files</i>
+  <i>JavaScript, TypeScript, JSON, YAML, HTML, CSS, TOML, CSV and Environment files — and every other file, by text scan</i>
 </p>
 
 <p align="center">
@@ -42,7 +42,8 @@ Open a file, press `Ctrl+Alt+P` (`Cmd+Alt+P` on Mac), and every file path in the
 
 - **Import analysis** — extract local imports from JS/TS, including multi-line import statements; npm package names are filtered out
 - **Asset auditing** — every `src`, `href`, `srcset`, `url()`, and `@import` in HTML/CSS
-- **Config review** — path-like values from JSON/JSONC, TOML, CSV, and `.env` files
+- **Config review** — path-like values from JSON/JSONC, YAML, TOML, CSV, and `.env` files
+- **Anything else** — Python, Go, Markdown, XML, a Dockerfile: no parser, so a text scan finds quoted filenames and any run carrying a path separator
 
 ## Use it from an AI agent
 
@@ -152,8 +153,12 @@ is already there; take the binary if you want no runtime, or if you want
 | TOML | `toml` | Path-like values and keys |
 | CSV | `csv` | Path-like cells |
 | Environment | `dotenv`, `env` | Path-like variable values and names |
+| YAML | `yaml` | Path-like scalar values and keys, across every document in the file |
+| Everything else | any other language ID | A text scan: quoted tokens, and undelimited runs that carry a path separator |
 
-Positions are real source positions for JS/TS, JSON/JSONC, HTML, and CSS (exact line and column of the path); TOML positions are located in the source text and can be approximate for repeated identical values; CSV positions are row/cell coordinates. Version strings (`1.8.1`) and IP addresses are never treated as paths, and `data:`/`javascript:` URLs are excluded from HTML/CSS extraction. Known limitation: bare domains like `example.com` are indistinguishable from filenames and are extracted.
+Positions are real source positions for JS/TS, JSON/JSONC, HTML, CSS and the text scan (exact line and column of the path); TOML and YAML positions are located in the source text and can be approximate for repeated identical values; CSV positions are row/cell coordinates. Version strings (`1.8.1`) and IP addresses are never treated as paths, and `data:`/`javascript:` URLs are excluded from HTML/CSS extraction. Known limitation: bare domains like `example.com` are indistinguishable from filenames and are extracted.
+
+The text scan claims a bare `name.ext` only inside quotes. `os.path` in a Python file and `main.py` are the same shape, and no rule short of a dictionary separates them — but source quotes its filenames and does not quote its attribute access, so the quoting does. A YAML scalar holding a shell command (`run: node ./scripts/build.js`) is one token containing spaces, so no path is claimed from it, exactly as in JSON and TOML.
 
 ## Commands
 
@@ -239,12 +244,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 91.72% |
-| Branches | 84.16% |
-| Functions | 94.89% |
-| Lines | 92.64% |
+| Statements | 92.04% |
+| Branches | 85.65% |
+| Functions | 94.55% |
+| Lines | 92.83% |
 
-206 test cases across 19 files, plus an integration suite that runs
+240 test cases across 21 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 

@@ -189,6 +189,156 @@
 		}
 	},
 	{
+		"name": "a yaml ci config is read by its own extractor",
+		"file": "paths.yml",
+		"arguments": {
+			"filename": "ci.yml"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./scripts/ci.sh",
+						"type": "relative",
+						"line": 7,
+						"column": 9
+					},
+					{
+						"value": "/var/cache/build",
+						"type": "absolute",
+						"line": 9,
+						"column": 14
+					},
+					{
+						"value": "./out/report.json",
+						"type": "relative",
+						"line": 10,
+						"column": 11
+					},
+					{
+						"value": "actions/checkout@v5",
+						"type": "unknown",
+						"line": 14,
+						"column": 15
+					},
+					{
+						"value": "packages/app",
+						"type": "unknown",
+						"line": 16,
+						"column": 28
+					},
+					{
+						"value": "dist/bundle.js",
+						"type": "file",
+						"line": 19,
+						"column": 17
+					},
+					{
+						"value": "https://example.com/upload",
+						"type": "url",
+						"line": 20,
+						"column": 16
+					},
+					{
+						"value": "config/app.yaml",
+						"type": "file",
+						"line": 22,
+						"column": 3
+					},
+					{
+						"value": "/etc/app/config.yaml",
+						"type": "absolute",
+						"line": 22,
+						"column": 20
+					},
+					{
+						"value": "./shared/lib.ts",
+						"type": "relative",
+						"line": 24,
+						"column": 17
+					},
+					{
+						"value": "./shared/lib.ts",
+						"type": "relative",
+						"line": 24,
+						"column": 17
+					}
+				],
+				"fileType": "yaml"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 11,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a python source file is read by the generic scan",
+		"file": "paths.py",
+		"arguments": {
+			"filename": "app.py"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "/var/data",
+						"type": "absolute",
+						"line": 7,
+						"column": 22
+					},
+					{
+						"value": "./config/app.yaml",
+						"type": "relative",
+						"line": 8,
+						"column": 16
+					},
+					{
+						"value": "/var/log/service",
+						"type": "absolute",
+						"line": 9,
+						"column": 12
+					},
+					{
+						"value": "C:\\\\Temp\\\\out",
+						"type": "absolute",
+						"line": 10,
+						"column": 12
+					},
+					{
+						"value": "docs/architecture.md",
+						"type": "file",
+						"line": 12,
+						"column": 7
+					},
+					{
+						"value": "./setup.sh",
+						"type": "relative",
+						"line": 12,
+						"column": 61
+					},
+					{
+						"value": "reports/summary.json",
+						"type": "file",
+						"line": 20,
+						"column": 37
+					}
+				],
+				"fileType": "unknown"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 7,
+				"truncated": false
+			}
+		}
+	},
+	{
 		"name": "an alias resolves to its language id",
 		"file": "paths.js",
 		"arguments": {
@@ -392,18 +542,62 @@
 		}
 	},
 	{
-		"name": "an unrecognised format is refused by name",
-		"content": "print(\"hi\")",
+		"name": "an unrecognised format is scanned, not refused",
+		"content": "shutil.copy(\"./src/a.py\", DEST)",
 		"arguments": {
 			"format": "python"
 		},
-		"expectedError": "Provide `format` (one of: csv, toml, dotenv, javascript, typescript, json, html, css) or a `filename` with a recognised extension."
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./src/a.py",
+						"type": "relative",
+						"line": 1,
+						"column": 14
+					}
+				],
+				"fileType": "unknown"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 1,
+				"truncated": false
+			}
+		}
 	},
 	{
-		"name": "neither format nor filename",
-		"content": "{}",
+		"name": "neither format nor filename is a generic scan",
+		"content": "run ./scripts/build.sh then docs/api.md",
 		"arguments": {},
-		"expectedError": "Provide `format` (one of: csv, toml, dotenv, javascript, typescript, json, html, css) or a `filename` with a recognised extension."
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "./scripts/build.sh",
+						"type": "relative",
+						"line": 1,
+						"column": 5
+					},
+					{
+						"value": "docs/api.md",
+						"type": "file",
+						"line": 1,
+						"column": 29
+					}
+				],
+				"fileType": "unknown"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 2,
+				"truncated": false
+			}
+		}
 	},
 	{
 		"name": "content must be a string",

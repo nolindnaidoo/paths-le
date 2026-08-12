@@ -5,9 +5,20 @@
  * else. An agent will send `yml`, `.env`, `jsx` or `tsconfig.json` instead.
  * Widening happens here rather than in the engine, whose behaviour is pinned by
  * characterization goldens.
+ *
+ * **Nothing fails to resolve.** A name neither layer recognises lands on the
+ * generic scan rather than on a refusal, so a Python file, a Dockerfile and a
+ * `.md` are read instead of being turned away.
  */
 
-/** Every language id the engine understands, keyed by what a caller might send. */
+/**
+ * Every language id the engine understands, keyed by what a caller might send.
+ *
+ * `markdown` and `xml` map to themselves and then to the generic scan. They
+ * earn a row because the row is what puts the real name in the answer — a `.md`
+ * file reads as `markdown` rather than as `unknown`, which is the difference
+ * between "scanned generically" and "not recognised at all".
+ */
 const ALIASES: Readonly<Record<string, string>> = Object.freeze({
 	csv: 'csv',
 	tsv: 'csv',
@@ -35,9 +46,21 @@ const ALIASES: Readonly<Record<string, string>> = Object.freeze({
 	scss: 'scss',
 	sass: 'scss',
 	less: 'less',
+	yaml: 'yaml',
+	yml: 'yaml',
+	markdown: 'markdown',
+	md: 'markdown',
+	xml: 'xml',
 });
 
-/** The formats a caller can name, for the tool schema's enum. */
+/**
+ * The formats a caller can name, for the tool schema's enum.
+ *
+ * `markdown` is here and `xml` is not, even though both are read by the generic
+ * scan: `markdown` is a format an agent asks for by name, and the enum is what
+ * tells it the ask is understood. Anything absent from this list still
+ * resolves — the enum advertises, it does not gate.
+ */
 export const SUPPORTED_FORMATS: readonly string[] = Object.freeze([
 	'csv',
 	'toml',
@@ -47,23 +70,36 @@ export const SUPPORTED_FORMATS: readonly string[] = Object.freeze([
 	'json',
 	'html',
 	'css',
+	'yaml',
+	'markdown',
 ]);
+
+/**
+ * What the engine uses when it recognises nothing.
+ *
+ * `unknown`, not `fallback`: the engine's `determineFileType` already answers
+ * `unknown` for a language it has no extractor for, and the name is
+ * user-visible — it is the `fileType` every MCP answer carries, so a second
+ * name here would be the two servers disagreeing on a field in plain sight.
+ */
+export const FALLBACK_FORMAT = 'unknown';
 
 function normalise(value: string): string {
 	return value.trim().toLowerCase().replace(/^\./, '');
 }
 
 /**
- * Resolve a language id from an explicit format, else from a filename.
+ * Resolve a language id from an explicit format, else from a filename, else the
+ * generic scan.
  *
- * Returns null rather than guessing: a wrong format extracts nothing and looks
- * like a document with no paths, which is the least debuggable outcome for a
- * caller.
+ * A caller who knows nothing about a document still gets its paths, which is
+ * the difference between a tool that can be pointed at a repository and one
+ * that has to have the repository described to it first.
  */
 export function resolveFormat(
 	format: string | undefined,
 	filename: string | undefined,
-): string | null {
+): string {
 	if (format) {
 		const direct = ALIASES[normalise(format)];
 		if (direct) return direct;
@@ -83,5 +119,5 @@ export function resolveFormat(
 		if (inferred) return inferred;
 	}
 
-	return null;
+	return FALLBACK_FORMAT;
 }

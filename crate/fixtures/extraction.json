@@ -551,5 +551,145 @@
 				"context": "HTML srcset"
 			}
 		]
+	},
+	{
+		"name": "paths.yml as yaml",
+		"file": "paths.yml",
+		"languageId": "yaml",
+		"expected": [
+			{
+				"value": "./scripts/ci.sh",
+				"type": "relative",
+				"line": 7,
+				"column": 9,
+				"context": "YAML value"
+			},
+			{
+				"value": "/var/cache/build",
+				"type": "absolute",
+				"line": 9,
+				"column": 14,
+				"context": "YAML value"
+			},
+			{
+				"value": "./out/report.json",
+				"type": "relative",
+				"line": 10,
+				"column": 11,
+				"context": "YAML value"
+			},
+			{
+				"value": "actions/checkout@v5",
+				"type": "unknown",
+				"line": 14,
+				"column": 15,
+				"context": "YAML value"
+			},
+			{
+				"value": "packages/app",
+				"type": "unknown",
+				"line": 16,
+				"column": 28,
+				"context": "YAML value"
+			},
+			{
+				"value": "dist/bundle.js",
+				"type": "file",
+				"line": 19,
+				"column": 17,
+				"context": "YAML value"
+			},
+			{
+				"value": "https://example.com/upload",
+				"type": "url",
+				"line": 20,
+				"column": 16,
+				"context": "YAML value"
+			},
+			{
+				"value": "config/app.yaml",
+				"type": "file",
+				"line": 22,
+				"column": 3,
+				"context": "YAML key"
+			},
+			{
+				"value": "/etc/app/config.yaml",
+				"type": "absolute",
+				"line": 22,
+				"column": 20,
+				"context": "YAML value"
+			},
+			{
+				"value": "./shared/lib.ts",
+				"type": "relative",
+				"line": 24,
+				"column": 17,
+				"context": "YAML value"
+			},
+			{
+				"value": "./shared/lib.ts",
+				"type": "relative",
+				"line": 24,
+				"column": 17,
+				"context": "YAML value"
+			}
+		]
+	},
+	{
+		"name": "paths.py as python (the generic scan)",
+		"file": "paths.py",
+		"languageId": "python",
+		"expected": [
+			{
+				"value": "/var/data",
+				"type": "absolute",
+				"line": 7,
+				"column": 22,
+				"context": "Text scan"
+			},
+			{
+				"value": "./config/app.yaml",
+				"type": "relative",
+				"line": 8,
+				"column": 16,
+				"context": "Text scan"
+			},
+			{
+				"value": "/var/log/service",
+				"type": "absolute",
+				"line": 9,
+				"column": 12,
+				"context": "Text scan"
+			},
+			{
+				"value": "C:\\\\Temp\\\\out",
+				"type": "absolute",
+				"line": 10,
+				"column": 12,
+				"context": "Text scan"
+			},
+			{
+				"value": "docs/architecture.md",
+				"type": "file",
+				"line": 12,
+				"column": 7,
+				"context": "Text scan"
+			},
+			{
+				"value": "./setup.sh",
+				"type": "relative",
+				"line": 12,
+				"column": 61,
+				"context": "Text scan"
+			},
+			{
+				"value": "reports/summary.json",
+				"type": "file",
+				"line": 20,
+				"column": 37,
+				"context": "Text scan"
+			}
+		]
 	}
 ]

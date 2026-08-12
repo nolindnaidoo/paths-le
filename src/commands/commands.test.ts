@@ -142,7 +142,7 @@ describe('paths-le.extractPaths', () => {
 		expect(_clipboardText()).toBe('./lib/util');
 	});
 
-	it('reports unsupported formats as info, not error', async () => {
+	it('extracts from a language with no typed extractor', async () => {
 		const { registerExtractCommand } = await import('./extract');
 		const context = {
 			subscriptions: [],
@@ -164,12 +164,17 @@ describe('paths-le.extractPaths', () => {
 			},
 		});
 
+		// Changed deliberately: this used to assert the unsupported-format
+		// notice. Every language is read now, so the command extracts instead.
 		_setActiveEditor(
-			_createDocument({ content: 'print(1)', languageId: 'python' }),
+			_createDocument({
+				content: 'open("./data/in.csv")',
+				languageId: 'python',
+			}),
 		);
 		await runCommand('paths-le.extractPaths');
 
-		expect(events.some((e) => e.startsWith('info:Path extraction'))).toBe(true);
+		expect(events).toContain('info:Extracted 1 paths from document');
 		expect(events.some((e) => e.startsWith('error:'))).toBe(false);
 	});
 });

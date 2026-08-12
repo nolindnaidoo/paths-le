@@ -112,6 +112,15 @@ fn tool_definitions() -> Value {
                                         With it off, paths are reported as written and none can \
                                         be a finding.",
                     },
+                    "resolveScanned": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "check the paths found in a file no format extractor \
+                                        reads — Python, Markdown, a Dockerfile — against the \
+                                        filesystem too. Those are found by scanning raw text, \
+                                        so they are reported as written by default rather than \
+                                        claimed to be missing.",
+                    },
                     "root": {
                         "type": "string",
                         "description": "the directory a relative path may not escape; the \
@@ -166,6 +175,10 @@ fn audit_tool(arguments: &Value) -> Result<Value, String> {
         .get("resolve")
         .and_then(Value::as_bool)
         .unwrap_or(true);
+    let resolve_scanned = arguments
+        .get("resolveScanned")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
     let deny_symlinks = arguments
         .get("denySymlinks")
         .and_then(Value::as_bool)
@@ -176,17 +189,17 @@ fn audit_tool(arguments: &Value) -> Result<Value, String> {
     let root = crate::cli::choose_root(arguments.get("root").and_then(Value::as_str), &inputs)?;
     let options = AuditOptions {
         resolve,
+        resolve_scanned,
         root,
         deny_symlinks,
     };
 
     let reports: Vec<Value> = targets
         .iter()
-        .map(|target| {
-            let report = audit::audit_file(target, &options);
-            serde_json::to_value(&report).expect("a report serializes")
-        })
+        .filter_map(|target| audit::audit_file(target, &options))
+        .map(|report| serde_json::to_value(&report).expect("a report serializes"))
         .collect();
+    let binary = targets.len() - reports.len();
 
     let findings: u64 = reports
         .iter()
@@ -207,6 +220,33 @@ fn audit_tool(arguments: &Value) -> Result<Value, String> {
             "resolve",
             "paths were reported as written and not checked against the filesystem, so none \
              could be a finding",
+        ));
+    }
+    // Said out loud rather than left in the per-path reasons. A model
+    // reading "0 findings" over a tree of Python files would otherwise
+    // conclude those files are clean, when what happened is that this
+    // declined to claim either way.
+    let scanned = targets
+        .iter()
+        .filter(|target| crate::extract::is_generic_scan(target.language_id))
+        .count();
+    if resolve && !resolve_scanned && scanned > 0 {
+        diagnostics.push(warning(
+            "scanned",
+            &format!(
+                "{scanned} of {} files had no format extractor and were scanned as raw text; \
+                 their paths are reported as written, not checked",
+                targets.len()
+            ),
+        ));
+    }
+    // Counted, not listed. A binary file is not a failure, but a run
+    // that covered fewer files than the tree holds has to say so or the
+    // count reads as coverage it does not have.
+    if binary > 0 {
+        diagnostics.push(warning(
+            "binary",
+            &format!("{binary} files were binary and hold no text to examine"),
         ));
     }
     for report in unexamined {

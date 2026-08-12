@@ -18,7 +18,7 @@ const EXTRACTION: &str = include_str!("../../fixtures/extraction.json");
 const HEURISTICS: &str = include_str!("../../fixtures/heuristics.json");
 
 /// Every document the corpus refers to, by the name its cases use.
-const DOCUMENTS: [(&str, &str); 10] = [
+const DOCUMENTS: [(&str, &str); 12] = [
     (
         "srcset-data-uri.html",
         include_str!("../../fixtures/documents/srcset-data-uri.html"),
@@ -58,6 +58,14 @@ const DOCUMENTS: [(&str, &str); 10] = [
     (
         "paths.html",
         include_str!("../../fixtures/documents/paths.html"),
+    ),
+    (
+        "paths.yml",
+        include_str!("../../fixtures/documents/paths.yml"),
+    ),
+    (
+        "paths.py",
+        include_str!("../../fixtures/documents/paths.py"),
     ),
 ];
 

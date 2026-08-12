@@ -62,6 +62,13 @@ jsonc-parser = "0.33"
 # the only reason it is written down here rather than discovered twice.
 toml = { version = "1", features = ["preserve_order"] }
 csv = "1"
+# saphyr for js-yaml, matching what numbers-le pairs them as. A YAML
+# document is where the paths in a repository's CI configs, Kubernetes
+# manifests and compose files live, and there is no reading one without
+# a parser: indentation, anchors, block scalars and flow collections are
+# not a regex. Positions still come from a forward-moving text search,
+# the way TOML's do, so the two parsers only have to agree on values.
+saphyr = "0.0.11"
 # The walker. `ignore` is ripgrep's, so "what this tool walks" and "what
 # ripgrep walks" are the same answer — which is the answer a person
 # auditing a repository already has in their head.

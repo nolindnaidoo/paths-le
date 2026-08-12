@@ -16,6 +16,7 @@ pub(crate) mod format;
 mod css;
 mod csv;
 mod dotenv;
+mod fallback;
 mod heuristics;
 mod html;
 mod javascript;
@@ -24,6 +25,7 @@ mod json;
 mod position;
 mod schemes;
 mod toml;
+mod yaml;
 
 #[cfg(test)]
 pub(crate) mod corpus;
@@ -47,11 +49,15 @@ pub(crate) struct Path {
     pub(crate) context: String,
 }
 
+/// The extension's `ParseError` also has a `format` category. It existed
+/// for one message — the unsupported-format refusal — and 0.2.0 replaced
+/// that refusal with the generic scan, so nothing produces it on either
+/// side any more. Kept out for the same reason `warning` is: a variant no
+/// code path can reach is a claim the code does not back.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum ErrorCategory {
     Parsing,
-    Format,
 }
 
 /// The extension's `ParseError` also has a `warning` level. Nothing in
@@ -121,20 +127,15 @@ pub(crate) type Extracted = Result<Vec<Path>, String>;
 /// `language_id` is a VS Code language id, exactly as the extension's
 /// engine accepts. Callers holding a filename or a loose format name go
 /// through `format::resolve_format` first.
+///
+/// A language with no typed extractor is read by the generic scan
+/// rather than refused. The refusal it replaces —
+/// `"Path extraction is not supported for {language_id} files"` — was
+/// the honest answer while there was nothing to fall through to; with a
+/// scan behind it, refusing would be declining to look at four fifths of
+/// a repository.
 pub(crate) fn extract(content: &str, language_id: &str) -> Extraction {
-    let file_type = determine_file_type(language_id);
-    if file_type == FileType::Unknown {
-        return Extraction::failed(
-            ErrorCategory::Format,
-            Severity::Info,
-            format!(
-                "Path extraction is not supported for {language_id} files. \
-                 Supported formats: CSV, TOML, ENV, JS, TS, JSON, HTML, CSS."
-            ),
-        );
-    }
-
-    match extract_by_file_type(content, file_type) {
+    match extract_by_file_type(content, determine_file_type(language_id)) {
         Ok(paths) => Extraction::found(paths),
         Err(message) => Extraction::failed(ErrorCategory::Parsing, Severity::Error, message),
     }
@@ -149,27 +150,52 @@ fn extract_by_file_type(content: &str, file_type: FileType) -> Extracted {
         FileType::Json => Ok(json::extract(content)),
         FileType::Css => css::extract(content),
         FileType::Html => html::extract(content),
-        FileType::Unknown => Ok(Vec::new()),
+        FileType::Yaml => Ok(yaml::extract(content)),
+        FileType::Unknown => Ok(fallback::extract(content)),
     }
+}
+
+/// Whether a language is read by the generic scan rather than by a
+/// typed extractor.
+///
+/// The audit layer needs this to decide whether resolution is opt-in for
+/// a file: a scan is generous by construction, so a false positive in it
+/// would surface as a `missing` finding rather than a quiet extra row.
+pub(crate) fn is_generic_scan(language_id: &str) -> bool {
+    determine_file_type(language_id) == FileType::Unknown
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    /// Changed deliberately in 0.2.0: an unsupported language used to be
+    /// a format diagnostic and an empty result. It is now the generic
+    /// scan, which is why a Python file reports its paths at all.
     #[test]
-    fn an_unsupported_language_is_a_format_error_not_an_empty_result() {
-        let result = extract("print(\"hi\")", "python");
-        assert!(!result.success);
-        assert!(result.paths.is_empty());
-        assert_eq!(result.errors.len(), 1);
-        assert_eq!(result.errors[0].category, ErrorCategory::Format);
-        assert_eq!(result.errors[0].severity, Severity::Info);
-        assert_eq!(
-            result.errors[0].message,
-            "Path extraction is not supported for python files. \
-             Supported formats: CSV, TOML, ENV, JS, TS, JSON, HTML, CSS."
-        );
+    fn an_unsupported_language_is_scanned_rather_than_refused() {
+        let result = extract("shutil.copy(\"./src/a.py\", DEST)", "python");
+        assert!(result.success);
+        assert!(result.errors.is_empty());
+        assert_eq!(result.paths.len(), 1);
+        assert_eq!(result.paths[0].value, "./src/a.py");
+        assert_eq!(result.paths[0].context, "Text scan");
+    }
+
+    /// The message that refusal carried is gone from the engine
+    /// entirely. Pinned because it is quoted in the extension, in the
+    /// MCP corpus and in a command's notification, and a stray copy left
+    /// behind would tell a user the file was skipped when it was read.
+    #[test]
+    fn nothing_still_says_extraction_is_unsupported() {
+        for language in ["python", "rust", "markdown", "unknown"] {
+            let result = extract("x = 1", language);
+            assert!(
+                result.errors.is_empty(),
+                "{language} produced {:?}",
+                result.errors
+            );
+        }
     }
 
     /// An empty document is a true empty result, not a failure — the
@@ -177,7 +203,17 @@ mod tests {
     /// "this was never looked at".
     #[test]
     fn an_empty_document_succeeds_with_nothing() {
-        for language in ["json", "toml", "csv", "dotenv", "javascript", "css", "html"] {
+        for language in [
+            "json",
+            "toml",
+            "csv",
+            "dotenv",
+            "javascript",
+            "css",
+            "html",
+            "yaml",
+            "unknown",
+        ] {
             let result = extract("", language);
             assert!(result.success, "{language}");
             assert!(result.paths.is_empty(), "{language}");
@@ -202,8 +238,30 @@ mod tests {
             "css",
             "scss",
             "less",
+            "yaml",
         ] {
             assert!(extract("", language).success, "{language}");
+        }
+    }
+
+    /// The typed extractors are exactly the ones that are not the scan,
+    /// and the audit layer branches on that answer.
+    #[test]
+    fn only_the_untyped_languages_are_a_generic_scan() {
+        for language in [
+            "json",
+            "toml",
+            "csv",
+            "dotenv",
+            "javascript",
+            "css",
+            "html",
+            "yaml",
+        ] {
+            assert!(!is_generic_scan(language), "{language}");
+        }
+        for language in ["python", "markdown", "xml", "unknown"] {
+            assert!(is_generic_scan(language), "{language}");
         }
     }
 }

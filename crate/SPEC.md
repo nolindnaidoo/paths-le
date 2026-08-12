@@ -46,8 +46,9 @@ an internal module boundary gives all of it.
 ```
 crate/
 ├── src/
-│   ├── extract/      pure: heuristics, positions, the eight format
-│   │                 extractors. No filesystem, no I/O, pub(crate).
+│   ├── extract/      pure: heuristics, positions, the nine format
+│   │                 extractors and the generic scan. No filesystem,
+│   │                 no I/O, pub(crate).
 │   ├── resolve.rs    the filesystem half — canonicalize, symlinks, roots
 │   ├── walk.rs       ignore-aware tree walking and format detection
 │   ├── audit.rs      one file end to end — the only path either surface calls
@@ -78,11 +79,70 @@ quietly fixed — otherwise "parity" cannot be tested.
 
 ### Formats
 
-Eight, matching the extension exactly: **JSON/JSONC, TOML, CSV, dotenv,
-JavaScript, TypeScript, HTML, CSS/SCSS/LESS.** A document in any other
-format is an unsupported-format result, not an empty one — the difference
-matters, because an empty result reads as "no paths here" and the truth
-is "this was never looked at".
+Nine typed extractors, matching the extension exactly: **JSON/JSONC,
+YAML, TOML, CSV, dotenv, JavaScript, TypeScript, HTML, CSS/SCSS/LESS.**
+Each is handed already-delimited tokens by a parser.
+
+**A document in any other format is scanned, not refused.** Every
+language id the engine has no extractor for — `python`, `go`,
+`markdown`, `xml`, a Dockerfile, a Makefile — resolves to `unknown` and
+goes through `extract/fallback.rs`. The refusal it replaced said
+`"Path extraction is not supported for {language_id} files"`, which was
+the honest answer while there was nothing to fall through to; with a
+scan behind it, refusing would be declining to look at four fifths of a
+repository.
+
+#### The generic scan
+
+Raw text has no delimited token, so the scan makes them and then applies
+the same heuristic:
+
+- A **quoted run** — single, double or backtick, closing on the same
+  line — is a delimited token and gets the whole heuristic, spaces
+  included. An unterminated quote is not a delimiter, or an apostrophe
+  in prose would swallow the rest of the line.
+- Everything else is an **undelimited run**, broken on whitespace and on
+  `()[]{},;=`, with a trailing `.` or `:` dropped. `<>|*?` are *not*
+  break characters: they are forbidden inside a candidate anyway, so
+  leaving them in rejects the whole token instead of salvaging a
+  fragment — `src/**/*.ts` stays one rejected glob.
+- **An undelimited run must carry a path separator.** This is the one
+  rule the scan adds, and it is what keeps `os.path`, `np.array` and
+  `logger.info` out: an extension and an attribute are the same shape,
+  and separating them by dictionary would be the TLD list this spec
+  already declined for `example.com`. What separates them is the
+  delimiter, because source quotes its filenames and does not quote its
+  attribute access — so `open("data.csv")` still reports `data.csv`.
+- A candidate made only of `/`, `\` and `.` is rejected. `//` matches
+  the Unix-absolute pattern exactly and opens a comment in half the
+  languages in a repository.
+
+`fixtures/documents/paths.py` pins all of it, `os.path` included.
+
+**Known limitation, pinned rather than fixed:** a quoted run swallows
+what is inside it, so a path inside a Python triple-quoted docstring is
+read as part of one long delimited token and not claimed. Both frontends
+do this identically.
+
+#### YAML
+
+`saphyr` here, `js-yaml` in the extension. **Positions come from a
+forward-moving text search, not from either parser**, exactly as TOML's
+do — a position taken from `saphyr`'s markers would disagree with
+`js-yaml`, which has no equivalent, on every quoted, folded or anchored
+scalar. So the two parsers only have to agree on the values and their
+order, which is what the corpus checks.
+
+Keys count as well as values, as TOML's do: a mapping keyed by path is
+ordinary in a config map or a compose file. An alias expands to its
+anchor's value, so the same string is reported twice and the second
+occurrence resolves to the anchor's position.
+
+**Known limitation, pinned:** a scalar holding a shell command —
+`run: node ./scripts/build.js` — is one delimited token containing
+spaces, so no path is claimed from it. That is the same rule JSON and
+TOML follow, and reading inside such a scalar would give YAML answers
+different in kind from theirs for identical input.
 
 ### The path heuristic
 
@@ -235,7 +295,11 @@ Finds every file and directory path in a document and reports whether it
 still points at anything. JSON reports on stdout, human summary on stderr.
 
 Options:
-  --no-resolve         report paths as written; skip the filesystem
+  --resolve            check the paths a generic scan found against the
+                       filesystem too. A file no format extractor reads
+                       is scanned as raw text, and those paths are
+                       reported as written unless this is given.
+  --no-resolve         report every path as written; skip the filesystem
                        entirely. No path can then be a finding.
   --root <dir>         the boundary a relative path may not escape
                        (default: the enclosing git repository, else the
@@ -243,7 +307,8 @@ Options:
   --deny-symlinks      treat a symlink as a finding too (it is reported
                        either way)
   --format <format>    force a format instead of inferring from the
-                       extension; required with --stdin
+                       extension; required with --stdin. A name no
+                       extractor answers to is scanned generically.
   --stdin              read one document from stdin
   --follow-symlinks    resolve through symlinks when walking a tree
                        (default: report the link, do not descend it)
@@ -310,6 +375,24 @@ Rules that keep this honest:
   is the written name **plus** an extension, never with its own
   extension replaced, so `./gone.ts` stays a real finding and
   `./tool-facts.generated` still resolves to `tool-facts.generated.ts`.
+- **A file read by the generic scan is not resolved unless asked.** The
+  scan is generous by construction, so resolving what it finds turns a
+  false positive into a `missing` finding — a claim — rather than a
+  quiet extra row. A typed extractor was handed a delimited token by a
+  parser and has earned the claim; a scan has not. `--resolve` on the
+  CLI and `resolveScanned` on the MCP tool ask for it. `--no-resolve`
+  still wins over both: asking for more resolution is not asking for
+  less.
+- **A colon-joined composite does not commit to being a path.** A
+  compose volume (`/etc/localtime:/etc/localtime:ro`), a `PATH` entry
+  (`/usr/bin:/usr/local/bin`), an `scp` target, a `file:line` reference:
+  each starts with `/` and so says it is a path, which would be evidence
+  enough for `missing` — about a string that was never one path. Found
+  by running the binary over a tree of compose files: five findings, all
+  five wrong. The value still resolves to `ok` if something by that whole
+  name is really there; only the unprovable negative is withheld. A
+  drive letter is the exception, being the one shape that is genuinely
+  one path with a colon in it.
 - **`missing` is a claim, and a claim needs evidence.** Extraction is
   generous by design: in an editor a human glances at the list and moves
   on. A resolver cannot be, so a value earns a `missing` verdict two
@@ -407,16 +490,28 @@ Exit 2 means the *question* was malformed — an unknown flag, an
 unreadable format name, a path that does not exist. It does not mean one
 file in fifty thousand was a PNG.
 
-A file that is not UTF-8 text, or that cannot be opened, is:
+**A binary file is not a skipped file.** A NUL byte in the first 8KB —
+ripgrep's heuristic, so the answer matches the walker's ignore rules —
+means the file was never a text candidate. It gets no report line at all
+and never moves the exit code. Before the walk widened to every
+extension it was never opened; reporting it now would make `--strict`
+exit 2 on every repository holding an image, which is every repository.
+It is still *counted*: the stderr summary ends `, 16 binary files
+skipped`, and the MCP audit carries a `binary` diagnostic, because
+coverage narrower than the tree that nobody was told about is the
+failure this tool exists to avoid.
+
+A file that looked like text and could not be read as it — a permission,
+invalid UTF-8 without a NUL — is:
 
 - named on stderr,
 - carried in the JSON report with a `skipped` diagnostic saying why,
 - and left out of the exit code.
 
 `--strict` turns any skipped file back into exit 2, for a pipeline that
-wants zero tolerance. What is never allowed is the third option: a file
-that silently vanishes from the report, which reads to whoever ran it as
-a file that was clean.
+wants zero tolerance. What is never allowed is the third option: a text
+file that silently vanishes from the report, which reads to whoever ran
+it as a file that was clean.
 
 ## The byte-order mark
 

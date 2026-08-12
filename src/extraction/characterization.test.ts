@@ -21,6 +21,8 @@ const FIXTURES: ReadonlyArray<{ fixture: string; languageId: string }> = [
 	{ fixture: 'paths.env', languageId: 'dotenv' },
 	{ fixture: 'paths.css', languageId: 'css' },
 	{ fixture: 'paths.html', languageId: 'html' },
+	{ fixture: 'paths.yml', languageId: 'yaml' },
+	{ fixture: 'paths.py', languageId: 'python' },
 ];
 
 describe('extraction characterization', () => {
@@ -35,10 +37,15 @@ describe('extraction characterization', () => {
 		});
 	}
 
-	it('unsupported language returns format error', async () => {
-		const result = await extractPaths('print("hi")', 'python');
-		expect(result.success).toBe(false);
-		expect(result.paths).toHaveLength(0);
-		expect(result.errors[0]?.category).toBe('format');
+	/**
+	 * Changed deliberately: a language with no typed extractor used to return a
+	 * format error and no paths. It is read by the generic scan now, which is
+	 * why `paths.py` is a fixture above rather than a refusal here.
+	 */
+	it('a language with no typed extractor is scanned, not refused', async () => {
+		const result = await extractPaths('open("./data/in.csv")', 'python');
+		expect(result.success).toBe(true);
+		expect(result.errors).toHaveLength(0);
+		expect(result.paths.map((path) => path.value)).toEqual(['./data/in.csv']);
 	});
 });

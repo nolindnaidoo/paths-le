@@ -2,7 +2,7 @@
 	"name": "paths-le",
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
-	"description": "Zero Hassle file path extraction from JavaScript, TypeScript, JSON, HTML, CSS, TOML, CSV, and ENV files",
+	"description": "Zero Hassle file path extraction from JavaScript, TypeScript, JSON, YAML, HTML, CSS, TOML, CSV and ENV files, and from any other file by text scan",
 	"version": "2.2.4",
 	"license": "MIT",
 	"author": {
@@ -56,7 +56,11 @@
 		"toml",
 		"csv",
 		"dotenv",
-		"env"
+		"env",
+		"yaml",
+		"yml",
+		"markdown",
+		"python"
 	],
 	"icon": "src/assets/images/icon.png",
 	"l10n": "./l10n",
@@ -75,7 +79,21 @@
 		"onLanguage:html",
 		"onLanguage:css",
 		"onLanguage:scss",
-		"onLanguage:less"
+		"onLanguage:less",
+		"onLanguage:yaml",
+		"onLanguage:markdown",
+		"onLanguage:xml",
+		"onLanguage:python",
+		"onLanguage:go",
+		"onLanguage:rust",
+		"onLanguage:java",
+		"onLanguage:shellscript",
+		"onLanguage:sql",
+		"onLanguage:dockerfile",
+		"onLanguage:makefile",
+		"onLanguage:ini",
+		"onLanguage:properties",
+		"onLanguage:plaintext"
 	],
 	"capabilities": {
 		"virtualWorkspaces": {
@@ -127,7 +145,7 @@
 			"editor/context": [
 				{
 					"command": "paths-le.extractPaths",
-					"when": "editorLangId =~ /^(javascript|javascriptreact|typescript|typescriptreact|json|jsonc|html|css|scss|less|csv|toml|dotenv|env)$/",
+					"when": "editorTextFocus",
 					"group": "1_modification@1"
 				}
 			],
@@ -189,7 +207,7 @@
 				},
 				"paths-le.safety.fileSizeWarnBytes": {
 					"type": "number",
-					"default": 1000000,
+					"default": 1e6,
 					"minimum": 1000,
 					"description": "%manifest.settings.safety.warn.file-size.desc%"
 				},
@@ -282,6 +300,7 @@
 	"dependencies": {
 		"@iarna/toml": "^2.2.5",
 		"csv-parse": "^7.0.2",
+		"js-yaml": "^5.2.3",
 		"jsonc-parser": "^3.3.1"
 	}
 }

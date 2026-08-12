@@ -10,7 +10,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use crate::audit::{self, AuditOptions, FileReport};
-use crate::extract::format::{SUPPORTED_FORMATS, resolve_format};
+use crate::extract::format::resolve_format;
 use crate::walk::{self, Target, WalkOptions};
 
 const USAGE: &str = "usage: paths-le [options] <file|dir>...
@@ -23,7 +23,11 @@ still points at anything. One JSON report per line on stdout, human
 summary on stderr.
 
 Options:
-  --no-resolve         report paths as written; skip the filesystem
+  --resolve            check the paths a generic scan found against the
+                       filesystem too. A file no format extractor reads
+                       is scanned as raw text, and those paths are
+                       reported as written unless this is given.
+  --no-resolve         report every path as written; skip the filesystem
                        entirely. No path can then be a finding.
   --root <dir>         the boundary a relative path may not escape
                        (default: the enclosing git repository, else the
@@ -31,7 +35,8 @@ Options:
   --deny-symlinks      treat a symlink as a finding too (it is
                        reported either way)
   --format <format>    force a format instead of inferring it from the
-                       file name; required with --stdin
+                       file name; required with --stdin. A name no
+                       extractor answers to is scanned generically.
   --strict             exit 2 if any file could not be read, rather than
                        reporting it and carrying on
   --stdin              read one document from stdin
@@ -47,8 +52,9 @@ For a run over many files, the exit code is the worst outcome in it.";
 /// USAGE by a test, because a flag documented and not implemented — or
 /// implemented and not documented — is the failure nobody notices until
 /// a user hits it.
-const FLAGS: [&str; 9] = [
+const FLAGS: [&str; 10] = [
     "--strict",
+    "--resolve",
     "--no-resolve",
     "--root",
     "--deny-symlinks",
@@ -68,6 +74,7 @@ struct Options {
     format: Option<&'static str>,
     root: Option<String>,
     resolve: bool,
+    resolve_scanned: bool,
     deny_symlinks: bool,
     walk: WalkOptions,
 }
@@ -101,8 +108,8 @@ pub(crate) fn run() -> ExitCode {
 
 fn execute(args: &[String]) -> Result<u8, String> {
     let options = parse(args)?;
-    let reports = if options.stdin {
-        vec![audit_stdin(&options)?]
+    let (reports, binary) = if options.stdin {
+        (vec![audit_stdin(&options)?], 0)
     } else {
         audit_inputs(&options)?
     };
@@ -115,21 +122,28 @@ fn execute(args: &[String]) -> Result<u8, String> {
     }
     drop(stdout);
 
-    summarise(&reports, options.resolve);
+    summarise(&reports, options.resolve, binary);
     Ok(audit::exit_code(&reports, options.strict))
 }
 
-fn audit_inputs(options: &Options) -> Result<Vec<FileReport>, String> {
+/// The reports, and how many files were binary and therefore never
+/// examined. The second number is not decoration: it is the difference
+/// between the tree and what the reports cover, and the summary says it
+/// out loud.
+fn audit_inputs(options: &Options) -> Result<(Vec<FileReport>, usize), String> {
     let targets = walk::collect(&options.inputs, &options.walk)?;
     let audit_options = AuditOptions {
         resolve: options.resolve,
+        resolve_scanned: options.resolve_scanned,
         root: choose_root(options.root.as_deref(), &options.inputs)?,
         deny_symlinks: options.deny_symlinks,
     };
-    Ok(targets
+    let reports: Vec<FileReport> = targets
         .iter()
-        .map(|target| audit::audit_file(target, &audit_options))
-        .collect())
+        .filter_map(|target| audit::audit_file(target, &audit_options))
+        .collect();
+    let binary = targets.len() - reports.len();
+    Ok((reports, binary))
 }
 
 fn audit_stdin(options: &Options) -> Result<FileReport, String> {
@@ -155,6 +169,7 @@ fn audit_stdin(options: &Options) -> Result<FileReport, String> {
     };
     let audit_options = AuditOptions {
         resolve: options.resolve,
+        resolve_scanned: options.resolve_scanned,
         root: choose_root(options.root.as_deref(), &[working])?,
         deny_symlinks: options.deny_symlinks,
     };
@@ -219,6 +234,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
         format: None,
         root: None,
         resolve: true,
+        resolve_scanned: false,
         deny_symlinks: false,
         walk: WalkOptions::default(),
     };
@@ -238,6 +254,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
         }
 
         match arg.as_str() {
+            "--resolve" => options.resolve_scanned = true,
             "--no-resolve" => options.resolve = false,
             "--deny-symlinks" => options.deny_symlinks = true,
             "--stdin" => options.stdin = true,
@@ -256,12 +273,12 @@ fn parse(args: &[String]) -> Result<Options, String> {
                 let value = rest
                     .next()
                     .ok_or_else(|| "--format needs a format".to_string())?;
-                let resolved = resolve_format(Some(value), None).ok_or_else(|| {
-                    format!(
-                        "{value} is not a format this understands; one of: {}",
-                        SUPPORTED_FORMATS.join(", ")
-                    )
-                })?;
+                // Not refused when it is unrecognised: there is a
+                // generic scan behind every name now, so `--format
+                // python` reads the file rather than turning it away.
+                // The report names the format it actually used, which is
+                // what a typo shows up as.
+                let resolved = resolve_format(Some(value), None);
                 options.format = Some(resolved);
                 options.walk.format = Some(resolved);
             }
@@ -281,7 +298,7 @@ fn parse(args: &[String]) -> Result<Options, String> {
 /// The human half. Every line here restates something already in the
 /// JSON — a summary that says more than the report would be a second
 /// source of truth.
-fn summarise(reports: &[FileReport], resolved: bool) {
+fn summarise(reports: &[FileReport], resolved: bool, binary: usize) {
     let mut stderr = std::io::stderr().lock();
     let mut findings = 0;
     let mut paths = 0;
@@ -320,9 +337,18 @@ fn summarise(reports: &[FileReport], resolved: bool) {
     } else {
         String::new()
     };
+    // Binary files are counted rather than listed. They are not
+    // findings and not failures, but a run that covered fewer files than
+    // the tree holds has to say so, or the reader reads the tally as
+    // coverage it does not have.
+    let unexamined = if binary > 0 {
+        format!(", {binary} binary files skipped")
+    } else {
+        String::new()
+    };
     let _ = writeln!(
         stderr,
-        "{} in {} — {tail}{noted}",
+        "{} in {} — {tail}{noted}{unexamined}",
         plural(paths, "path", "paths"),
         plural(files, "file", "files")
     );
@@ -384,15 +410,23 @@ mod tests {
         assert!(parse(&["--format".to_string()]).is_err());
     }
 
+    /// Changed deliberately in 0.2.0: an unrecognised `--format` used to
+    /// be refused. There is a generic scan behind every name now, so
+    /// naming one this does not know reads the file instead of turning
+    /// it away — and the report says `unknown`, which is where a typo
+    /// shows up.
     #[test]
-    fn an_unknown_format_is_refused_by_name() {
+    fn an_unknown_format_is_scanned_rather_than_refused() {
         let args = vec![
             "--format".to_string(),
             "python".to_string(),
             "x".to_string(),
         ];
-        let error = parse(&args).expect_err("a refusal");
-        assert!(error.contains("python"), "{error}");
+        let options = parse(&args).expect("accepted");
+        assert_eq!(
+            options.format,
+            Some(crate::extract::format::FALLBACK_FORMAT)
+        );
     }
 
     #[test]
@@ -411,6 +445,20 @@ mod tests {
         assert!(parse(&["x".to_string()]).expect("parses").resolve);
         let off = parse(&["--no-resolve".to_string(), "x".to_string()]).expect("parses");
         assert!(!off.resolve);
+    }
+
+    /// The asymmetry the generic scan needs: resolution is on by default
+    /// and the scan's share of it is not, so the two flags are not
+    /// opposites and the usage text has to say so.
+    #[test]
+    fn a_generic_scan_is_resolved_only_when_asked() {
+        assert!(!parse(&["x".to_string()]).expect("parses").resolve_scanned);
+        let on = parse(&["--resolve".to_string(), "x".to_string()]).expect("parses");
+        assert!(on.resolve_scanned);
+        assert!(
+            on.resolve,
+            "asking for more resolution is not asking for less"
+        );
     }
 
     #[test]

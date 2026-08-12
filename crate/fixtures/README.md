@@ -52,6 +52,20 @@ or is a bug, and is ported anyway because parity is the contract:
   out of the results.
 - **`documents/paths.html`** covers a multi-line tag and a `srcset` with
   two entries, each of which must get its own real position.
+- **`documents/paths.yml`** is a CI config, the document type the YAML
+  extractor exists for. It pins three things that look like bugs and are
+  not: `src/**/*.ts` is rejected whole because a glob carries forbidden
+  characters; `run: node ./scripts/build.js` yields nothing, because the
+  scalar is one delimited token containing spaces and JSON and TOML
+  answer the same way; and an alias (`*shared`) reports its anchor's
+  value a second time, at the anchor's position.
+- **`documents/paths.py`** pins exactly what the generic scan claims and
+  does not, `os.path` included. `os.path`, `os.path.join`, `np.array`
+  and `app.models` are all `name.ext` to the shared heuristic and none
+  is reported, because an undelimited run has to carry a path separator;
+  `"data.csv"` inside quotes is. It also pins that a path inside a
+  triple-quoted Python docstring is swallowed by the quote and not
+  claimed — the same answer on both sides, which is what matters.
 - **`documents/srcset-data-uri.html`** pins a quirk found by porting: a
   `data:` URI inside `srcset` is split on its own base64 commas before
   the scheme exclusion runs, so the tail is reported as a path. Both

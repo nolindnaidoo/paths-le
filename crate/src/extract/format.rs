@@ -6,6 +6,13 @@
 //! corpus. `resolve_format` widens: an agent or a shell sends `yml`,
 //! `.env`, `jsx` or `tsconfig.json`, and widening happens here rather
 //! than in the engine.
+//!
+//! **Nothing fails to resolve.** A name neither layer recognises lands
+//! on the generic scan rather than on a refusal, so a Python file, a
+//! Dockerfile and a `.md` are read instead of being turned away. What is
+//! lost is the typo guard — `--format jso` now scans generically instead
+//! of being refused — and what replaces it is the report, which names
+//! the format it actually used on every line.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum FileType {
@@ -17,6 +24,7 @@ pub(crate) enum FileType {
     Csv,
     Toml,
     Dotenv,
+    Yaml,
     Unknown,
 }
 
@@ -30,15 +38,20 @@ pub(crate) fn determine_file_type(language_id: &str) -> FileType {
         "json" | "jsonc" => FileType::Json,
         "html" => FileType::Html,
         "css" | "scss" | "less" => FileType::Css,
+        "yaml" => FileType::Yaml,
         _ => FileType::Unknown,
     }
 }
 
-/// The formats a caller can name, for the MCP tool schema's enum and the
-/// CLI's `--format` error message. Byte-identical to the npm server's
-/// `SUPPORTED_FORMATS`, in the same order, because both appear in a
-/// message the corpus pins.
-pub(crate) const SUPPORTED_FORMATS: [&str; 8] = [
+/// The formats a caller can name, for the MCP tool schema's enum.
+/// Byte-identical to the npm server's `SUPPORTED_FORMATS`, in the same
+/// order, because both appear in a message the corpus pins.
+///
+/// `markdown` is here and `xml` is not, even though both are read by the
+/// generic scan: `markdown` is a format an agent asks for by name, and
+/// the enum is what tells it the ask is understood. Anything absent from
+/// this list still resolves — the enum advertises, it does not gate.
+pub(crate) const SUPPORTED_FORMATS: [&str; 10] = [
     "csv",
     "toml",
     "dotenv",
@@ -47,11 +60,29 @@ pub(crate) const SUPPORTED_FORMATS: [&str; 8] = [
     "json",
     "html",
     "css",
+    "yaml",
+    "markdown",
 ];
+
+/// What the engine uses when it recognises nothing.
+///
+/// **`unknown`, not `fallback`.** The extension's `determineFileType`
+/// already answers `unknown` for a language it has no extractor for, and
+/// the name is user-visible: it is the `fileType` every MCP answer
+/// carries and the `format` every audit report carries, so a second name
+/// here would be the two frontends disagreeing on a field in plain
+/// sight.
+pub(crate) const FALLBACK_FORMAT: &str = "unknown";
 
 /// Every language id the engine understands, keyed by what a caller
 /// might send. Mirrors `src/mcp/fileType.ts`.
-const ALIASES: [(&str, &str); 26] = [
+///
+/// `markdown` and `xml` map to themselves and then to the generic scan.
+/// They earn a row because the row is what puts the real name in the
+/// report — a `.md` file reads as `markdown` rather than as `unknown`,
+/// which is the difference between "scanned generically" and "not
+/// recognised at all".
+const ALIASES: [(&str, &str); 31] = [
     ("csv", "csv"),
     ("tsv", "csv"),
     ("toml", "toml"),
@@ -78,6 +109,11 @@ const ALIASES: [(&str, &str); 26] = [
     ("scss", "scss"),
     ("sass", "scss"),
     ("less", "less"),
+    ("yaml", "yaml"),
+    ("yml", "yaml"),
+    ("markdown", "markdown"),
+    ("md", "markdown"),
+    ("xml", "xml"),
 ];
 
 fn normalise(value: &str) -> String {
@@ -92,28 +128,34 @@ fn alias(key: &str) -> Option<&'static str> {
         .map(|(_, to)| *to)
 }
 
-/// Resolve a language id from an explicit format, else from a filename.
+/// Resolve a language id from an explicit format, else from a filename,
+/// else the generic scan.
 ///
-/// Returns `None` rather than guessing: a wrong format extracts nothing
-/// and looks like a document with no paths, which is the least
-/// debuggable outcome for a caller.
-pub(crate) fn resolve_format(format: Option<&str>, filename: Option<&str>) -> Option<&'static str> {
+/// A caller who knows nothing about a document still gets its paths,
+/// which is the difference between a tool that can be pointed at a
+/// repository and one that has to have the repository described to it
+/// first.
+pub(crate) fn resolve_format(format: Option<&str>, filename: Option<&str>) -> &'static str {
     if let Some(format) = format
         && let Some(direct) = alias(&normalise(format))
     {
-        return Some(direct);
+        return direct;
     }
 
-    let filename = filename?;
+    let Some(filename) = filename else {
+        return FALLBACK_FORMAT;
+    };
     // A dotfile like `.env` has no extension to split on; its whole name
     // is the type, which is exactly the case a caller sends most often.
     let bare = normalise(filename);
     if let Some(whole) = alias(bare.strip_prefix('.').unwrap_or(&bare)) {
-        return Some(whole);
+        return whole;
     }
 
-    let extension = filename.rsplit_once('.').map(|(_, ext)| ext)?;
-    alias(&normalise(extension))
+    filename
+        .rsplit_once('.')
+        .and_then(|(_, extension)| alias(&normalise(extension)))
+        .unwrap_or(FALLBACK_FORMAT)
 }
 
 #[cfg(test)]
@@ -127,58 +169,87 @@ mod tests {
         assert_eq!(determine_file_type("typescriptreact"), FileType::Typescript);
         assert_eq!(determine_file_type("scss"), FileType::Css);
         assert_eq!(determine_file_type("env"), FileType::Dotenv);
+        assert_eq!(determine_file_type("yaml"), FileType::Yaml);
         assert_eq!(determine_file_type("python"), FileType::Unknown);
     }
 
     #[test]
     fn an_explicit_format_wins() {
-        assert_eq!(resolve_format(Some("tsx"), None), Some("typescript"));
-        assert_eq!(resolve_format(Some(".TOML"), None), Some("toml"));
-        assert_eq!(resolve_format(Some(" js "), None), Some("javascript"));
+        assert_eq!(resolve_format(Some("tsx"), None), "typescript");
+        assert_eq!(resolve_format(Some(".TOML"), None), "toml");
+        assert_eq!(resolve_format(Some(" js "), None), "javascript");
     }
 
     #[test]
     fn a_filename_resolves_by_extension() {
-        assert_eq!(resolve_format(None, Some("tsconfig.json")), Some("json"));
-        assert_eq!(resolve_format(None, Some("a/b/style.SCSS")), Some("scss"));
+        assert_eq!(resolve_format(None, Some("tsconfig.json")), "json");
+        assert_eq!(resolve_format(None, Some("a/b/style.SCSS")), "scss");
+    }
+
+    /// The highest-value addition: every CI config, Kubernetes manifest
+    /// and compose file in a repository is one of these two extensions.
+    #[test]
+    fn yaml_resolves_under_both_spellings() {
+        assert_eq!(resolve_format(None, Some("ci.yml")), "yaml");
+        assert_eq!(resolve_format(None, Some("deployment.yaml")), "yaml");
+        assert_eq!(resolve_format(Some("yml"), None), "yaml");
     }
 
     /// The case a caller sends most often, and the one an extension
     /// split would get wrong.
     #[test]
     fn a_dotfile_resolves_by_its_whole_name() {
-        assert_eq!(resolve_format(None, Some(".env")), Some("dotenv"));
-        assert_eq!(resolve_format(None, Some("env")), Some("dotenv"));
+        assert_eq!(resolve_format(None, Some(".env")), "dotenv");
+        assert_eq!(resolve_format(None, Some("env")), "dotenv");
     }
 
     #[test]
     fn an_unrecognised_format_falls_through_to_the_filename() {
-        assert_eq!(resolve_format(Some("python"), Some("a.json")), Some("json"));
+        assert_eq!(resolve_format(Some("python"), Some("a.json")), "json");
     }
 
+    /// Not a refusal and not an empty result — the generic scan. This is
+    /// the property the whole file-type widening rests on.
     #[test]
-    fn nothing_recognisable_returns_none() {
-        assert_eq!(resolve_format(Some("python"), None), None);
-        assert_eq!(resolve_format(None, Some("script.py")), None);
-        assert_eq!(resolve_format(None, Some("noextension")), None);
-        assert_eq!(resolve_format(None, None), None);
+    fn nothing_recognisable_falls_back() {
+        for name in ["python", "rust", "", "jso"] {
+            assert_eq!(resolve_format(Some(name), None), FALLBACK_FORMAT, "{name}");
+        }
+        assert_eq!(resolve_format(None, Some("script.py")), FALLBACK_FORMAT);
+        assert_eq!(resolve_format(None, Some("Makefile")), FALLBACK_FORMAT);
+        assert_eq!(resolve_format(None, None), FALLBACK_FORMAT);
     }
 
-    /// Every format the schema advertises must actually resolve, or the
-    /// enum promises something the engine refuses.
+    /// The fallback name is itself a language id the engine accepts, or
+    /// a report's `format` field would name something that cannot be
+    /// fed back in.
     #[test]
-    fn every_advertised_format_resolves() {
+    fn the_fallback_name_round_trips() {
+        assert_eq!(determine_file_type(FALLBACK_FORMAT), FileType::Unknown);
+    }
+
+    /// Every format the schema advertises must actually resolve to
+    /// itself, or the enum promises something the engine reads
+    /// differently.
+    #[test]
+    fn every_advertised_format_resolves_to_itself() {
         for format in SUPPORTED_FORMATS {
-            assert!(resolve_format(Some(format), None).is_some(), "{format}");
+            assert_eq!(resolve_format(Some(format), None), format, "{format}");
         }
     }
 
-    /// Every alias must land on a language id the engine understands,
-    /// or a caller gets an empty result for a format that was accepted.
+    /// Every alias must land on a language id the engine dispatches on —
+    /// a typed extractor, or the generic scan named as such. An alias
+    /// landing anywhere else would accept a format and then read the
+    /// document as something it is not.
     #[test]
-    fn every_alias_lands_on_a_known_file_type() {
+    fn every_alias_lands_on_a_language_the_engine_dispatches() {
         for (from, to) in ALIASES {
-            assert_ne!(determine_file_type(to), FileType::Unknown, "{from} -> {to}");
+            let generic = determine_file_type(to) == FileType::Unknown;
+            assert!(
+                !generic || matches!(to, "markdown" | "xml"),
+                "{from} -> {to} is neither typed nor a declared generic scan"
+            );
         }
     }
 }

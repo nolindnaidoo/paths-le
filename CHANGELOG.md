@@ -13,6 +13,36 @@ separate product on its own cadence and keeps its own
 
 ### Added
 
+- **A YAML extractor** (`yaml`), reading path-like scalar values and keys
+  across every document in a file. Every CI config, Kubernetes manifest
+  and compose file was previously a document this extension refused.
+
+- **Every other language is now read too**, by a text scan:
+  Python, Go, Markdown, XML, a Dockerfile, a Makefile. It makes the
+  delimited tokens raw text does not have — a quoted run gets the whole
+  path heuristic, and an undelimited run has to carry a path separator.
+  That second rule is what keeps `os.path`, `np.array` and `logger.info`
+  out of the results: an extension and an attribute are the same shape,
+  and only the quoting tells them apart.
+
+### Changed
+
+- **The unsupported-format notice is gone.** `Path extraction is not
+  supported for {languageId} files` was the honest answer while there was
+  nothing to fall through to; the command now extracts from whatever
+  document is open. The `format` error category went with it, having
+  existed only for that message.
+
+- **`extract_paths` no longer refuses a call with neither `format` nor
+  `filename`.** It scans the content and answers `fileType: "unknown"`.
+  `resolveFormat` returns that instead of `null`, and `SUPPORTED_FORMATS`
+  gains `yaml` and `markdown`.
+
+- The context menu entry is no longer gated on a list of language IDs,
+  and `activationEvents` covers the languages the new formats bring.
+
+### Added
+
 - A **Rust CLI and MCP server**, in [`crate/`](crate/README.md), published
   to crates.io as [`paths-le`](https://crates.io/crates/paths-le). It runs
   the same extraction from a terminal and adds what an editor cannot do:

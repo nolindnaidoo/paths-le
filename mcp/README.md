@@ -91,8 +91,8 @@ If that prints the tool name, the server works.
 | argument | type | |
 |---|---|---|
 | `content` | string | **required.** The text to scan. |
-| `format` | string | One of `csv`, `toml`, `dotenv`, `javascript`, `typescript`, `json`, `html`, `css`. Common extensions and aliases (`ts`, `tsx`, `jsonc`, `scss`, `env`…) are accepted. Required unless `filename` is given. |
-| `filename` | string | Used to infer `format` when it is absent — `tsconfig.json` resolves to `json`, and `.env` to `dotenv`. |
+| `format` | string | One of `csv`, `toml`, `dotenv`, `javascript`, `typescript`, `json`, `html`, `css`, `yaml`, `markdown`. Common extensions and aliases (`ts`, `tsx`, `jsonc`, `scss`, `env`, `yml`…) are accepted. Optional: with neither this nor `filename`, the content is scanned as text. |
+| `filename` | string | Used to infer `format` when it is absent — `tsconfig.json` resolves to `json`, `.env` to `dotenv`, `ci.yml` to `yaml`. A name that resolves to nothing gets the text scan. |
 | `dedupe` | boolean | Collapse repeats to the first occurrence. Default `false`. |
 | `maxResults` | number | Default `500`, ceiling `5000`. |
 

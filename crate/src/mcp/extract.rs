@@ -25,10 +25,13 @@ pub(crate) fn definition() -> Value {
     json!({
         "name": "extract_paths",
         "description": "Extract every file and directory path from a document, with its kind and \
-                        1-based line and column. Supports JSON, TOML, CSV, dotenv, JavaScript, \
-                        TypeScript, HTML and CSS. Each path is classified as file, relative, \
-                        absolute or url. Paths are reported as written — nothing is resolved \
-                        against a workspace or the filesystem.",
+                        1-based line and column. Reads JSON, YAML, TOML, CSV, dotenv, \
+                        JavaScript, TypeScript, HTML and CSS with a parser for that format, and \
+                        anything else — Python, Go, Markdown, a Dockerfile — by scanning its \
+                        text, which finds paths that carry a separator or a quoted filename. \
+                        Each path is classified as file, relative, absolute or url. Paths are \
+                        reported as written — nothing is resolved against a workspace or the \
+                        filesystem.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -36,8 +39,9 @@ pub(crate) fn definition() -> Value {
                 "format": {
                     "type": "string",
                     "enum": SUPPORTED_FORMATS,
-                    "description": "Document format. Provide this or `filename`. Common \
-                                    extensions and aliases are accepted.",
+                    "description": "Document format. Common extensions and aliases are \
+                                    accepted. Omit it and `filename` to scan the text \
+                                    generically.",
                 },
                 "filename": {
                     "type": "string",
@@ -78,15 +82,11 @@ pub(crate) fn run(arguments: &Value) -> Result<Value, String> {
     let format = arguments.get("format").and_then(Value::as_str);
     let filename = arguments.get("filename").and_then(Value::as_str);
 
-    // Requiring one of the two up front gives a message naming the
-    // problem, instead of the engine returning an empty result for an
-    // unknown language.
-    let language_id = resolve_format(format, filename).ok_or_else(|| {
-        format!(
-            "Provide `format` (one of: {}) or a `filename` with a recognised extension.",
-            SUPPORTED_FORMATS.join(", ")
-        )
-    })?;
+    // Neither one given is no longer a refusal. It used to be, because
+    // the engine had nothing to do with a document it could not name;
+    // now the answer is the generic scan, and `fileType` in the result
+    // says which one ran.
+    let language_id = resolve_format(format, filename);
 
     let result = extract::extract(content, language_id);
 

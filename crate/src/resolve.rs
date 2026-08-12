@@ -235,6 +235,9 @@ pub(crate) fn resolve(
 /// missing. That shape is also how bare module specifiers are written,
 /// which this tool refuses to resolve for the same reason.
 fn commits_to_being_a_path(value: &str) -> bool {
+    if is_composite(value) {
+        return false;
+    }
     if value.starts_with("./")
         || value.starts_with("../")
         || value.starts_with('/')
@@ -249,6 +252,34 @@ fn commits_to_being_a_path(value: &str) -> bool {
     // `png` no, `trailing.` no.
     last.rsplit_once('.')
         .is_some_and(|(stem, extension)| !stem.is_empty() && !extension.is_empty())
+}
+
+/// Whether a colon makes the value several things joined, rather than
+/// one path.
+///
+/// A colon is the separator everything on Unix reaches for once it needs
+/// to write two paths in one string: a compose volume
+/// (`/etc/localtime:/etc/localtime:ro`), a `PATH` entry
+/// (`/usr/bin:/usr/local/bin`), an `scp` target, a `file:line` reference.
+/// Each of those starts with `/` and so *says* it is a path, which is
+/// enough evidence for `missing` — and the claim is then false about a
+/// string that was never one path.
+///
+/// Found by running the binary over a repository of compose files: five
+/// findings, all five wrong, in the format the YAML extractor was added
+/// for. The value is still reported and still resolves to `ok` if
+/// something by that whole name is really there; only the unprovable
+/// negative is withheld, which is the same trade the rule above makes.
+///
+/// The drive letter is the exception it has to make room for: `C:\Temp`
+/// is one path with a colon in it, and it is the only shape that is.
+fn is_composite(value: &str) -> bool {
+    let tail = if is_windows_path(value) {
+        &value[2..]
+    } else {
+        value
+    };
+    tail.contains(':')
 }
 
 /// Extensions a module specifier written without one can resolve to.
@@ -707,6 +738,40 @@ mod tests {
         ] {
             assert!(!commits_to_being_a_path(not), "{not}");
         }
+    }
+
+    /// A regression, found by running the binary over a tree of compose
+    /// files rather than by reading the code: every one of the five new
+    /// findings the YAML extractor produced was a volume mapping, and
+    /// every one of them was wrong. A composite is several things joined
+    /// by a colon, so this declines to claim it is one missing path.
+    #[test]
+    fn a_colon_joined_composite_does_not_commit_to_being_a_path() {
+        for composite in [
+            "/etc/localtime:/etc/localtime:ro",
+            "/var/run/docker.sock:/var/run/docker.sock",
+            "./stack.conf:/redis-stack.conf:ro",
+            "/usr/bin:/usr/local/bin",
+            "src/app.ts:42",
+        ] {
+            assert!(!commits_to_being_a_path(composite), "{composite}");
+        }
+        // The one shape that is genuinely one path with a colon in it.
+        assert!(commits_to_being_a_path(r"C:\Temp\out.txt"));
+        assert!(commits_to_being_a_path("C:/Temp/out.txt"));
+    }
+
+    /// Withholding the negative is not withholding the answer: a
+    /// composite that really names something still resolves.
+    #[test]
+    fn a_composite_that_is_actually_there_still_resolves() {
+        let tree = TempTree::new("resolve-composite");
+        tree.write("a:b.txt", "");
+        let resolution = resolve_in(&tree, "./a:b.txt");
+        assert_eq!(resolution.verdict, Verdict::Ok);
+
+        let absent = resolve_in(&tree, "./nope:also-nope.txt");
+        assert_eq!(absent.verdict, Verdict::Unresolved);
     }
 
     /// Canonicalisation is the audit; a link is a fact until asked

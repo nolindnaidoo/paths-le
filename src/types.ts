@@ -5,7 +5,13 @@ export interface ExtractionResult {
 }
 
 export interface ParseError {
-	readonly category: 'parsing' | 'format';
+	/**
+	 * There was a `format` category too, for one message: the
+	 * unsupported-format refusal. The generic scan replaced that refusal, so
+	 * nothing produces it on either frontend any more — and a variant no code
+	 * path can reach is a claim the code does not back.
+	 */
+	readonly category: 'parsing';
 	readonly severity: 'info' | 'warning' | 'error';
 	readonly message: string;
 	readonly context?: string;
@@ -36,6 +42,8 @@ export type FileType =
 	| 'csv'
 	| 'toml'
 	| 'dotenv'
+	| 'yaml'
+	/** Read by the generic text scan rather than by a parser. */
 	| 'unknown';
 
 export interface PathResolutionConfig {

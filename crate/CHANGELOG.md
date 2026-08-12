@@ -9,6 +9,74 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A YAML extractor.** Every CI config, Kubernetes manifest and compose
+  file in a repository was previously invisible to this tool. `saphyr`
+  reads it here where `js-yaml` reads it in the extension, and positions
+  come from a forward-moving text search rather than from either parser
+  — the same design TOML's positions use, and the reason the two
+  frontends can agree without `js-yaml` exposing offsets it does not
+  have. Keys count as well as values.
+
+- **A generic text scan for every other format.** A document the engine
+  has no extractor for is read rather than refused: Python, Go,
+  Markdown, XML, a Dockerfile, a Makefile. Measured over two real
+  repositories, the paths found went from 1,930 to 6,598 and from 487 to
+  6,555.
+
+  The scan makes the delimited tokens raw text does not have. A quoted
+  run gets the whole path heuristic; an undelimited run must carry a
+  path separator, which is what keeps `os.path`, `np.array` and
+  `logger.info` out of the results — an extension and an attribute are
+  the same shape, and only the quoting tells them apart.
+  `fixtures/documents/paths.py` pins exactly what it claims and does not.
+
+- **`--resolve`**, and `resolveScanned` on the MCP audit tool. A file
+  read by the generic scan has its paths reported as written unless one
+  of these is given, because a scan is generous by construction and
+  resolving what it finds would turn a false positive into a `missing`
+  finding rather than a quiet extra row. `--no-resolve` still wins over
+  both.
+
+### Changed
+
+- **Every file in a tree is now examined, not just the recognised
+  formats**, and naming a file whose extension means nothing is no
+  longer refused — naming a file is an instruction.
+
+- **`--format` accepts any name.** One this engine does not recognise
+  reads the document with the generic scan instead of refusing it. The
+  report's `format` field names what was actually used, which is where a
+  typo shows up.
+
+- **`extract_paths` no longer refuses a call with neither `format` nor
+  `filename`**, on either server. It scans the content and answers
+  `fileType: "unknown"`. Both corpus cases that pinned the refusal now
+  pin the scan.
+
+- **A binary file produces no report line at all.** A NUL byte in the
+  first 8KB — ripgrep's heuristic — means the file was never a text
+  candidate, and before the walk widened it was never opened. Reporting
+  each one as `skipped` made `--strict` exit 2 on every repository
+  holding an image. They are counted instead: the stderr summary ends
+  `, 16 binary files skipped`, and the MCP audit carries a `binary`
+  diagnostic. A file that looked like text and could not be read as it
+  keeps its named `skipped` diagnostic and still fails `--strict`.
+
+- **The `format` error category is gone**, having existed for the one
+  message the generic scan replaced.
+
+### Fixed
+
+- **A colon-joined composite is no longer claimed to be a missing
+  path.** A compose volume (`/etc/localtime:/etc/localtime:ro`), a
+  `PATH` entry, an `scp` target and a `file:line` reference all start
+  with `/` and so had evidence enough for a `missing` verdict, about a
+  string that was never one path. Found by running the binary over a
+  tree of compose files: five findings, all five wrong. The value still
+  resolves to `ok` when something by that whole name is really there.
+
 ### Fixed
 
 - **Every absolute path was `non-canonical` on Windows.** The

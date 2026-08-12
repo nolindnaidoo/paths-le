@@ -101,16 +101,37 @@ filesystem about them, and that is all it ever does.
 
 ## What it reads
 
-Eight formats, the same eight the extension supports: **JSON/JSONC,
-TOML, CSV, dotenv, JavaScript, TypeScript, HTML, CSS/SCSS/LESS.** A
-directory is walked the way ripgrep walks one — `.gitignore` honoured,
+**Every text file in the tree.** Nine formats have a parser behind
+them — **JSON/JSONC, YAML, TOML, CSV, dotenv, JavaScript, TypeScript,
+HTML, CSS/SCSS/LESS** — and everything else is read by a generic text
+scan: Python, Go, Markdown, XML, a Dockerfile, a Makefile.
+
+A directory is walked the way ripgrep walks one — `.gitignore` honoured,
 hidden files skipped — so what it looks at is the answer you already have
 in your head. A file named explicitly is always read, ignore rules
 included.
 
-Files in other formats are skipped silently when they turn up in a walk,
-and refused loudly when you name one: a repository is full of files this
-has nothing to say about, and naming one means you expected otherwise.
+The scan claims two shapes and nothing else: a **quoted** token, which
+gets the full path heuristic, and an **undelimited** run that carries a
+path separator. That second rule is why `os.path` in a Python file is
+not reported as a file — an extension and an attribute are the same
+shape, and only the quoting tells them apart. Because a scan is generous,
+**its paths are not resolved unless you pass `--resolve`**: a false
+positive would otherwise arrive as a `missing` finding rather than a
+quiet extra row.
+
+A binary file — a NUL byte in the first 8KB, ripgrep's own test — is
+skipped with no report line and counted in the summary. A file that
+looked like text and could not be read as it is named, and `--strict`
+fails the run on it.
+
+Reading every text file means reading the ones you may not want: a
+committed lockfile is text, and its integrity hashes and version ranges
+match the path heuristic the same way `example.com` does. None of them
+can become a finding — the resolver declines to claim about a value that
+does not commit to being a path — but they are rows. The walker is
+ripgrep's, so an `.ignore` file naming `bun.lock` is the lever, and it
+is the same lever you already use for `rg`.
 
 ## The verdicts
 
@@ -168,7 +189,8 @@ shape is also how bare module specifiers are written.
 ## Options
 
 ```
---no-resolve         report paths as written; skip the filesystem entirely
+--resolve            check what a generic scan found against the filesystem too
+--no-resolve         report every path as written; skip the filesystem entirely
 --root <dir>         the boundary a relative path may not escape
                      (default: the enclosing git repository)
 --deny-symlinks      treat a symlink as a finding too

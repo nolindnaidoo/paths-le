@@ -96,23 +96,22 @@ export function registerExtractCommand(
 	context.subscriptions.push(command);
 }
 
+/**
+ * The unsupported-format branch that used to live here is gone with the
+ * refusal it reported: every language is read now, so a document the engine
+ * cannot name is scanned rather than declined. What remains is the parse
+ * failure, which is a real error and shown as one.
+ */
 function handleExtractionFailure(
 	result: { success: boolean; errors: readonly unknown[] },
 	deps: Readonly<{ notifier: Notifier }>,
 ): void {
-	const firstError = result.errors[0] as
-		| { category?: string; message?: string }
-		| undefined;
+	const firstError = result.errors[0] as { message?: string } | undefined;
 
 	if (!firstError) {
 		deps.notifier.showError(
 			vscode.l10n.t('Failed to extract paths: Unknown error'),
 		);
-		return;
-	}
-
-	if (firstError.category === 'format') {
-		deps.notifier.showInfo(firstError.message ?? 'Unsupported format');
 		return;
 	}
 
