@@ -185,5 +185,5 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
-[0.2.0]: https://github.com/nolindnaidoo/paths-le/releases/tag/crate-v0.2.0
-[0.1.0]: https://github.com/nolindnaidoo/paths-le/releases/tag/crate-v0.1.0
+[0.2.0]: https://crates.io/crates/paths-le/0.2.0
+[0.1.0]: https://crates.io/crates/paths-le/0.1.0
