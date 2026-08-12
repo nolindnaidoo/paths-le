@@ -218,10 +218,27 @@ CI additionally builds on macOS, Windows and Linux, checks the Rust 1.88
 minimum version, runs `cargo audit`, the no-inline-`#[allow]` and
 no-filesystem-in-`extract/` policy jobs, the per-module coverage floor,
 the gated scenarios, and parity — including on extension-side edits to
-`src/extraction/**`, so neither frontend can drift green. A change is
-not done because it compiles; it is done when it is tested, linted,
-documented where behavior changed (README / CHANGELOG / SPEC / this
-file), and honest — claims in docs must match the code.
+`src/extraction/**`, so neither frontend can drift green.
+
+Six further jobs exist because something got past all of the above by
+hand, and each one is runnable locally:
+
+| job | what it holds | locally |
+|---|---|---|
+| `hazards` | A tree built at runtime — BOM, CRLF, NUL, invalid UTF-8, a FIFO, a symlink loop, a mode-000 file, a path over 260 characters. No panic, no hang, exit 0/1/2, never a signal. A platform that cannot express a case says so by name. | `cargo test --test hazards -- --nocapture` |
+| `platform` | Separators forward in every reported path, a walk that survives a reserved device name, no file reported twice on a case-folding filesystem, a stdin refusal judged by its exit code. The suite runs under `TZ=UTC` and with `TZ` unset. | `cargo test --test platform -- --nocapture` |
+| `differential` | Several hundred generated `extract_paths` calls through **both** servers, byte-identical. Scoped to the shared tool: the two *surfaces* are allowed to differ (SPEC.md, "Deliberate divergences"). | `bun ../scripts/check-extraction-differential.ts` |
+| `fuzz` | 60 s per target over `is_path_like`, `classify_path_type`, `resolve_format` and the extractors. In-crate rather than `cargo-fuzz`: there is no library target, and adding one would make `extract/` public API. | `PATHS_LE_FUZZ_SECONDS=20 cargo test --bin paths-le fuzz::` |
+| `budget` | A 500-file tree inside 10× a recorded local measurement, and four times the tree inside six times the clock. | `PATHS_LE_BUDGET=1 cargo test --release --test budget -- --nocapture` |
+| `coverage-matrix` | One file per alias-table entry plus a dozen extensions it does not know: every one opened and reported under the format that read it. Fails on a `SUPPORTED_FORMATS` entry with no corpus case. | `cargo test --test coverage_matrix -- --nocapture` |
+
+The alias mapping `coverage-matrix` checks is read out of
+`src/extract/format.rs` rather than copied — a copy is a second source of
+truth that agrees until somebody edits one of them.
+
+A change is not done because it compiles; it is done when it is tested,
+linted, documented where behavior changed (README / CHANGELOG / SPEC /
+this file), and honest — claims in docs must match the code.
 
 ## Commits and pull requests
 

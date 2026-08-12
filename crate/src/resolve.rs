@@ -390,8 +390,41 @@ fn lexical_normalise(path: &StdPath) -> PathBuf {
     out
 }
 
-fn display(path: &StdPath) -> String {
-    path.to_string_lossy().into_owned()
+/// A path as the report writes it: **separators forward, on every
+/// platform**.
+///
+/// Windows spells them `\`, and `canonicalize` hands back a `\\?\`
+/// verbatim prefix on top. Either one puts a spelling in the report that
+/// the same report taken on another machine cannot be diffed against,
+/// and the paths this tool extracts are written with `/` in the source
+/// it read them from — so a Windows run would answer in a different
+/// alphabet from the document it was answering about.
+///
+/// The rewrite is Windows-only, deliberately: `\` is a legal character
+/// in a Unix filename, and rewriting it there would rename the file in
+/// the report.
+pub(crate) fn display(path: &StdPath) -> String {
+    let rendered = path.to_string_lossy();
+    if cfg!(windows) {
+        return forward_slashes(&rendered);
+    }
+    rendered.into_owned()
+}
+
+/// The Windows half of `display`, written as a pure string function so
+/// that every platform compiles and tests it. A branch only Windows can
+/// execute is a branch only Windows CI can catch.
+fn forward_slashes(rendered: &str) -> String {
+    let bare = match rendered.strip_prefix(r"\\?\UNC\") {
+        // `\\?\UNC\server\share` is `\\server\share` written the long
+        // way, so dropping the whole prefix would lose the host.
+        Some(tail) => format!(r"\\{tail}"),
+        None => rendered
+            .strip_prefix(r"\\?\")
+            .unwrap_or(rendered)
+            .to_string(),
+    };
+    bare.replace('\\', "/")
 }
 
 #[cfg(test)]
@@ -401,6 +434,33 @@ mod tests {
 
     fn resolve_in(tree: &TempTree, value: &str) -> Resolution {
         resolve(value, PathType::Relative, tree.path(), tree.path())
+    }
+
+    /// The Windows rewrite, tested on every platform. envsync-le shipped
+    /// `\` in its reports for a release because the only machine that
+    /// could see the bug was the only machine nothing asserted on.
+    #[test]
+    fn a_reported_path_spells_its_separators_forward() {
+        assert_eq!(
+            forward_slashes(r"C:\Users\me\src\app.ts"),
+            "C:/Users/me/src/app.ts"
+        );
+        assert_eq!(forward_slashes(r"\\?\C:\a\b.txt"), "C:/a/b.txt");
+        assert_eq!(
+            forward_slashes(r"\\?\UNC\host\share\a.txt"),
+            "//host/share/a.txt"
+        );
+        assert_eq!(forward_slashes(r"\\host\share\a.txt"), "//host/share/a.txt");
+        assert_eq!(forward_slashes("already/forward.ts"), "already/forward.ts");
+    }
+
+    /// A Unix filename may legally contain a backslash, so the rewrite
+    /// must not run there — renaming a file in the report would be worse
+    /// than an unfamiliar separator.
+    #[cfg(unix)]
+    #[test]
+    fn a_backslash_in_a_unix_filename_survives_the_report() {
+        assert_eq!(display(StdPath::new(r"/tmp/od\d.txt")), r"/tmp/od\d.txt");
     }
 
     #[test]

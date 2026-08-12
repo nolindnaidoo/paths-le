@@ -129,9 +129,13 @@ Reading every text file means reading the ones you may not want: a
 committed lockfile is text, and its integrity hashes and version ranges
 match the path heuristic the same way `example.com` does. None of them
 can become a finding — the resolver declines to claim about a value that
-does not commit to being a path — but they are rows. The walker is
-ripgrep's, so an `.ignore` file naming `bun.lock` is the lever, and it
-is the same lever you already use for `rg`.
+does not commit to being a path — but they are rows, and there are a lot
+of them. **On the 501-file tree the `budget` job scans, one lockfile
+accounts for 2,000 of the 3,000 paths reported — two thirds of the
+output from one file.** A real TypeScript application measured the same
+shape: 5,367 of 6,555. The walker is ripgrep's, so an `.ignore` file
+naming `bun.lock` is the lever, and it is the same lever you already use
+for `rg`.
 
 ## The verdicts
 

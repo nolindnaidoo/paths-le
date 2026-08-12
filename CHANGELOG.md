@@ -25,6 +25,12 @@ separate product on its own cadence and keeps its own
   out of the results: an extension and an attribute are the same shape,
   and only the quoting tells them apart.
 
+- **A markdown document in the shared corpus**
+  (`crate/fixtures/documents/paths.md`). `markdown` is advertised in the
+  `extract_paths` schema and nothing held the two servers to reading it
+  the same way; now a case does. No behaviour changed — this pins what
+  both already answer.
+
 ### Changed
 
 - **The unsupported-format notice is gone.** `Path extraction is not

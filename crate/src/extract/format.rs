@@ -116,8 +116,13 @@ const ALIASES: [(&str, &str); 31] = [
     ("xml", "xml"),
 ];
 
+/// `value.trim().toLowerCase().replace(/^\./, '')`, and the trim is
+/// JavaScript's on purpose: Rust's strips U+0085 and keeps U+FEFF, and
+/// the extension's does the opposite. A format name arrives from an
+/// agent or a shell, so a stray invisible character around it is exactly
+/// the input that would have the two servers resolve one name two ways.
 fn normalise(value: &str) -> String {
-    let trimmed = value.trim().to_lowercase();
+    let trimmed = super::js::trim(value).to_lowercase();
     trimmed.strip_prefix('.').unwrap_or(&trimmed).to_string()
 }
 
@@ -178,6 +183,20 @@ mod tests {
         assert_eq!(resolve_format(Some("tsx"), None), "typescript");
         assert_eq!(resolve_format(Some(".TOML"), None), "toml");
         assert_eq!(resolve_format(Some(" js "), None), "javascript");
+    }
+
+    /// A format name is trimmed with JavaScript's whitespace set, not
+    /// Rust's. The two disagree about exactly two characters, and a name
+    /// wrapped in one of them would otherwise resolve on one server and
+    /// fall through to the generic scan on the other.
+    #[test]
+    fn a_format_name_is_trimmed_with_javascripts_whitespace() {
+        assert_eq!(resolve_format(Some("\u{feff}json\u{feff}"), None), "json");
+        assert_eq!(
+            resolve_format(Some("\u{85}json"), None),
+            FALLBACK_FORMAT,
+            "U+0085 is not whitespace to JavaScript, so it is part of the name"
+        );
     }
 
     #[test]

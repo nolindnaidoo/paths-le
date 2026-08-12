@@ -18,7 +18,11 @@ const EXTRACTION: &str = include_str!("../../fixtures/extraction.json");
 const HEURISTICS: &str = include_str!("../../fixtures/heuristics.json");
 
 /// Every document the corpus refers to, by the name its cases use.
-const DOCUMENTS: [(&str, &str); 12] = [
+///
+/// Visible to the rest of `extract/`'s tests because `fuzz.rs` seeds its
+/// generator from them: a mutation of a real document reaches further
+/// into the extractors than a random string does.
+pub(crate) const DOCUMENTS: [(&str, &str); 13] = [
     (
         "srcset-data-uri.html",
         include_str!("../../fixtures/documents/srcset-data-uri.html"),
@@ -66,6 +70,10 @@ const DOCUMENTS: [(&str, &str); 12] = [
     (
         "paths.py",
         include_str!("../../fixtures/documents/paths.py"),
+    ),
+    (
+        "paths.md",
+        include_str!("../../fixtures/documents/paths.md"),
     ),
 ];
 

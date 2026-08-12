@@ -223,6 +223,35 @@ Commands, the editor UI, i18n, the configuration reader, the status bar
 and telemetry are extension concerns with no CLI equivalent. Parity is
 `src/extraction/**` and nothing else.
 
+### Deliberate divergences
+
+Two different things get called "drift", and only one of them is a bug.
+
+**The shared `extract_paths` tool may never diverge.** One tool name, one
+schema, two servers — the npm one the extension ships and this one. An
+agent must get the same answer whichever it reaches, so a difference
+there is a defect in one of them, full stop. It is pinned two ways:
+`fixtures/mcp-extract-paths.json` runs the cases somebody wrote down
+against both, and `scripts/check-extraction-differential.ts` generates
+several hundred more and puts them through both servers.
+
+**The two surfaces are allowed to differ, and should.** The extension is
+IDE-first — one open buffer, a person reading results in an editor — and
+this is terminal-first: trees, exit codes, JSON Lines, piping,
+automation. Holding either to the other's shape would make both worse.
+What follows from that split, and why:
+
+| divergence | why |
+|---|---|
+| The walk, resolution, exit codes, `--strict`, JSON Lines on stdout | A terminal answers about a tree and a script branches on the answer. An editor has neither a tree nor an exit code. |
+| A file read by the generic scan is not resolved unless `--resolve` asks | A scan is generous by construction. In an editor a human glances at a generous list and moves on; a `missing` verdict is a claim, and a claim needs evidence. |
+| A relative path resolves against the directory of the file it was found in, not the workspace folder | See "Resolution — the enhancement". `./helper` in `src/app.ts` means a sibling of `app.ts`, and that is the dominant case on a command line. |
+| Extraction can fail here with a parsing diagnostic; the extension's engine cannot report one | The regex-driven extractors have a backtracking budget, and exhausting it is a refusal rather than a wrong answer. The extension's engine has no channel to say so. Both return no paths; only this one says why. |
+
+Anything else is drift. A difference that does not follow from IDE-first
+versus terminal-first is a bug in one of the two, and it belongs in this
+table only after it has an answer to "which use case asked for this?".
+
 ## Output contract
 
 **stdout is protocol. stderr is human. There is no `--json` flag** — one
@@ -270,6 +299,17 @@ Paths are reported as they were walked, so naming a relative directory
 gives relative report paths. Resolution compares canonically underneath,
 because a finding that depended on how the argument was spelled would be
 worse than no finding at all.
+
+**Every path in the report spells its separators forward, on every
+platform** — `file`, `resolution.canonical` and `resolution.symlink`
+alike. A report is a document somebody diffs against the same report
+taken on another machine, and the paths this tool extracts are written
+with `/` in the source it read them from, so a Windows run answering in
+`\` would be answering in a different alphabet from the question. The
+rewrite is Windows-only: `\` is a legal character in a Unix filename,
+and rewriting it there would rename the file in the report.
+`canonicalize`'s `\\?\` verbatim prefix goes the same way, being an
+artefact of the call rather than part of the path.
 
 ### Exit codes are the API
 

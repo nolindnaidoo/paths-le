@@ -29,6 +29,8 @@ mod yaml;
 
 #[cfg(test)]
 pub(crate) mod corpus;
+#[cfg(test)]
+mod fuzz;
 
 pub(crate) use format::{FileType, determine_file_type};
 pub(crate) use heuristics::PathType;

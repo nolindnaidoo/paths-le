@@ -32,6 +32,10 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the same shape, and only the quoting tells them apart.
   `fixtures/documents/paths.py` pins exactly what it claims and does not.
 
+- **`fixtures/documents/paths.md`**, so `markdown` — advertised in the
+  `extract_paths` schema — is finally pinned by a shared corpus case
+  rather than promised. Both frontends run it.
+
 - **`--resolve`**, and `resolveScanned` on the MCP audit tool. A file
   read by the generic scan has its paths reported as written unless one
   of these is given, because a scan is generous by construction and
@@ -68,6 +72,28 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   message the generic scan replaced.
 
 ### Fixed
+
+- **Every path in a report spells its separators forward, on every
+  platform.** `file`, `resolution.canonical` and `resolution.symlink`
+  came back with `\` on Windows and a `\\?\` verbatim prefix on anything
+  `canonicalize` touched, so the same tree audited on two machines
+  produced two reports that could not be diffed — and neither matched
+  the `/` the source it read them from was written with. A sibling crate
+  shipped that for a whole release because the only machine that could
+  see it was the only machine nothing asserted on.
+
+- **A CSV cell was trimmed with Rust's idea of whitespace, not
+  JavaScript's.** The reader was asked to trim, and its trim strips
+  U+0085 and keeps U+FEFF — the exact two characters this crate spells
+  out by hand because the two languages disagree about them. A cell led
+  by U+0085 came back as `/a.txt` here and `\u{85}/a.txt` from the npm
+  server, classified `absolute` against `file`. Found by the generated
+  differential; both servers now answer identically.
+
+- **A format name was trimmed the same wrong way.** `\u{feff}json`
+  resolved to `json` on the npm server and fell through to the generic
+  scan here, so one name read a document two ways depending on which
+  server an agent reached.
 
 - **A colon-joined composite is no longer claimed to be a missing
   path.** A compose volume (`/etc/localtime:/etc/localtime:ro`), a

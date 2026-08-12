@@ -691,5 +691,61 @@
 				"context": "Text scan"
 			}
 		]
+	},
+	{
+		"name": "paths.md as markdown (the generic scan)",
+		"file": "paths.md",
+		"languageId": "markdown",
+		"expected": [
+			{
+				"value": "./docs/architecture.md",
+				"type": "relative",
+				"line": 6,
+				"column": 32,
+				"context": "Text scan"
+			},
+			{
+				"value": "docs/scan.md",
+				"type": "file",
+				"line": 7,
+				"column": 55,
+				"context": "Text scan"
+			},
+			{
+				"value": "README.md",
+				"type": "file",
+				"line": 8,
+				"column": 28,
+				"context": "Text scan"
+			},
+			{
+				"value": "/var/log/service",
+				"type": "absolute",
+				"line": 11,
+				"column": 35,
+				"context": "Text scan"
+			},
+			{
+				"value": "C:\\Temp\\out",
+				"type": "absolute",
+				"line": 11,
+				"column": 56,
+				"context": "Text scan"
+			},
+			{
+				"value": "https://example.com/spec.html",
+				"type": "url",
+				"line": 12,
+				"column": 21,
+				"context": "Text scan"
+			},
+			{
+				"value": "./scripts/setup.sh",
+				"type": "relative",
+				"line": 14,
+				"column": 3,
+				"context": "Text scan"
+			}
+		]
 	}
 ]

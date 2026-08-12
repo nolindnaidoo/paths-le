@@ -117,7 +117,7 @@ fn is_binary(bytes: &[u8]) -> bool {
 /// the run's summary says how many, because a narrower coverage than the
 /// tree nobody was told about is the failure this tool exists to avoid.
 pub(crate) fn audit_file(target: &Target, options: &AuditOptions) -> Option<FileReport> {
-    let file = target.path.to_string_lossy().into_owned();
+    let file = resolve::display(&target.path);
 
     let skipped = |reason: String| FileReport {
         file: file.clone(),
@@ -217,7 +217,9 @@ pub(crate) fn audit_content(content: &str, target: &Target, options: &AuditOptio
         .count();
 
     FileReport {
-        file: target.path.to_string_lossy().into_owned(),
+        // Separators forward on every platform: a report is a document
+        // somebody diffs against the same report taken elsewhere.
+        file: resolve::display(&target.path),
         format: target.language_id.to_string(),
         summary: Summary {
             paths: paths.len(),

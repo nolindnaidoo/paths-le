@@ -19,12 +19,18 @@ pub(crate) fn extract(content: &str) -> Vec<Path> {
     // header cell.
     let content = content.strip_prefix('\u{feff}').unwrap_or(content);
 
+    // Deliberately NOT `.trim(csv::Trim::All)`: that trims with Rust's
+    // notion of whitespace, which includes U+0085 and excludes U+FEFF —
+    // the exact two characters this crate spells out by hand in `js`
+    // because JavaScript disagrees about both. The extension trims each
+    // cell with `String.prototype.trim`, so `js::trim` below is the
+    // whole trim, and a reader that got there first would quietly answer
+    // differently on a cell those characters lead.
     let mut reader = ::csv::ReaderBuilder::new()
         .has_headers(false)
         // Rows of differing width are data, not an error: a path in a
         // ragged export is still a path.
         .flexible(true)
-        .trim(::csv::Trim::All)
         .from_reader(content.as_bytes());
 
     let mut paths = Vec::new();
@@ -96,6 +102,26 @@ mod tests {
     fn version_strings_and_plain_words_are_not_paths() {
         let paths = extract("version,name\n3.4.5,not-a-path\n");
         assert!(paths.is_empty());
+    }
+
+    /// A regression the generated differential found: the reader was
+    /// asked to trim, and its trim is Rust's — so a cell led by U+0085
+    /// came back as `/a.txt` here and as `\u{85}/a.txt` from the npm
+    /// server, which classified it `file` where this said `absolute`.
+    /// The two spellings of whitespace are the whole reason `js` exists;
+    /// trimming has to go through it.
+    #[test]
+    fn cells_are_trimmed_with_javascripts_whitespace_not_rusts() {
+        // U+0085 is whitespace to Rust and not to JavaScript: it stays.
+        let paths = extract("a\n\u{85}/a.txt\n");
+        assert_eq!(paths[0].value, "\u{85}/a.txt");
+        assert_eq!(paths[0].kind, PathType::File);
+
+        // U+FEFF is the mirror image — whitespace to JavaScript and not
+        // to Rust — so it goes.
+        let paths = extract("a\nx,\u{feff}/a.txt\n");
+        assert_eq!(paths[0].value, "/a.txt");
+        assert_eq!(paths[0].kind, PathType::Absolute);
     }
 
     #[test]
