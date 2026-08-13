@@ -171,6 +171,42 @@ pub(crate) fn is_generic_scan(language_id: &str) -> bool {
 mod tests {
     use super::*;
 
+    /// The refusal path, which nothing exercised: every test drove a
+    /// document that parsed, so `Extraction::failed` and the `Err` arm of
+    /// `extract` were the whole of this module's coverage gap.
+    ///
+    /// This matters more than a percentage. SPEC.md records the refusal
+    /// as a deliberate divergence — the extension's engine cannot report
+    /// one, so this is behaviour only the crate has, and it was the only
+    /// behaviour here with no test at all.
+    ///
+    /// The shape: an `import` head whose lazy run of non-quote,
+    /// non-semicolon characters must grow across hundreds of characters
+    /// and then fail, repeated until fancy-regex's default backtracking
+    /// budget is spent. Roughly 75 repetitions trips it; 150 keeps the
+    /// test clear of the boundary without depending on where exactly it
+    /// sits.
+    #[test]
+    fn a_pattern_that_exhausts_its_budget_refuses_rather_than_answering() {
+        let document = format!("import {} from\n", "x".repeat(400)).repeat(150);
+        let result = extract(&document, "javascript");
+
+        assert!(!result.success, "a spent budget must not read as success");
+        assert!(
+            result.paths.is_empty(),
+            "a refusal carries no paths: {:?}",
+            result.paths
+        );
+        assert_eq!(result.errors.len(), 1);
+        assert_eq!(result.errors[0].category, ErrorCategory::Parsing);
+        assert_eq!(result.errors[0].severity, Severity::Error);
+        assert!(
+            result.errors[0].message.contains("gave up"),
+            "the message should say the pattern gave up: {}",
+            result.errors[0].message
+        );
+    }
+
     /// Changed deliberately in 0.2.0: an unsupported language used to be
     /// a format diagnostic and an empty result. It is now the generic
     /// scan, which is why a Python file reports its paths at all.
