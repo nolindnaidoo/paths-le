@@ -337,12 +337,12 @@ fn stdin_without_a_format_exits_two() {
         .stderr(Stdio::piped())
         .spawn()
         .expect("the binary runs");
-    child
-        .stdin
-        .as_mut()
-        .expect("stdin")
-        .write_all(b"{}")
-        .expect("the document is written");
+    // The child refuses before it ever reads stdin, so it can be gone
+    // before this write lands and the pipe closes underneath it. Whether
+    // that happens is a race between two processes, and on Linux it does:
+    // asserting the write turned a correct refusal into a red build with
+    // "Broken pipe". The exit code is the contract; the write is not.
+    let _ = child.stdin.as_mut().expect("stdin").write_all(b"{}");
     let output = child.wait_with_output().expect("the run finishes");
     assert_eq!(output.status.code(), Some(2));
 }
