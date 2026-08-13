@@ -2,7 +2,7 @@
 	"name": "paths-le",
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
-	"description": "Zero Hassle file path extraction from JavaScript, TypeScript, JSON, YAML, HTML, CSS, TOML, CSV and ENV files, and from any other file by text scan",
+	"description": "Extract every file path in a codebase, and say whether it still points at anything",
 	"version": "2.3.0",
 	"license": "MIT",
 	"author": {
