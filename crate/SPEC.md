@@ -60,7 +60,7 @@ crate/
 **`extract/` touches no filesystem.** It takes document text and a
 format, and returns paths with positions. The entire extraction layer is
 therefore testable from a fixture file: no I/O, no temp directories, no
-flake. It is `pub(crate)` and carries the **90% line coverage floor per
+flake. It is `pub(crate)` and carries the **75% line coverage floor per
 module**, which is the only thing the split was ever for.
 
 **`resolve.rs` is the only module allowed to touch the filesystem.** If a

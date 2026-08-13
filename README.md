@@ -249,13 +249,14 @@ a build only tells you how busy the runner was.
 | Functions | 94.55% |
 | Lines | 92.83% |
 
-240 test cases across 21 files, plus an integration suite that runs
+296 test cases across 22 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 
-Generated from `coverage/coverage-summary.json` by
-`scripts/coverage-readme.js`; CI fails if this section drifts from a fresh
-run. Reproduce with `bun run test:coverage`.
+Generated from a real run — `coverage/coverage-summary.json` and
+`coverage/test-results.json` — by `scripts/coverage-readme.js`; CI fails if
+this section drifts. Reproduce with `bun run test:coverage`, and the case
+count is the one vitest prints.
 <!-- coverage:end -->
 
 ## More from the LE family

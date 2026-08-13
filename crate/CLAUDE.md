@@ -16,7 +16,7 @@ with its own `CLAUDE.md`.
   lint, or add a commented relaxation to `[lints.clippy]` in
   `Cargo.toml`.
 - New logic goes in `extract/` when it is pure (it must then be
-  unit-tested, 90% module coverage floor), and in `resolve.rs` /
+  unit-tested, 75% module coverage floor), and in `resolve.rs` /
   `walk.rs` only when it needs the filesystem. A `std::fs` call in
   `extract/` fails a CI job.
 - `fixtures/` is shared with the extension — changing it changes both
