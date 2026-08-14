@@ -63,7 +63,7 @@ with no runtime, or if you want `paths_le_audit` too — resolving paths
 against the filesystem is this binary's half, and the npm server
 deliberately touches no files.
 
-All ten LE tools are on **[letools.dev](https://letools.dev)**.
+All sixteen LE tools are on **[letools.dev](https://letools.dev)**.
 
 ## Sixty seconds
 
@@ -292,6 +292,7 @@ Each stands on its own: no shared crate, no published core. Where two of them
 agree, it is because the same answer was right twice.
 
 **Contact** — [nolindnaidoo.com](https://nolindnaidoo.com) · [GitHub](https://github.com/nolindnaidoo) · [LinkedIn](https://www.linkedin.com/in/nolindnaidoo/)
+
 ## Also by nolindnaidoo
 
 **Rust** — pixelcoords and pixelactions are one loop: pixelcoords answers

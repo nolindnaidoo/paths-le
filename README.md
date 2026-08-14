@@ -45,6 +45,16 @@ Open a file, press `Ctrl+Alt+P` (`Cmd+Alt+P` on Mac), and every file path in the
 - **Config review** — path-like values from JSON/JSONC, YAML, TOML, CSV, and `.env` files
 - **Anything else** — Python, Go, Markdown, XML, a Dockerfile: no parser, so a text scan finds quoted filenames and any run carrying a path separator
 
+## Install
+
+| Where | What you get | Install |
+|---|---|---|
+| **VS Code** | The extraction, in your editor, on a keystroke | [Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le) |
+| **Cursor, VSCodium, Windsurf** | The same extension | [Open VSX](https://open-vsx.org/extension/OffensiveEdge/paths-le) |
+| **A terminal or a CI step** | The same run over a whole tree, with exit codes | `cargo install paths-le` · [crates.io](https://crates.io/crates/paths-le) |
+| **Any MCP agent, via Node** | `extract_paths` over stdio — the same tool this binary offers | `npx paths-le-mcp` · [npm](https://www.npmjs.com/package/paths-le-mcp) |
+| **Zed** | The MCP server as a context server | [add it by hand](https://zed.dev/docs/ai/mcp) *(no listing yet)* |
+
 ## Use it from an AI agent
 
 The same engine runs as an [MCP](https://modelcontextprotocol.io) server, so an agent can call it directly instead of you running a command.
@@ -80,7 +90,7 @@ Most hosts read a JSON config. Add one entry:
 }
 ```
 
-`-y` skips the install prompt on first run. Pin a version if you would rather not track releases — `paths-le-mcp@2.2.1`.
+`-y` skips the install prompt on first run. Pin a version if you would rather not track releases — `paths-le-mcp@2.3.0`.
 
 Prefer not to go through `npx` on every launch? Install it once and point at the binary instead:
 
@@ -126,21 +136,6 @@ paths-le mcp                  # the same audit over MCP on stdio
 
 The exit code is the answer: **0 clear · 1 findings · 2 the question was
 malformed** — so `paths-le --strict .` is a CI step as it stands.
-
-Install it with `cargo install paths-le`
-([crates.io](https://crates.io/crates/paths-le)). The spec
-([`crate/SPEC.md`](crate/SPEC.md)) and the engineering standard
-([`crate/AGENTS.md`](crate/AGENTS.md)) live alongside it in
-[`crate/`](crate/README.md), and it keeps its own
-[CHANGELOG](crate/CHANGELOG.md) — the two products in this repository
-release on their own cadence.
-
-**Two MCP servers, one tool.** `paths-le mcp` offers `extract_paths`
-exactly as [`paths-le-mcp`](https://www.npmjs.com/package/paths-le-mcp)
-does — [`crate/fixtures/mcp-extract-paths.json`](crate/fixtures/mcp-extract-paths.json)
-runs against both and CI fails if they diverge. Take the npm one if Node
-is already there; take the binary if you want no runtime, or if you want
-`paths_le_audit` too.
 
 ## Supported formats
 
@@ -206,19 +201,15 @@ setting of its own.
 - **The MCP server holds the same line.** It takes content as an argument and returns data: no filesystem access, no network calls, no telemetry. Your agent already has file-read tools, so duplicating them inside the server would add a path-traversal surface for no capability. `check:mcp-bundle` fails the build if the server ever imports something that could reach either.
 - Error notifications redact home directories and credential-shaped fragments.
 
-## Development
+## Documentation
 
-```bash
-bun install
-bun run build            # esbuild bundle -> dist/extension.js
-bun run typecheck        # tsc --noEmit (includes tests)
-bun run test             # vitest unit suite
-bun run test:integration # real VS Code extension host
-bun run lint             # biome
-bun run package          # VSIX into release/
-```
-
-Architecture and conventions live in [AGENTS.md](AGENTS.md). Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
+| What | Where |
+|---|---|
+| What the tool is allowed to say — scope, output contract, refusals, non-goals | [`crate/SPEC.md`](crate/SPEC.md) |
+| How the extension is built and held together — architecture, invariants, toolchain, release | [AGENTS.md](AGENTS.md) |
+| How the CLI is built and held together | [`crate/AGENTS.md`](crate/AGENTS.md) |
+| What changed | [CHANGELOG.md](CHANGELOG.md) · [`crate/CHANGELOG.md`](crate/CHANGELOG.md) |
+| The tool's page, and the other fifteen | [letools.dev/tools/paths-le](https://letools.dev/tools/paths-le) |
 
 ## Performance
 
@@ -293,6 +284,7 @@ Each stands on its own: no shared crate, no published core. Where two of them
 agree, it is because the same answer was right twice.
 
 **Contact** — [nolindnaidoo.com](https://nolindnaidoo.com) · [GitHub](https://github.com/nolindnaidoo) · [LinkedIn](https://www.linkedin.com/in/nolindnaidoo/)
+
 ## Also by nolindnaidoo
 
 **Rust** — pixelcoords and pixelactions are one loop: pixelcoords answers
