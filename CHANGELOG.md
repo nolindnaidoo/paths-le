@@ -9,7 +9,7 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
-## [2.3.0] - 2026-08-12
+## [2.3.0] - 2026-08-14
 
 Run it on the file you have open and it reads the file you have open.
 Until now it refused anything outside eight formats, which on most days
@@ -435,3 +435,4 @@ integration suite on every CI run.
   TOML, CSV, and .env files; dedupe and sort post-processing;
   `Ctrl+Alt+P` / `Cmd+Alt+P`; opt-in canonical path resolution;
   manifest/settings translations. (Condensed.)
+[0.2.0]: https://crates.io/crates/paths-le/0.2.0
