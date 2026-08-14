@@ -258,6 +258,16 @@ the engineering standard this crate is held to is in
 and what changed is in
 [CHANGELOG.md](https://github.com/nolindnaidoo/paths-le/blob/main/crate/CHANGELOG.md).
 
+## Documentation
+
+| What | Where |
+|---|---|
+| What this tool is allowed to say — scope, output contract, refusals, non-goals | [SPEC.md](https://github.com/nolindnaidoo/paths-le/blob/main/crate/SPEC.md) |
+| How the code is written and held together — architecture, invariants, the gates | [AGENTS.md](https://github.com/nolindnaidoo/paths-le/blob/main/crate/AGENTS.md) |
+| The VS Code extension this shares its extraction with | [README.md](https://github.com/nolindnaidoo/paths-le/blob/main/README.md) |
+| What changed | [CHANGELOG.md](https://github.com/nolindnaidoo/paths-le/blob/main/crate/CHANGELOG.md) |
+| The tool's page, and the other fifteen | [letools.dev/tools/paths-le](https://letools.dev/tools/paths-le) |
+
 ## More from the LE family
 
 Sixteen single-purpose tools for the work in front of every model. Each ships
