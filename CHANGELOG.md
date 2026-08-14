@@ -79,6 +79,12 @@ is the file you are actually looking at.
   the CLI, and the CLI references them back, so a reader arriving at any
   one of the five channels can find the other four.
 
+- **New icon artwork.** All sixteen tools were redrawn in one style, so
+  the family reads as one set wherever the listings sit side by side —
+  the Marketplace, Open VSX and letools.dev. The framing is unchanged:
+  the drawing fills 65.8% of an 800×800 canvas, and every smaller size
+  is derived from that one file rather than drawn again.
+
 ## [2.2.4] - 2026-08-07
 
 ### Changed
