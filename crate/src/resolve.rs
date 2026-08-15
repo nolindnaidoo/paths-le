@@ -411,6 +411,22 @@ pub(crate) fn display(path: &StdPath) -> String {
     rendered.into_owned()
 }
 
+/// The directory `path` sits in, as a path a syscall will accept.
+///
+/// `Path::parent` answers `Some("")` for a bare filename rather than
+/// `None`, so the obvious `parent().unwrap_or(".")` never fires and
+/// hands back an empty path instead. Nothing accepts one: `paths-le
+/// a.yaml` failed with an error that named no file, and every relative
+/// path inside such a file resolved against an empty base and came back
+/// `escapes-root` — a file that was there and a file that was not got
+/// the same verdict. Naming a file and naming its directory must agree.
+pub(crate) fn parent_dir(path: &StdPath) -> PathBuf {
+    match path.parent() {
+        Some(parent) if !parent.as_os_str().is_empty() => parent.to_path_buf(),
+        _ => PathBuf::from("."),
+    }
+}
+
 /// The Windows half of `display`, written as a pure string function so
 /// that every platform compiles and tests it. A branch only Windows can
 /// execute is a branch only Windows CI can catch.
@@ -434,6 +450,17 @@ mod tests {
 
     fn resolve_in(tree: &TempTree, value: &str) -> Resolution {
         resolve(value, PathType::Relative, tree.path(), tree.path())
+    }
+
+    /// The empty parent is the whole bug: `Path::parent` reports
+    /// `Some("")` for a bare filename, and an empty path is one no
+    /// syscall accepts and one no relative path can be joined onto.
+    #[test]
+    fn a_bare_filename_has_the_working_directory_for_a_parent() {
+        assert_eq!(parent_dir(StdPath::new("a.yaml")), PathBuf::from("."));
+        assert_eq!(parent_dir(StdPath::new("./a.yaml")), PathBuf::from("."));
+        assert_eq!(parent_dir(StdPath::new("src/a.yaml")), PathBuf::from("src"));
+        assert_eq!(parent_dir(StdPath::new("/a.yaml")), PathBuf::from("/"));
     }
 
     /// The Windows rewrite, tested on every platform. envsync-le shipped

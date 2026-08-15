@@ -184,10 +184,7 @@ pub(crate) fn audit_content(content: &str, target: &Target, options: &AuditOptio
     // directory of a file that was just read should always canonicalise,
     // and if it somehow does not, the escape check behaves as it would
     // have anyway rather than the audit failing.
-    let base_dir = target
-        .path
-        .parent()
-        .map_or_else(|| PathBuf::from("."), PathBuf::from);
+    let base_dir = resolve::parent_dir(&target.path);
     let base_dir = std::fs::canonicalize(&base_dir).unwrap_or(base_dir);
 
     let scanned = extract::is_generic_scan(target.language_id);

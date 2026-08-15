@@ -1,0 +1,8 @@
+service: api
+entrypoint: ./bin/server.js
+config: ./config/production.yaml
+secrets: ../shared/secrets.env
+static:
+  - ./public/index.html
+  - ./public/app.css
+logs: /var/log/api/current.log

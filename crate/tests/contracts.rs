@@ -84,6 +84,47 @@ fn reports(run: &Run) -> Vec<serde_json::Value> {
         .collect()
 }
 
+/// The same run, from inside a directory — the only way to hand the
+/// binary an argument with no directory component, which is what a
+/// person types.
+fn run_in(dir: &Path, args: &[&str]) -> Run {
+    let output = Command::new(BINARY)
+        .args(args)
+        .current_dir(dir)
+        .output()
+        .expect("the binary runs");
+    Run {
+        code: output.status.code().expect("an exit code"),
+        stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
+        stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
+    }
+}
+
+/// `paths-le a.yaml` — a filename with no directory in front of it.
+///
+/// It exited 2 with an error naming no file, because the root came from
+/// `Path::parent`, which answers `Some("")` here rather than `None`.
+/// Every other test in this file names its files by absolute path, so
+/// none of them could reach it.
+#[test]
+fn a_bare_filename_argument_is_audited_like_any_other() {
+    let tree = Tree::new("bare-name");
+    tree.write("bin/server.js", "");
+    tree.write(
+        "deploy.yaml",
+        "entrypoint: ./bin/server.js\nmissing: ./bin/gone.js\n",
+    );
+    let run = run_in(tree.path(), &["deploy.yaml"]);
+    assert_eq!(run.code, 1, "{}", run.stderr);
+
+    // And the two paths must be told apart. Against an empty base every
+    // relative path resolved outside the root, so the file that was
+    // there and the file that was not came back with one verdict.
+    let paths = &reports(&run)[0]["paths"];
+    assert_eq!(paths[0]["resolution"]["verdict"], "ok", "{paths:?}");
+    assert_eq!(paths[1]["resolution"]["verdict"], "missing", "{paths:?}");
+}
+
 #[test]
 fn a_tree_whose_paths_all_resolve_exits_clear() {
     let tree = Tree::new("clean");

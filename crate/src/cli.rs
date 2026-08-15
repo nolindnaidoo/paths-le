@@ -203,9 +203,7 @@ pub(crate) fn choose_root(explicit: Option<&str>, inputs: &[PathBuf]) -> Result<
 
     let start = match inputs {
         [only] if only.is_dir() => only.clone(),
-        [only] => only
-            .parent()
-            .map_or_else(|| PathBuf::from("."), PathBuf::from),
+        [only] => crate::resolve::parent_dir(only),
         _ => std::env::current_dir()
             .map_err(|error| format!("could not read the working directory: {error}"))?,
     };
@@ -505,6 +503,21 @@ mod tests {
         tree.mkdir(".git");
         let file = tree.write("packages/app/a.json", "{}");
         assert_eq!(choose_root(None, &[file]).expect("a root"), tree.path());
+    }
+
+    /// A bare filename has no directory component, and `Path::parent`
+    /// answers `Some("")` for it rather than `None` — so the root came
+    /// out empty and `canonicalize` refused it, naming no file. Every
+    /// other test here passes an absolute path from a `TempTree`, which
+    /// always has a parent, which is how this shipped.
+    #[test]
+    fn a_bare_filename_roots_at_the_working_directory() {
+        let bare = choose_root(None, &[PathBuf::from("a.json")]).expect("a root");
+        let dotted = choose_root(None, &[PathBuf::from("./a.json")]).expect("a root");
+        assert_eq!(
+            bare, dotted,
+            "how the argument was spelled must not change the root"
+        );
     }
 
     /// Several inputs have no single obvious root, so the run starts

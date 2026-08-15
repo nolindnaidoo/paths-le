@@ -7,6 +7,34 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-08-15
+
+### Added
+
+- **The crates.io page carries a demo of the CLI.** It had the icon and
+  nothing else, because the only recording in the repository was of the
+  VS Code extension reading an editor buffer — a clip of something this
+  binary does not do. `assets/demo.tape` records the real binary against
+  the files in `assets/demo/`, so the clip is reproducible (`cd assets
+  && vhs demo.tape`) rather than an artifact nobody can regenerate.
+
+### Fixed
+
+- **`paths-le a.yaml` audits the file instead of failing.** A filename
+  with no directory in front of it exited 2 with `: No such file or
+  directory` — an error naming no file at all. `Path::parent` answers
+  `Some("")` for a bare name rather than `None`, so the root came out
+  empty and `canonicalize` refused it. `./a.yaml` and an absolute path
+  were read; the same file named the way a person types it was not.
+
+- **A relative path in such a file is resolved, not called an escape.**
+  The same empty parent became the base every relative path was joined
+  against, so with an explicit `--root` every one of them resolved
+  outside it: a file that was there and a file that was not came back
+  with one verdict, `escapes-root`. A directory argument was never
+  affected, which is why the corpus stayed green — every test in it
+  names its files by absolute path.
+
 ## [0.2.1] - 2026-08-15
 
 ### Fixed
@@ -202,6 +230,7 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.2.2]: https://crates.io/crates/paths-le/0.2.2
 [0.2.1]: https://crates.io/crates/paths-le/0.2.1
 [0.2.0]: https://crates.io/crates/paths-le/0.2.0
 [0.1.0]: https://crates.io/crates/paths-le/0.1.0
