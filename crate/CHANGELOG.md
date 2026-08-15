@@ -7,6 +7,24 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-08-15
+
+### Fixed
+
+- **`.env.local` and its siblings are read as dotenv.** Format
+  resolution split on the last dot, so `.env.local`, `.env.production`
+  and `.env.test.local` asked `local`, `production` and `local` for a
+  format, got nothing, and fell to the generic scan — which has no
+  key/value grammar and breaks a value on whitespace.
+  `SPACED=./my app/data.db` became `./my` and `app/data.db`, both
+  reported `missing`: **two false findings and exit 1 over a file that
+  was correct**, while the `.env` beside it resolved fine.
+
+  The leading dot is what distinguishes them, so the check runs before
+  `normalise` strips it: `env.ts` is an ordinary TypeScript file and
+  must not read as dotenv, which is the opposite mistake. `.envrc` is
+  direnv's shell script and stays out too. Both are pinned.
+
 ## [0.3.0] - 2026-08-15
 
 ### Fixed
@@ -251,6 +269,7 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.3.1]: https://crates.io/crates/paths-le/0.3.1
 [0.3.0]: https://crates.io/crates/paths-le/0.3.0
 [0.2.2]: https://crates.io/crates/paths-le/0.2.2
 [0.2.1]: https://crates.io/crates/paths-le/0.2.1

@@ -163,10 +163,74 @@ pub(crate) fn resolve_format(format: Option<&str>, filename: Option<&str>) -> &'
         return whole;
     }
 
+    // **A dotenv file is `.env` and everything after it.** Splitting on
+    // the last dot asks `local` and `production` for a format and gets
+    // nothing, so `.env.local` fell to the generic scan — which has no
+    // key/value grammar and breaks a value on whitespace. A path with a
+    // space in it then became two, and both were reported `missing`:
+    // not a silent miss but two false findings and exit 1 over a file
+    // that was correct. `.env` beside it resolved fine.
+    if is_dotenv(&super::js::trim(filename).to_lowercase()) {
+        return alias("env").unwrap_or(FALLBACK_FORMAT);
+    }
+
     filename
         .rsplit_once('.')
         .and_then(|(_, extension)| alias(&normalise(extension)))
         .unwrap_or(FALLBACK_FORMAT)
+}
+
+/// Whether a filename names a dotenv file.
+///
+/// `.env` and any suffix of it — `.env.local`, `.env.production`,
+/// `.env.test.local` — plus the `<name>.env` spelling.
+///
+/// **The leading dot is the signal**, so this takes the name before
+/// `normalise` strips it. Without it `env.ts` — an ordinary TypeScript
+/// file, and a common one — read as a dotenv file, which is the
+/// opposite mistake to the one being fixed. `.envrc` is direnv's shell
+/// script and is likewise not a dotenv file.
+fn is_dotenv(name: &str) -> bool {
+    name == ".env"
+        || name.starts_with(".env.")
+        || name == "env"
+        || name
+            .strip_suffix(".env")
+            .is_some_and(|stem| !stem.is_empty())
+}
+
+#[cfg(test)]
+mod dotenv_tests {
+    use super::resolve_format;
+
+    /// **Not a silent miss — two false findings.** Splitting on the last
+    /// dot asked `local` for a format, so `.env.local` fell to the
+    /// generic scan, which has no key/value grammar and breaks a value
+    /// on whitespace. `SPACED=./my app/data.db` became `./my` and
+    /// `app/data.db`, both reported `missing`, exit 1, over a file that
+    /// was correct. `.env` beside it resolved fine.
+    #[test]
+    fn every_dotenv_spelling_resolves() {
+        for name in [
+            ".env",
+            ".env.local",
+            ".env.production",
+            ".env.test.local",
+            "app.env",
+            "env",
+        ] {
+            assert_eq!(resolve_format(None, Some(name)), "dotenv", "{name}");
+        }
+    }
+
+    /// `.envrc` is direnv's shell script, not a dotenv file. The suffix
+    /// must begin at a dot, so `envrc` must not match `env.`.
+    #[test]
+    fn a_name_that_merely_starts_with_env_is_not_dotenv() {
+        for name in [".envrc", "environment.json", "env.ts", "sender.env.rs"] {
+            assert_ne!(resolve_format(None, Some(name)), "dotenv", "{name}");
+        }
+    }
 }
 
 #[cfg(test)]
