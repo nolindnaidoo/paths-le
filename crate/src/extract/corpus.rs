@@ -22,7 +22,7 @@ const HEURISTICS: &str = include_str!("../../fixtures/heuristics.json");
 /// Visible to the rest of `extract/`'s tests because `fuzz.rs` seeds its
 /// generator from them: a mutation of a real document reaches further
 /// into the extractors than a random string does.
-pub(crate) const DOCUMENTS: [(&str, &str); 13] = [
+pub(crate) const DOCUMENTS: [(&str, &str); 14] = [
     (
         "srcset-data-uri.html",
         include_str!("../../fixtures/documents/srcset-data-uri.html"),
@@ -50,6 +50,10 @@ pub(crate) const DOCUMENTS: [(&str, &str); 13] = [
     (
         "paths.csv",
         include_str!("../../fixtures/documents/paths.csv"),
+    ),
+    (
+        "paths.tsv",
+        include_str!("../../fixtures/documents/paths.tsv"),
     ),
     (
         "paths.env",

@@ -145,7 +145,8 @@ pub(crate) fn extract(content: &str, language_id: &str) -> Extraction {
 
 fn extract_by_file_type(content: &str, file_type: FileType) -> Extracted {
     match file_type {
-        FileType::Csv => Ok(csv::extract(content)),
+        FileType::Csv => Ok(csv::extract(content, csv::COMMA)),
+        FileType::Tsv => Ok(csv::extract(content, csv::TAB)),
         FileType::Toml => Ok(toml::extract(content)),
         FileType::Dotenv => dotenv::extract(content),
         FileType::Javascript | FileType::Typescript => javascript::extract(content),

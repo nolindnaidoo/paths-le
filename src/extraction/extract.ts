@@ -1,6 +1,6 @@
 import type { ExtractionResult, FileType, Path } from '../types';
 import { extractFromCss } from './formats/css';
-import { extractFromCsv } from './formats/csv';
+import { extractFromCsv, TAB } from './formats/csv';
 import { extractFromDotenv } from './formats/dotenv';
 import { extractFromFallback } from './formats/fallback';
 import { extractFromHtml } from './formats/html';
@@ -36,6 +36,8 @@ function extractPathsByFileType(
 	switch (fileType) {
 		case 'csv':
 			return extractFromCsv(content);
+		case 'tsv':
+			return extractFromCsv(content, TAB);
 		case 'toml':
 			return extractFromToml(content);
 		case 'dotenv':
@@ -60,6 +62,8 @@ function determineFileType(languageId: string): FileType {
 	switch (languageId) {
 		case 'csv':
 			return 'csv';
+		case 'tsv':
+			return 'tsv';
 		case 'toml':
 			return 'toml';
 		case 'dotenv':

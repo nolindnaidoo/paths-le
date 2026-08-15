@@ -22,6 +22,10 @@ pub(crate) enum FileType {
     Html,
     Css,
     Csv,
+    /// The same reader with a tab between cells. Its own variant rather
+    /// than an alias for `Csv`: read on commas, a tab row is one cell,
+    /// which is never path-like, so the document reported nothing.
+    Tsv,
     Toml,
     Dotenv,
     Yaml,
@@ -31,6 +35,7 @@ pub(crate) enum FileType {
 pub(crate) fn determine_file_type(language_id: &str) -> FileType {
     match language_id {
         "csv" => FileType::Csv,
+        "tsv" => FileType::Tsv,
         "toml" => FileType::Toml,
         "dotenv" | "env" => FileType::Dotenv,
         "javascript" | "javascriptreact" => FileType::Javascript,
@@ -51,8 +56,9 @@ pub(crate) fn determine_file_type(language_id: &str) -> FileType {
 /// generic scan: `markdown` is a format an agent asks for by name, and
 /// the enum is what tells it the ask is understood. Anything absent from
 /// this list still resolves — the enum advertises, it does not gate.
-pub(crate) const SUPPORTED_FORMATS: [&str; 10] = [
+pub(crate) const SUPPORTED_FORMATS: [&str; 11] = [
     "csv",
+    "tsv",
     "toml",
     "dotenv",
     "javascript",
@@ -84,7 +90,7 @@ pub(crate) const FALLBACK_FORMAT: &str = "unknown";
 /// recognised at all".
 const ALIASES: [(&str, &str); 31] = [
     ("csv", "csv"),
-    ("tsv", "csv"),
+    ("tsv", "tsv"),
     ("toml", "toml"),
     ("dotenv", "dotenv"),
     ("env", "dotenv"),

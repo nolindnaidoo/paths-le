@@ -3,16 +3,32 @@ import type { Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 
 /**
+ * The byte between cells, and the name the context line goes by.
+ *
+ * Tab-separated files are the same grammar with a different delimiter,
+ * and reading one on commas made every row a single cell — never
+ * path-like, so the document reported nothing at all. Held equal to the
+ * crate's `COMMA`/`TAB` by the shared corpus.
+ */
+export const COMMA = ',';
+export const TAB = '\t';
+
+/**
  * Extract path-like cells from CSV.
  * Positions are cell coordinates — line is the row number, column is
  * the cell index (not a character offset); the context repeats both.
  */
-export function extractFromCsv(content: string): readonly Path[] {
+export function extractFromCsv(
+	content: string,
+	delimiter: string = COMMA,
+): readonly Path[] {
 	if (content.trim().length === 0) return [];
+	const label = delimiter === TAB ? 'TSV' : 'CSV';
 
 	try {
 		const rows = parse(content, {
 			columns: false,
+			delimiter,
 			bom: true,
 			skip_empty_lines: true,
 			relax_quotes: true,
@@ -36,7 +52,7 @@ export function extractFromCsv(content: string): readonly Path[] {
 							line: rowIndex + 1,
 							column: colIndex + 1,
 						},
-						context: `CSV cell [${rowIndex + 1},${colIndex + 1}]`,
+						context: `${label} cell [${rowIndex + 1},${colIndex + 1}]`,
 					});
 				}
 			}

@@ -80,7 +80,8 @@ quietly fixed — otherwise "parity" cannot be tested.
 ### Formats
 
 Nine typed extractors, matching the extension exactly: **JSON/JSONC,
-YAML, TOML, CSV, dotenv, JavaScript, TypeScript, HTML, CSS/SCSS/LESS.**
+YAML, TOML, CSV, TSV, dotenv, JavaScript, TypeScript, HTML,
+CSS/SCSS/LESS.**
 Each is handed already-delimited tokens by a parser.
 
 **A document in any other format is scanned, not refused.** Every

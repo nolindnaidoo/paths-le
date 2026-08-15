@@ -435,3 +435,37 @@ fn the_cli_and_the_mcp_server_report_the_same_thing() {
 
     assert_eq!(from_mcp, from_cli, "the two surfaces disagree");
 }
+
+/// **Naming a format may never find less than not naming one.**
+///
+/// `.tsv` named the comma reader, so a tab row was one cell, no cell was
+/// path-like, and a file full of paths reported none — with an empty
+/// `diagnostics` and exit 1, which reads as a clean file. SPEC.md names
+/// that outcome as the one never allowed.
+#[test]
+fn a_named_format_never_finds_less_than_the_generic_scan() {
+    let tree = Tree::new("named-vs-scan");
+    let body = "name\tpath\tbackup\nalpha\t./src/a.ts\t./bak/a.ts\n";
+    let named = tree.write("data.tsv", body);
+    let bare = tree.write("data.unknown-to-this-tool", body);
+
+    let named_run = run_in(tree.path(), &["--no-resolve", &named.to_string_lossy()]);
+    let bare_run = run_in(tree.path(), &["--no-resolve", &bare.to_string_lossy()]);
+
+    let values = |run: &Run| -> Vec<String> {
+        reports(run)[0]["paths"]
+            .as_array()
+            .expect("paths")
+            .iter()
+            .map(|p| p["value"].as_str().expect("a value").to_string())
+            .collect()
+    };
+    assert_eq!(
+        values(&named_run),
+        values(&bare_run),
+        "{}",
+        named_run.stdout
+    );
+    assert_eq!(values(&named_run).len(), 2);
+    assert_eq!(reports(&named_run)[0]["format"], "tsv");
+}

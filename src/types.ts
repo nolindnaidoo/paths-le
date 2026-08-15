@@ -40,6 +40,7 @@ export type FileType =
 	| 'html'
 	| 'css'
 	| 'csv'
+	| 'tsv'
 	| 'toml'
 	| 'dotenv'
 	| 'yaml'

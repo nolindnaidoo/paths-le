@@ -295,8 +295,8 @@ fn extraction_never_panics_and_stays_inside_the_document() {
         let language = languages[turn % languages.len()];
         turn += 1;
         let result = extract(input, language);
-        // CSV positions are cell coordinates rather than offsets, so the
-        // line bound below does not apply to them.
+        // CSV and TSV positions are cell coordinates rather than
+        // offsets, so the line bound below does not apply to them.
         let lines = 1 + input.bytes().filter(|byte| *byte == b'\n').count();
         for path in &result.paths {
             assert!(
@@ -307,7 +307,7 @@ fn extraction_never_panics_and_stays_inside_the_document() {
                 readable(input)
             );
             assert!(
-                language == "csv" || path.position.line <= lines,
+                language == "csv" || language == "tsv" || path.position.line <= lines,
                 "{language} put a path on line {} of a {lines}-line document: \"{}\"",
                 path.position.line,
                 readable(input)

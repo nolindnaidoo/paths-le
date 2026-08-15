@@ -21,7 +21,7 @@
  */
 const ALIASES: Readonly<Record<string, string>> = Object.freeze({
 	csv: 'csv',
-	tsv: 'csv',
+	tsv: 'tsv',
 	toml: 'toml',
 	dotenv: 'dotenv',
 	env: 'dotenv',
@@ -63,6 +63,7 @@ const ALIASES: Readonly<Record<string, string>> = Object.freeze({
  */
 export const SUPPORTED_FORMATS: readonly string[] = Object.freeze([
 	'csv',
+	'tsv',
 	'toml',
 	'dotenv',
 	'javascript',

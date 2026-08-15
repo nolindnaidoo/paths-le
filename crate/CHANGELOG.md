@@ -7,6 +7,27 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-08-15
+
+### Fixed
+
+- **`.tsv` is read with a tab between cells.** It named the comma
+  reader, so a whole row arrived as one cell, no cell was path-like, and
+  a file full of paths reported none — with an empty `diagnostics` and
+  exit 1, which reads to whoever ran it as a clean file. SPEC.md names
+  that outcome as the one never allowed.
+
+### Added
+
+- `tsv` is a format in its own right on **both frontends**, in the same
+  commit: it resolves, names itself in a report, is offered in both MCP
+  schemas, and `fixtures/documents/paths.tsv` pins it for the extension
+  and the crate alike. A `.tsv` cell's context line reads `TSV cell
+  [r,c]` on both.
+
+- A contract test asserting that naming a format never finds less than
+  not naming one, observed failing before the fix.
+
 ## [0.2.2] - 2026-08-15
 
 ### Added
@@ -230,6 +251,7 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.3.0]: https://crates.io/crates/paths-le/0.3.0
 [0.2.2]: https://crates.io/crates/paths-le/0.2.2
 [0.2.1]: https://crates.io/crates/paths-le/0.2.1
 [0.2.0]: https://crates.io/crates/paths-le/0.2.0

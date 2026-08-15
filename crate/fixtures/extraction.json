@@ -257,18 +257,18 @@
 		"languageId": "json",
 		"expected": [
 			{
-				"value": "./naïve/path.txt",
+				"value": "./na\u00efve/path.txt",
 				"type": "relative",
 				"line": 2,
 				"column": 11,
-				"context": "JSON café"
+				"context": "JSON caf\u00e9"
 			},
 			{
-				"value": "../über/straße.md",
+				"value": "../\u00fcber/stra\u00dfe.md",
 				"type": "relative",
 				"line": 3,
 				"column": 17,
-				"context": "JSON emoji🎯key"
+				"context": "JSON emoji\ud83c\udfafkey"
 			}
 		]
 	},
@@ -353,6 +353,27 @@
 				"line": 7,
 				"column": 2,
 				"context": "CSV cell [7,2]"
+			}
+		]
+	},
+	{
+		"name": "paths.tsv as tsv",
+		"file": "paths.tsv",
+		"languageId": "tsv",
+		"expected": [
+			{
+				"value": "/srv/reports/q1.pdf",
+				"type": "absolute",
+				"line": 2,
+				"column": 2,
+				"context": "TSV cell [2,2]"
+			},
+			{
+				"value": "./images/a.png",
+				"type": "relative",
+				"line": 3,
+				"column": 2,
+				"context": "TSV cell [3,2]"
 			}
 		]
 	},

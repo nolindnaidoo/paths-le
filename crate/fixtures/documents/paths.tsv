@@ -1,0 +1,4 @@
+name	path	size
+report	/srv/reports/q1.pdf	2048
+avatar	./images/a.png	512
+plain	not-a-path	9

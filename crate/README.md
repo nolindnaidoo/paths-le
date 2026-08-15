@@ -110,7 +110,7 @@ filesystem about them, and that is all it ever does.
 ## What it reads
 
 **Every text file in the tree.** Nine formats have a parser behind
-them — **JSON/JSONC, YAML, TOML, CSV, dotenv, JavaScript, TypeScript,
+them — **JSON/JSONC, YAML, TOML, CSV, TSV, dotenv, JavaScript, TypeScript,
 HTML, CSS/SCSS/LESS** — and everything else is read by a generic text
 scan: Python, Go, Markdown, XML, a Dockerfile, a Makefile.
 
