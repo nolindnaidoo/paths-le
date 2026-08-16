@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Extract every file path in a codebase, and say whether it still points at anything",
-	"version": "2.3.0",
+	"version": "2.3.1",
 	"license": "MIT",
 	"author": {
 		"name": "nolindnaidoo",
