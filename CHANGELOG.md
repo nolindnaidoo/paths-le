@@ -9,6 +9,24 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
+## [Unreleased]
+
+### Fixed
+
+- **A tab-separated file is read with tabs.** `.tsv` was handed to the
+  comma reader, so every row came back as a single field and the paths
+  inside it were never seen. Fixed on both frontends.
+
+### Changed
+
+- **New icon artwork.** A new drawing in the style the family is moving
+  to, framed like the rest of the set.
+
+### Fixed
+
+- **The agent-files check no longer times out on Windows.** A test-only
+  fix; nothing a user of the extension can observe.
+
 ## [2.3.0] - 2026-08-14
 
 Run it on the file you have open and it reads the file you have open.
