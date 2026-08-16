@@ -117,11 +117,13 @@ impl Extraction {
     }
 }
 
-/// A format extractor's result. Only the four regex-driven extractors
-/// can fail, and only by exhausting the backtracking budget on a
-/// pathological document — a refusal, never a wrong answer. The
-/// extension has no equivalent failure because its engine cannot report
-/// one; reporting it here is a documented divergence in SPEC.md.
+/// A format extractor's result. Two things fail, and neither is a wrong
+/// answer: the CSV reader refuses a document whose quoting is malformed,
+/// and the four regex-driven extractors refuse one that exhausts the
+/// backtracking budget. The first is reported by both frontends, from
+/// the same reader in two languages; the second is this crate's alone,
+/// because the extension's engine has no equivalent failure, and it is a
+/// documented divergence in SPEC.md.
 pub(crate) type Extracted = Result<Vec<Path>, String>;
 
 /// Extract every path from a document.
@@ -145,8 +147,8 @@ pub(crate) fn extract(content: &str, language_id: &str) -> Extraction {
 
 fn extract_by_file_type(content: &str, file_type: FileType) -> Extracted {
     match file_type {
-        FileType::Csv => Ok(csv::extract(content, csv::COMMA)),
-        FileType::Tsv => Ok(csv::extract(content, csv::TAB)),
+        FileType::Csv => csv::extract(content, csv::COMMA),
+        FileType::Tsv => csv::extract(content, csv::TAB),
         FileType::Toml => Ok(toml::extract(content)),
         FileType::Dotenv => dotenv::extract(content),
         FileType::Javascript | FileType::Typescript => javascript::extract(content),

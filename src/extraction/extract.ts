@@ -1,4 +1,4 @@
-import type { ExtractionResult, FileType, Path } from '../types';
+import type { Extracted, ExtractionResult, FileType } from '../types';
 import { extractFromCss } from './formats/css';
 import { extractFromCsv, TAB } from './formats/csv';
 import { extractFromDotenv } from './formats/dotenv';
@@ -20,41 +20,71 @@ export async function extractPaths(
 	content: string,
 	languageId: string,
 ): Promise<ExtractionResult> {
-	const paths = extractPathsByFileType(content, determineFileType(languageId));
+	const extracted = extractPathsByFileType(
+		content,
+		determineFileType(languageId),
+	);
+	if ('refusal' in extracted) return refused(extracted.refusal);
 
 	return Object.freeze({
 		success: true,
-		paths: Object.freeze(paths),
+		paths: Object.freeze(extracted.paths),
 		errors: Object.freeze([]),
+	});
+}
+
+/**
+ * A document a format reader refused: no paths, **and the reason why**.
+ *
+ * An empty result carrying an empty `diagnostics` is indistinguishable from a
+ * file that is genuinely clean, which is the silent miss this tool exists to
+ * prevent — a malformed CSV holding `/etc/passwd` reported neither the path nor
+ * a word about the malformation. The severity is `error`, so the MCP envelope
+ * comes back `ok: false` and the CLI exits 2 rather than reporting a clean run.
+ */
+function refused(message: string): ExtractionResult {
+	return Object.freeze({
+		success: false,
+		paths: Object.freeze([]),
+		errors: Object.freeze([
+			Object.freeze({
+				category: 'parsing' as const,
+				severity: 'error' as const,
+				message,
+				recoverable: false,
+				recoveryAction: 'none' as const,
+				timestamp: Date.now(),
+			}),
+		]),
 	});
 }
 
 function extractPathsByFileType(
 	content: string,
 	fileType: FileType,
-): readonly Path[] {
+): Extracted {
 	switch (fileType) {
 		case 'csv':
 			return extractFromCsv(content);
 		case 'tsv':
 			return extractFromCsv(content, TAB);
 		case 'toml':
-			return extractFromToml(content);
+			return { paths: extractFromToml(content) };
 		case 'dotenv':
-			return extractFromDotenv(content);
+			return { paths: extractFromDotenv(content) };
 		case 'javascript':
 		case 'typescript':
-			return extractFromJavaScript(content);
+			return { paths: extractFromJavaScript(content) };
 		case 'json':
-			return extractFromJson(content);
+			return { paths: extractFromJson(content) };
 		case 'css':
-			return extractFromCss(content);
+			return { paths: extractFromCss(content) };
 		case 'html':
-			return extractFromHtml(content);
+			return { paths: extractFromHtml(content) };
 		case 'yaml':
-			return extractFromYaml(content);
+			return { paths: extractFromYaml(content) };
 		default:
-			return extractFromFallback(content);
+			return { paths: extractFromFallback(content) };
 	}
 }
 

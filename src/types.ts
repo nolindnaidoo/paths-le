@@ -21,6 +21,20 @@ export interface ParseError {
 	readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * What one format extractor answers: the paths it found, or the reason it
+ * refused the document.
+ *
+ * Only the CSV reader refuses today. A document whose quoting is malformed is
+ * not a document with no paths in it, and reporting it as one — an empty result
+ * with an empty `diagnostics` — is the silent miss this tool exists to prevent.
+ * The crate's `Extracted` is the same type in Rust, and both readers produce the
+ * same message.
+ */
+export type Extracted =
+	| { readonly paths: readonly Path[] }
+	| { readonly refusal: string };
+
 export interface Path {
 	readonly value: string;
 	readonly type: PathType;

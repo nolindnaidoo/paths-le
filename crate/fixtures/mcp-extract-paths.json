@@ -600,6 +600,176 @@
 		}
 	},
 	{
+		"name": "a csv whose quote is never closed refuses and names why",
+		"content": "\"name,size\n/etc/passwd,1\n",
+		"arguments": {
+			"format": "csv"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "csv"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid CSV: quoted field is never closed (row 1, cell 1)"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a csv cell that carries on past its closing quote refuses and names why",
+		"content": "\"a\"x,size\n/etc/passwd,1\n",
+		"arguments": {
+			"format": "csv"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "csv"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid CSV: a closing quote is followed by more than whitespace (row 1, cell 1)"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a refusal points at the cell it gave up on",
+		"content": "a,b\nc,d\ne,\"f\"x\n",
+		"arguments": {
+			"format": "csv"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "csv"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid CSV: a closing quote is followed by more than whitespace (row 3, cell 2)"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a tsv refusal is reported as a tsv",
+		"content": "\"./no-extension\",two\n1,2\n",
+		"arguments": {
+			"format": "tsv"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "tsv"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid TSV: a closing quote is followed by more than whitespace (row 1, cell 1)"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a no-break space after a closing quote is whitespace like any other",
+		"content": "\"name\" ,size\n/etc/passwd,1\n/var/log/app.log,2\n",
+		"arguments": {
+			"format": "csv"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "/etc/passwd",
+						"type": "absolute",
+						"line": 2,
+						"column": 1
+					},
+					{
+						"value": "/var/log/app.log",
+						"type": "absolute",
+						"line": 3,
+						"column": 1
+					}
+				],
+				"fileType": "csv"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 2,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a byte-order mark after a closing quote is whitespace like any other",
+		"content": "\"name\"﻿,size\n/etc/passwd,1\n/var/log/app.log,2\n",
+		"arguments": {
+			"format": "csv"
+		},
+		"expected": {
+			"ok": true,
+			"data": {
+				"paths": [
+					{
+						"value": "/etc/passwd",
+						"type": "absolute",
+						"line": 2,
+						"column": 1
+					},
+					{
+						"value": "/var/log/app.log",
+						"type": "absolute",
+						"line": 3,
+						"column": 1
+					}
+				],
+				"fileType": "csv"
+			},
+			"diagnostics": [],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 2,
+				"truncated": false
+			}
+		}
+	},
+	{
 		"name": "content must be a string",
 		"arguments": {
 			"format": "json"

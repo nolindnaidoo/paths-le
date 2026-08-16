@@ -7,7 +7,7 @@
 
 use super::js;
 use super::position::Position;
-use super::{Path, heuristics};
+use super::{Extracted, Path, heuristics};
 
 /// The character between cells, and the name the context line goes by.
 ///
@@ -20,28 +20,31 @@ pub(crate) const TAB: char = '\t';
 
 const QUOTE: char = '"';
 
-/// The row separators `csv-parse` discovers, in its order of preference.
+/// The row separators the reader discovers, in its order of preference.
 /// Windows before the classic Mac ending, or every `\r\n` would read as
 /// a `\r` row followed by an empty one.
 const ENDINGS: [&str; 3] = ["\r\n", "\n", "\r"];
 
-pub(crate) fn extract(content: &str, delimiter: char) -> Vec<Path> {
+pub(crate) fn extract(content: &str, delimiter: char) -> Extracted {
     let label = if delimiter == TAB { "TSV" } else { "CSV" };
     if js::is_blank(content) {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    // The extension's reader strips a byte-order mark; this one does
-    // not, and a leading BOM would otherwise become part of the first
+    // `csv-parse` was asked to strip a byte-order mark; both readers do
+    // it themselves now, or a leading BOM becomes part of the first
     // header cell.
     let content = content.strip_prefix('\u{feff}').unwrap_or(content);
 
-    // A refused document reports nothing at all, matching the
-    // extension's `catch { return [] }`. A half-read CSV would report
-    // positions that do not correspond to the file.
-    let Some(records) = rows(content, delimiter) else {
-        return Vec::new();
-    };
+    // A refused document says why. It used to report nothing at all,
+    // matching the extension's `catch { return [] }` — and a document
+    // holding `/etc/passwd` then came back as no paths and no
+    // diagnostics, which is indistinguishable from a file that is
+    // genuinely clean. That silent miss is the failure this family
+    // exists to prevent, so both readers now name the malformation.
+    // Still no partial answer: a half-read CSV would report positions
+    // that do not correspond to the file.
+    let records = rows(content, delimiter).map_err(|refusal| refusal.message(label))?;
 
     let mut paths = Vec::new();
     for (row_index, record) in records.iter().enumerate() {
@@ -64,7 +67,56 @@ pub(crate) fn extract(content: &str, delimiter: char) -> Vec<Path> {
             });
         }
     }
-    paths
+    Ok(paths)
+}
+
+/// Why the reader gave up, and where.
+///
+/// The coordinates are the ones a reported path carries — the row number
+/// and the cell index, both counted from one — so "row 2, cell 3" names
+/// the same place in the document as `CSV cell [2,3]` does. A byte
+/// offset would not: the two frontends count a document's length in
+/// different units, and this message has to come out byte-identical from
+/// both.
+#[derive(Debug, PartialEq, Eq)]
+struct Refusal {
+    reason: Reason,
+    row: usize,
+    cell: usize,
+}
+
+/// The two ways a document is malformed. Kept apart because the message
+/// is the only place a reader learns which one happened, and "invalid
+/// CSV" on its own tells them nothing they can act on.
+#[derive(Debug, PartialEq, Eq)]
+enum Reason {
+    Unterminated,
+    AfterClosingQuote,
+}
+
+impl Refusal {
+    /// `label` is the name the context line goes by, so a tab-separated
+    /// document is not reported as an invalid CSV.
+    fn message(&self, label: &str) -> String {
+        let what = match self.reason {
+            Reason::Unterminated => "quoted field is never closed",
+            Reason::AfterClosingQuote => "a closing quote is followed by more than whitespace",
+        };
+        format!(
+            "Invalid {label}: {what} (row {}, cell {})",
+            self.row, self.cell
+        )
+    }
+}
+
+/// Where the reader stands: the rows it has finished and the cells it
+/// has taken, both counted from one.
+fn at(reason: Reason, records: &[Vec<String>], record: &[String]) -> Refusal {
+    Refusal {
+        reason,
+        row: records.len() + 1,
+        cell: record.len() + 1,
+    }
 }
 
 /// The cell being read.
@@ -93,40 +145,40 @@ impl Cell {
     }
 
     /// One character of text, which decides both what the cell keeps and
-    /// how far the scan moves — `csv-parse` folds the two together.
-    /// `None` refuses the document.
+    /// how far the scan moves — `csv-parse` folds the two together. An
+    /// `Err` refuses the document.
     ///
     /// A cell that has been through a closing quote keeps nothing more,
     /// whether or not a later quote re-opened it: whitespace may stand
     /// between the closing quote and the end of the cell, and nothing
     /// else may.
-    fn push(&mut self, c: char) -> Option<usize> {
+    fn push(&mut self, c: char) -> Result<usize, Reason> {
         let space = js::is_js_whitespace(c);
         let keeps = self.quoting || !self.text.is_empty() || !space;
         if keeps && !self.was_quoted {
             self.text.push(c);
-            return Some(c.len_utf8());
+            return Ok(c.len_utf8());
         }
         if !space {
-            return None;
+            return Err(Reason::AfterClosingQuote);
         }
         // Whitespace the reader drops: leading whitespace, or the run
-        // after a closing quote. It steps a whole character over the
-        // first and a single *byte* over the second, so a multi-byte
-        // space there lands mid-sequence next time round, where no
-        // separator, quote or space can match and the document is
-        // refused. U+00A0 and U+FEFF are ordinary things to find in a
-        // spreadsheet export, so the quirk is reproduced rather than
-        // tidied away.
-        if !keeps {
-            return Some(c.len_utf8());
-        }
-        (c.len_utf8() == 1).then_some(1)
+        // after a closing quote. `csv-parse` steps a whole character
+        // over the first and a single *byte* over the second, so a
+        // multi-byte space there landed mid-sequence next time round,
+        // where no separator, quote or space can match, and refused a
+        // document nobody had mis-quoted. U+00A0 and U+FEFF are ordinary
+        // things to find in a spreadsheet export, so the whole character
+        // is stepped over on both frontends now: whitespace is
+        // whitespace whatever its encoded length.
+        Ok(c.len_utf8())
     }
 }
 
-/// The extension's reader, rule for rule — `csv-parse` under `trim`,
-/// `relax_quotes`, `skip_empty_lines` and `relax_column_count`.
+/// The reader the extension spells out in
+/// `src/extraction/formats/csv.ts`, rule for rule — `csv-parse` under
+/// `trim`, `relax_quotes`, `skip_empty_lines` and `relax_column_count`,
+/// with the one rule below that is deliberately not mirrored.
 ///
 /// Hand-written because no Rust reader answers the same way. Asked to
 /// read `"./a",b` with a tab delimiter — one cell whose text is
@@ -137,11 +189,18 @@ impl Cell {
 /// of a cell somebody quoted wrong is the failure this family exists to
 /// refuse.
 ///
-/// `None` is the parse error the extension catches, and exactly two
-/// things produce it: a quote left open at the end of the document, and
+/// The extension carries the same reader for the same kind of reason:
+/// `csv-parse` *throws* on the malformations below, so nothing on that
+/// side could name which one happened, and it walks the whitespace after
+/// a closing quote one byte at a time, so nothing could stop it refusing
+/// a document over a no-break space. Two readers, one rule set, held
+/// equal by `fixtures/mcp-extract-paths.json`.
+///
+/// An `Err` is the refusal both frontends report, and exactly two things
+/// produce it: a quote left open at the end of the document, and
 /// anything but whitespace between a closing quote and the end of its
 /// cell.
-fn rows(content: &str, delimiter: char) -> Option<Vec<Vec<String>>> {
+fn rows(content: &str, delimiter: char) -> Result<Vec<Vec<String>>, Refusal> {
     let mut records: Vec<Vec<String>> = Vec::new();
     let mut record: Vec<String> = Vec::new();
     let mut cell = Cell {
@@ -154,7 +213,8 @@ fn rows(content: &str, delimiter: char) -> Option<Vec<Vec<String>>> {
 
     while let Some(c) = rest.chars().next() {
         if cell.quoting {
-            rest = quoted(&mut cell, &mut ending, rest, delimiter)?;
+            rest = quoted(&mut cell, &mut ending, rest, delimiter)
+                .map_err(|reason| at(reason, &records, &record))?;
             continue;
         }
 
@@ -192,17 +252,20 @@ fn rows(content: &str, delimiter: char) -> Option<Vec<Vec<String>>> {
             continue;
         }
 
-        rest = &rest[cell.push(c)?..];
+        let step = cell
+            .push(c)
+            .map_err(|reason| at(reason, &records, &record))?;
+        rest = &rest[step..];
     }
 
     if cell.quoting {
-        return None;
+        return Err(at(Reason::Unterminated, &records, &record));
     }
     if cell.was_quoted || !cell.text.is_empty() || !record.is_empty() {
         record.push(cell.take());
         records.push(record);
     }
-    Some(records)
+    Ok(records)
 }
 
 /// One step inside `"…"`, returning what is left to read.
@@ -211,17 +274,19 @@ fn quoted<'a>(
     ending: &mut Option<&'a str>,
     rest: &'a str,
     delimiter: char,
-) -> Option<&'a str> {
+) -> Result<&'a str, Reason> {
     // A doubled quote is one quote of text, and it can never be the
     // closing one. The reader steps over the first and takes the second
     // as an ordinary character, so it goes through `push` like one.
     if let Some(tail) = rest.strip_prefix("\"\"") {
         cell.push(QUOTE)?;
-        return Some(tail);
+        return Ok(tail);
     }
-    let c = rest.chars().next()?;
+    let Some(c) = rest.chars().next() else {
+        return Err(Reason::Unterminated);
+    };
     if c != QUOTE {
-        return Some(&rest[cell.push(c)?..]);
+        return Ok(&rest[cell.push(c)?..]);
     }
 
     let after = &rest[QUOTE.len_utf8()..];
@@ -235,11 +300,11 @@ fn quoted<'a>(
     // step earlier — and it is the honest one. `"./a",b` read on tabs is
     // not the path `./a,b`; it is a cell somebody quoted wrong.
     if !closes(after, delimiter, *ending) {
-        return None;
+        return Err(Reason::AfterClosingQuote);
     }
     cell.quoting = false;
     cell.was_quoted = true;
-    Some(after)
+    Ok(after)
 }
 
 /// Whether a closing quote here really closes the cell.
@@ -259,28 +324,35 @@ mod tests {
     use super::*;
     use crate::extract::PathType;
 
+    /// The paths of a document that reads. Every case below either goes
+    /// through this or asserts the refusal by hand, so a test can never
+    /// pass by quietly reading a refusal as an empty result.
+    fn read(content: &str, delimiter: char) -> Vec<Path> {
+        extract(content, delimiter).expect("the document reads")
+    }
+
     /// The delimiter is the whole fix: read on commas, a tab row is one
     /// cell, which is never path-like, so a `.tsv` full of paths
     /// reported nothing and exited 1 like a clean file.
     #[test]
     fn a_tab_row_is_cells_under_tab_and_one_cell_under_comma() {
         let text = "name\tpath\nalpha\t./src/a.ts\n";
-        let tabbed = extract(text, TAB);
+        let tabbed = read(text, TAB);
         assert_eq!(tabbed.len(), 1);
         assert_eq!(tabbed[0].value, "./src/a.ts");
         assert_eq!(tabbed[0].context, "TSV cell [2,2]");
-        assert!(extract(text, COMMA).is_empty());
+        assert!(read(text, COMMA).is_empty());
     }
 
     #[test]
     fn a_blank_document_yields_nothing() {
-        assert!(extract("", COMMA).is_empty());
-        assert!(extract(" \n ", COMMA).is_empty());
+        assert!(read("", COMMA).is_empty());
+        assert!(read(" \n ", COMMA).is_empty());
     }
 
     #[test]
     fn positions_are_cell_coordinates() {
-        let paths = extract("a,b\nx,/srv/f.txt\n", COMMA);
+        let paths = read("a,b\nx,/srv/f.txt\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position, Position { line: 2, column: 2 });
         assert_eq!(paths[0].context, "CSV cell [2,2]");
@@ -288,7 +360,7 @@ mod tests {
 
     #[test]
     fn a_quoted_cell_may_contain_a_space() {
-        let paths = extract("a\n\"./with space/f.png\"\n", COMMA);
+        let paths = read("a\n\"./with space/f.png\"\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "./with space/f.png");
         assert_eq!(paths[0].kind, PathType::Relative);
@@ -296,13 +368,13 @@ mod tests {
 
     #[test]
     fn cells_are_trimmed_before_the_heuristic_sees_them() {
-        let paths = extract("a\n   /srv/f.txt   \n", COMMA);
+        let paths = read("a\n   /srv/f.txt   \n", COMMA);
         assert_eq!(paths[0].value, "/srv/f.txt");
     }
 
     #[test]
     fn ragged_rows_are_data_not_an_error() {
-        let paths = extract(
+        let paths = read(
             "a,b,c\n/one.txt\n/two.txt,/three.txt,/four.txt,/five.txt\n",
             COMMA,
         );
@@ -311,7 +383,7 @@ mod tests {
 
     #[test]
     fn version_strings_and_plain_words_are_not_paths() {
-        let paths = extract("version,name\n3.4.5,not-a-path\n", COMMA);
+        let paths = read("version,name\n3.4.5,not-a-path\n", COMMA);
         assert!(paths.is_empty());
     }
 
@@ -324,27 +396,27 @@ mod tests {
     #[test]
     fn cells_are_trimmed_with_javascripts_whitespace_not_rusts() {
         // U+0085 is whitespace to Rust and not to JavaScript: it stays.
-        let paths = extract("a\n\u{85}/a.txt\n", COMMA);
+        let paths = read("a\n\u{85}/a.txt\n", COMMA);
         assert_eq!(paths[0].value, "\u{85}/a.txt");
         assert_eq!(paths[0].kind, PathType::File);
 
         // U+FEFF is the mirror image — whitespace to JavaScript and not
         // to Rust — so it goes.
-        let paths = extract("a\nx,\u{feff}/a.txt\n", COMMA);
+        let paths = read("a\nx,\u{feff}/a.txt\n", COMMA);
         assert_eq!(paths[0].value, "/a.txt");
         assert_eq!(paths[0].kind, PathType::Absolute);
     }
 
     #[test]
     fn a_byte_order_mark_does_not_corrupt_the_first_cell() {
-        let paths = extract("\u{feff}/srv/f.txt\n", COMMA);
+        let paths = read("\u{feff}/srv/f.txt\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "/srv/f.txt");
     }
 
     #[test]
     fn empty_lines_do_not_shift_the_rows_after_them() {
-        let paths = extract("a\n\n/srv/f.txt\n", COMMA);
+        let paths = read("a\n\n/srv/f.txt\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position.line, 2);
     }
@@ -357,106 +429,152 @@ mod tests {
     /// wrote; `csv-parse` refuses the document, so this does too.
     #[test]
     fn a_quote_that_closes_mid_cell_refuses_the_document() {
-        assert!(extract("\"./no-extension\",two\n1,2\n", TAB).is_empty());
-        assert!(rows("\"./no-extension\",two\n1,2\n", TAB).is_none());
+        let refusal = extract("\"./no-extension\",two\n1,2\n", TAB).expect_err("a refusal");
+        assert_eq!(
+            refusal,
+            "Invalid TSV: a closing quote is followed by more than whitespace (row 1, cell 1)"
+        );
+        assert!(rows("\"./no-extension\",two\n1,2\n", TAB).is_err());
 
         // The same bytes on commas are well-formed and still read.
-        let paths = extract("\"./no-extension\",two\n1,2\n", COMMA);
+        let paths = read("\"./no-extension\",two\n1,2\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "./no-extension");
         assert_eq!(paths[0].position, Position { line: 1, column: 1 });
     }
 
     /// A refusal is the whole document, not the offending cell: the
-    /// extension's reader throws and its `catch` returns `[]`, so a
-    /// perfectly good path on a later row goes unreported too. Reporting
-    /// it here would be a different answer from the same input.
+    /// reader cannot place a path from a file it stopped reading, so a
+    /// good path on a later row goes unreported too. What it may never do
+    /// is go unreported *silently* — this document holds `/real/path.txt`
+    /// and used to come back as no paths with an empty `diagnostics`,
+    /// which reads as a file that is clean.
     #[test]
-    fn a_refusal_abandons_every_row_including_the_good_ones() {
-        assert!(extract("\"a\"x\n/real/path.txt\n", COMMA).is_empty());
-        assert!(extract("\"a\"x\t/real/path.txt\n", TAB).is_empty());
+    fn a_refusal_abandons_every_row_and_says_so() {
+        for delimiter in [COMMA, TAB] {
+            let separator = if delimiter == TAB { '\t' } else { ',' };
+            let document = format!("\"a\"x{separator}/real/path.txt\n");
+            let refusal = extract(&document, delimiter).expect_err("a refusal");
+            assert!(refusal.contains("closing quote"), "{refusal}");
+            assert!(!refusal.is_empty());
+        }
     }
 
-    /// Both spellings of malformed quoting, on both delimiters.
+    /// Both spellings of malformed quoting, on both delimiters, each with
+    /// the message that names which one happened. "Invalid CSV" on its
+    /// own would leave a reader nothing to act on.
     #[test]
-    fn every_malformed_quote_refuses_on_either_delimiter() {
+    fn every_malformed_quote_refuses_with_the_reason_that_applies() {
         for delimiter in [COMMA, TAB] {
+            let label = if delimiter == TAB { "TSV" } else { "CSV" };
+            let closing = format!(
+                "Invalid {label}: a closing quote is followed by more than whitespace (row 1, cell 1)"
+            );
+            let never = format!("Invalid {label}: quoted field is never closed (row 1, cell 1)");
+
             // Junk straight after the closing quote.
-            assert!(rows("\"abc\"def\n", delimiter).is_none());
+            assert_eq!(refusal("\"abc\"def\n", delimiter), closing);
             // Junk after the closing quote and its trailing space.
-            assert!(rows("  \"a\"  x,b\n", delimiter).is_none());
+            assert_eq!(refusal("  \"a\"  x,b\n", delimiter), closing);
             // A closing quote followed by junk at the end of the file.
-            assert!(rows("\"abc\"x", delimiter).is_none());
+            assert_eq!(refusal("\"abc\"x", delimiter), closing);
             // Never closed at all.
-            assert!(rows("\"unterminated\n", delimiter).is_none());
-            assert!(rows("\"", delimiter).is_none());
+            assert_eq!(refusal("\"unterminated\n", delimiter), never);
+            assert_eq!(refusal("\"", delimiter), never);
             // The doubled quote swallowed the closing one.
-            assert!(rows("\"a\"\"\n", delimiter).is_none());
+            assert_eq!(refusal("\"a\"\"\n", delimiter), never);
         }
+    }
+
+    /// The refusal points at the cell it gave up on, in the coordinates a
+    /// reported path carries — so `row 3, cell 2` is the cell a result
+    /// would have called `CSV cell [3,2]`.
+    #[test]
+    fn a_refusal_names_the_cell_it_gave_up_on() {
+        assert_eq!(
+            refusal("a,b\nc,d\ne,\"f\"x\n", COMMA),
+            "Invalid CSV: a closing quote is followed by more than whitespace (row 3, cell 2)"
+        );
+        assert_eq!(
+            refusal("a,b\nc,\"never closed\n", COMMA),
+            "Invalid CSV: quoted field is never closed (row 2, cell 2)"
+        );
     }
 
     /// A quote that is not at the start of a cell is text, which is what
     /// `relax_quotes` is actually for. None of these refuse.
     #[test]
     fn a_quote_inside_a_cell_is_literal_text() {
-        assert_eq!(rows("a\"b,c\n", COMMA), Some(vec![vec_of(&["a\"b", "c"])]));
+        assert_eq!(rows("a\"b,c\n", COMMA), Ok(vec![vec_of(&["a\"b", "c"])]));
         assert_eq!(
             rows("abc\"def\"\n", COMMA),
-            Some(vec![vec_of(&["abc\"def\""])])
+            Ok(vec![vec_of(&["abc\"def\""])])
         );
         assert_eq!(
             rows("ab\"\ncd\n", COMMA),
-            Some(vec![vec_of(&["ab\""]), vec_of(&["cd"]),])
+            Ok(vec![vec_of(&["ab\""]), vec_of(&["cd"]),])
         );
         // Under tabs the same row is one cell, quotes and commas and all.
-        assert_eq!(rows("a\"b,c\n", TAB), Some(vec![vec_of(&["a\"b,c"])]));
+        assert_eq!(rows("a\"b,c\n", TAB), Ok(vec![vec_of(&["a\"b,c"])]));
     }
 
     /// Well-formed quoting still means what it always did, on either
     /// delimiter: the delimiter inside the quotes is text.
     #[test]
     fn a_delimiter_inside_a_well_formed_quoted_cell_does_not_split_it() {
-        assert_eq!(
-            rows("\"a,b\",c\n", COMMA),
-            Some(vec![vec_of(&["a,b", "c"])])
-        );
-        assert_eq!(
-            rows("\"a\tb\"\tc\n", TAB),
-            Some(vec![vec_of(&["a\tb", "c"])])
-        );
+        assert_eq!(rows("\"a,b\",c\n", COMMA), Ok(vec![vec_of(&["a,b", "c"])]));
+        assert_eq!(rows("\"a\tb\"\tc\n", TAB), Ok(vec![vec_of(&["a\tb", "c"])]));
         // A doubled quote is one quote of text, and a quoted cell may
         // carry a row separator.
-        assert_eq!(rows("\"a\"\"b\"\n", COMMA), Some(vec![vec_of(&["a\"b"])]));
-        assert_eq!(rows("\"\"\"\"\n", COMMA), Some(vec![vec_of(&["\""])]));
+        assert_eq!(rows("\"a\"\"b\"\n", COMMA), Ok(vec![vec_of(&["a\"b"])]));
+        assert_eq!(rows("\"\"\"\"\n", COMMA), Ok(vec![vec_of(&["\""])]));
         assert_eq!(
             rows("\"a\nb\",c\n", COMMA),
-            Some(vec![vec_of(&["a\nb", "c"])])
+            Ok(vec![vec_of(&["a\nb", "c"])])
         );
     }
 
-    /// Whitespace is allowed to stand between a closing quote and the
-    /// end of its cell — but `csv-parse` walks that run a byte at a
-    /// time, so a multi-byte space refuses where a single-byte one is
-    /// skipped, and only once the cell has text to keep.
+    /// Whitespace may stand between a closing quote and the end of its
+    /// cell, and how many bytes it is spelled with is none of the
+    /// reader's business.
+    ///
+    /// `csv-parse` walks that run a byte at a time, so U+00A0 refused
+    /// where U+0020 was skipped — and a no-break space is an ordinary
+    /// thing to find in a spreadsheet export. Both frontends step the
+    /// whole character now; this is the one rule deliberately *not*
+    /// mirrored from `csv-parse`.
     #[test]
-    fn whitespace_after_a_closing_quote_follows_the_readers_own_rule() {
-        assert_eq!(rows("\"a\" ,b\n", COMMA), Some(vec![vec_of(&["a", "b"])]));
-        assert_eq!(
-            rows("  \"a\"  ,b\n", COMMA),
-            Some(vec![vec_of(&["a", "b"])])
+    fn whitespace_after_a_closing_quote_is_whitespace_whatever_its_length() {
+        assert_eq!(rows("\"a\" ,b\n", COMMA), Ok(vec![vec_of(&["a", "b"])]));
+        assert_eq!(rows("  \"a\"  ,b\n", COMMA), Ok(vec![vec_of(&["a", "b"])]));
+        for space in ['\u{a0}', '\u{feff}', '\u{2028}', '\u{2003}', '\u{3000}'] {
+            assert_eq!(
+                rows(&format!("\"a\"{space},b\n"), COMMA),
+                Ok(vec![vec_of(&["a", "b"])]),
+                "{space:?} after a closing quote"
+            );
+            assert_eq!(
+                rows(&format!("\"a\" {space} ,b\n"), COMMA),
+                Ok(vec![vec_of(&["a", "b"])]),
+                "{space:?} in a run after a closing quote"
+            );
+        }
+        // The whole document, not just the reader: a spreadsheet export
+        // whose header carries one used to report none of its paths.
+        let paths = read(
+            "\"name\"\u{a0},size\n/etc/passwd,1\n/var/log/app.log,2\n",
+            COMMA,
         );
-        assert!(rows("\"a\"\u{a0},b\n", COMMA).is_none());
-        assert!(rows("\"a\" \u{a0},b\n", COMMA).is_none());
-        assert!(rows("\"a\"\u{feff},b\n", COMMA).is_none());
-        // An empty quoted cell has nothing to keep, so the reader steps
-        // the whole character and reads on.
-        assert_eq!(
-            rows("\"\"\u{a0},b\n", COMMA),
-            Some(vec![vec_of(&["", "b"])])
-        );
+        assert_eq!(paths.len(), 2);
+        assert_eq!(paths[0].value, "/etc/passwd");
+        assert_eq!(paths[1].value, "/var/log/app.log");
+
+        // An empty quoted cell has nothing to keep, and always stepped
+        // the whole character.
+        assert_eq!(rows("\"\"\u{a0},b\n", COMMA), Ok(vec![vec_of(&["", "b"])]));
         assert_eq!(
             rows("\"\" \u{feff},b\n", COMMA),
-            Some(vec![vec_of(&["", "b"])])
+            Ok(vec![vec_of(&["", "b"])])
         );
     }
 
@@ -468,12 +586,12 @@ mod tests {
     #[test]
     fn a_cell_that_re_opens_its_quotes_may_still_keep_nothing() {
         // Nothing to keep, so it reads to the end.
-        assert_eq!(rows("\"\" \"\" ", COMMA), Some(vec![vec_of(&[""])]));
-        assert_eq!(rows("\"\" \"\",b\n", COMMA), Some(vec![vec_of(&["", "b"])]));
+        assert_eq!(rows("\"\" \"\" ", COMMA), Ok(vec![vec_of(&[""])]));
+        assert_eq!(rows("\"\" \"\",b\n", COMMA), Ok(vec![vec_of(&["", "b"])]));
         // Something to keep, so it refuses.
-        assert!(rows("\"\" \"./b.ts\"\n", COMMA).is_none());
-        assert!(rows("\"\"\t\"\"\"\"\r./b.ts", COMMA).is_none());
-        assert!(rows("\"\" \u{feff}\"./b.ts\"\r/c.md", TAB).is_none());
+        assert!(rows("\"\" \"./b.ts\"\n", COMMA).is_err());
+        assert!(rows("\"\"\t\"\"\"\"\r./b.ts", COMMA).is_err());
+        assert!(rows("\"\" \u{feff}\"./b.ts\"\r/c.md", TAB).is_err());
     }
 
     /// The row separator is fixed by the first one outside a quoted
@@ -483,15 +601,15 @@ mod tests {
     fn the_row_separator_is_whichever_one_came_first() {
         assert_eq!(
             rows("a,b\nc\r\nd\n", COMMA),
-            Some(vec![vec_of(&["a", "b"]), vec_of(&["c"]), vec_of(&["d"])])
+            Ok(vec![vec_of(&["a", "b"]), vec_of(&["c"]), vec_of(&["d"])])
         );
         assert_eq!(
             rows("a,b\r\nc\nd\r\n", COMMA),
-            Some(vec![vec_of(&["a", "b"]), vec_of(&["c\nd"])])
+            Ok(vec![vec_of(&["a", "b"]), vec_of(&["c\nd"])])
         );
         assert_eq!(
             rows("a,b\rc,d\r", COMMA),
-            Some(vec![vec_of(&["a", "b"]), vec_of(&["c", "d"])])
+            Ok(vec![vec_of(&["a", "b"]), vec_of(&["c", "d"])])
         );
     }
 
@@ -501,11 +619,11 @@ mod tests {
     /// one is a row.
     #[test]
     fn a_whitespace_only_row_does_not_shift_the_rows_after_it() {
-        let paths = extract("a\n   \n/srv/f.txt\n", COMMA);
+        let paths = read("a\n   \n/srv/f.txt\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position.line, 2);
 
-        let paths = extract("a\n\u{85}\n/srv/f.txt\n", COMMA);
+        let paths = read("a\n\u{85}\n/srv/f.txt\n", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position.line, 3);
     }
@@ -514,11 +632,15 @@ mod tests {
     /// cell, quoted or not.
     #[test]
     fn a_document_that_stops_without_a_row_separator_keeps_its_last_cell() {
-        let paths = extract("one,two\n\"./x.ts\",2", COMMA);
+        let paths = read("one,two\n\"./x.ts\",2", COMMA);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position, Position { line: 2, column: 1 });
-        assert_eq!(rows("a,", COMMA), Some(vec![vec_of(&["a", ""])]));
-        assert_eq!(rows("\"abc\" ", COMMA), Some(vec![vec_of(&["abc"])]));
+        assert_eq!(rows("a,", COMMA), Ok(vec![vec_of(&["a", ""])]));
+        assert_eq!(rows("\"abc\" ", COMMA), Ok(vec![vec_of(&["abc"])]));
+    }
+
+    fn refusal(content: &str, delimiter: char) -> String {
+        extract(content, delimiter).expect_err("a refusal")
     }
 
     fn vec_of(cells: &[&str]) -> Vec<String> {

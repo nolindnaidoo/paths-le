@@ -216,11 +216,11 @@ setting of its own.
 <!-- performance:start -->
 | Input | Size | Found | Time | Rate | Scan speed |
 | --- | --- | --- | --- | --- | --- |
-| TypeScript imports | 2.10 MB | 40,000 | 20.4 ms | 1,960,564/sec | 103.1 MB/s |
-| JSON config | 1.17 MB | 40,001 | 25.1 ms | 1,593,917/sec | 46.7 MB/s |
-| HTML document | 1.27 MB | 40,000 | 17.57 ms | 2,277,234/sec | 72 MB/s |
-| CSS stylesheet | 1.57 MB | 40,000 | 18.59 ms | 2,151,130/sec | 84.5 MB/s |
-| CSV data | 2.09 MB | 60,000 | 57.33 ms | 1,046,485/sec | 36.5 MB/s |
+| TypeScript imports | 2.10 MB | 40,000 | 19.85 ms | 2,015,130/sec | 105.9 MB/s |
+| JSON config | 1.17 MB | 40,001 | 23.17 ms | 1,726,103/sec | 50.6 MB/s |
+| HTML document | 1.27 MB | 40,000 | 18.64 ms | 2,146,436/sec | 67.9 MB/s |
+| CSS stylesheet | 1.57 MB | 40,000 | 16.47 ms | 2,428,210/sec | 95.3 MB/s |
+| CSV data | 2.09 MB | 60,000 | 67.22 ms | 892,581/sec | 31.1 MB/s |
 
 Median of 7 runs after warmup, on Apple M5 Pro, 24 GB RAM, Node 24.3.0. Inputs are generated
 by `scripts/benchmark.ts` rather than checked in, so the sizes above are
@@ -235,12 +235,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 92.04% |
-| Branches | 85.65% |
-| Functions | 94.55% |
-| Lines | 92.83% |
+| Statements | 92.70% |
+| Branches | 87.04% |
+| Functions | 94.93% |
+| Lines | 93.67% |
 
-296 test cases across 22 files, plus an integration suite that runs
+318 test cases across 22 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 

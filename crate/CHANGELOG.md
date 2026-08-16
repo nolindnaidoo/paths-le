@@ -7,6 +7,51 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **A CSV this tool cannot read now exits 2 and says why, instead of
+  reporting a clean file.** 0.3.2 made a malformed quote refuse the whole
+  document, which was right, but the refusal was silent: no paths, an
+  empty `diagnostics`, and exit 0. A file holding `/etc/passwd` and
+  `/var/log/app.log` was indistinguishable from a file with no paths in
+  it — the outcome SPEC.md names as the one never allowed. A refused
+  document now carries one diagnostic, severity `error` and code
+  `parsing`, naming which malformation happened and where:
+
+  ```
+  Invalid CSV: quoted field is never closed (row 1, cell 1)
+  Invalid CSV: a closing quote is followed by more than whitespace (row 3, cell 2)
+  ```
+
+  `TSV` replaces `CSV` when the delimiter is a tab. The coordinates are
+  cell coordinates — `row 3, cell 2` is what a result would have called
+  `CSV cell [3,2]` — rather than a byte offset, which two frontends
+  counting a document's length in different units could not spell the
+  same way. An `error` diagnostic already means the file was not
+  examined, so the run exits 2 by the rule that was already there. The
+  npm server emits the identical diagnostic; the corpus pins it.
+
+- **A no-break space after a closing quote no longer loses the whole
+  document.** `csv-parse` walks that whitespace run one *byte* at a time,
+  and the reader mirrored the quirk deliberately — so `"name" ,size` was
+  read and `"name"<U+00A0>,size` was refused, along with U+FEFF, U+2028
+  and every other multi-byte space. All of them are ordinary in a
+  spreadsheet export, and a document carrying one is not malformed.
+  Whitespace is whitespace whatever its encoded length; both frontends
+  step the whole character now. This is the one rule deliberately not
+  mirrored from `csv-parse`, and SPEC.md says so.
+
+### Changed
+
+- **The extension carries the same reader.** It delegated to `csv-parse`,
+  which throws — so nothing on that side could name the malformation —
+  and which has the whitespace bug above with no setting that turns it
+  off. `src/extraction/formats/csv.ts` is now `extract/csv.rs` in
+  TypeScript, and `fixtures/mcp-extract-paths.json` holds the two equal.
+  No other rule moved on either side.
+
 ## [0.3.2] - 2026-08-16
 
 ### Fixed

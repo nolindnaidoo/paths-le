@@ -469,3 +469,55 @@ fn a_named_format_never_finds_less_than_the_generic_scan() {
     assert_eq!(values(&named_run).len(), 2);
     assert_eq!(reports(&named_run)[0]["format"], "tsv");
 }
+
+/// **A document the reader refused exits 2 and says why.**
+///
+/// It used to report no paths, an empty `diagnostics` and exit 1 — a
+/// file holding `/etc/passwd` reading to a script as a file that is
+/// clean. SPEC.md's rule is that an `error` diagnostic means the file
+/// was not examined and the run exits 2 rather than reporting a clean
+/// result that quietly skipped something.
+#[test]
+fn a_document_the_reader_refused_exits_two_and_names_why() {
+    let tree = Tree::new("malformed-csv");
+    let file = tree.write("inventory.csv", "\"name,size\n/etc/passwd,1\n");
+    let run = run(&["--no-resolve", &file.to_string_lossy()]);
+
+    assert_eq!(run.code, 2, "{}{}", run.stdout, run.stderr);
+    let report = &reports(&run)[0];
+    assert_eq!(report["summary"]["paths"], 0);
+    assert_eq!(report["diagnostics"][0]["severity"], "error");
+    assert_eq!(report["diagnostics"][0]["code"], "parsing");
+    assert_eq!(
+        report["diagnostics"][0]["message"],
+        "Invalid CSV: quoted field is never closed (row 1, cell 1)"
+    );
+    // The human projection has to carry it too, or the reader watching
+    // stderr sees a run that found nothing.
+    assert!(run.stderr.contains("never closed"), "{}", run.stderr);
+}
+
+/// A no-break space after a closing quote is an ordinary thing to find
+/// in a spreadsheet export. `csv-parse` walked that whitespace run one
+/// byte at a time and refused the document over it, and the reader
+/// mirrored the quirk; both frontends step the whole character now.
+#[test]
+fn a_multi_byte_space_after_a_closing_quote_does_not_lose_the_document() {
+    let tree = Tree::new("nbsp-csv");
+    let file = tree.write(
+        "inventory.csv",
+        "\"name\"\u{a0},size\n/etc/passwd,1\n/var/log/app.log,2\n",
+    );
+    let run = run(&["--no-resolve", &file.to_string_lossy()]);
+
+    assert_eq!(run.code, 0, "{}{}", run.stdout, run.stderr);
+    let report = &reports(&run)[0];
+    assert_eq!(report["summary"]["paths"], 2);
+    assert!(
+        report["diagnostics"]
+            .as_array()
+            .expect("diagnostics")
+            .is_empty(),
+        "{report}"
+    );
+}

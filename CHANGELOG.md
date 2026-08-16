@@ -9,6 +9,55 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
+## [Unreleased]
+
+### Fixed
+
+- **A CSV this extension cannot read now says so instead of reporting a
+  clean file.** Every malformed-quote refusal came back as no paths and
+  an empty `diagnostics` — the reader threw and a `catch` returned `[]`
+  — so a spreadsheet holding `/etc/passwd` and `/var/log/app.log` read
+  to an agent exactly like a file with no paths in it. That silent miss
+  is the failure this tool exists to prevent. A refused document now
+  carries one diagnostic, severity `error` and code `parsing`, naming
+  which malformation happened and where:
+
+  ```
+  Invalid CSV: quoted field is never closed (row 1, cell 1)
+  Invalid CSV: a closing quote is followed by more than whitespace (row 3, cell 2)
+  ```
+
+  `TSV` replaces `CSV` for a tab-separated document, and the coordinates
+  are the cell coordinates a reported path already carries. The
+  `extract_paths` MCP tool answers `ok: false` for such a document; the
+  Rust CLI exits 2 rather than 0. Both frontends changed together.
+
+- **A no-break space after a closing quote no longer loses the whole
+  document.** `csv-parse` walks the whitespace run after a closing quote
+  one *byte* at a time, so `"name" ,size` was read and
+  `"name"<U+00A0>,size` was refused — as were U+FEFF, U+2028 and every
+  other multi-byte space, all of them ordinary in a spreadsheet export.
+  Whitespace is whitespace whatever its encoded length, and both
+  frontends now step the whole character.
+
+### Changed
+
+- **CSV is read by a reader in this repository rather than by
+  `csv-parse`.** The library throws on a malformed quote, which leaves
+  nothing to report about *which* malformation it was, and its
+  byte-at-a-time whitespace walk is the bug above. `csv-parse` is gone
+  from the dependencies; `src/extraction/formats/csv.ts` is now the same
+  reader as the crate's `extract/csv.rs`, rule for rule, held equal by
+  `crate/fixtures/`. Every other rule is unchanged: a quote opens a cell
+  only where nothing precedes it, `""` is one literal quote, ragged rows
+  are data, a byte-order mark is stripped, cells are trimmed, and the row
+  separator is fixed by the first one outside a quoted cell.
+
+  It costs throughput: the benchmark's 2.09 MB CSV went from 57 ms to
+  67 ms, and the README's generated table is regenerated to say so. A
+  reader that refuses a document nobody mis-quoted, and cannot say what
+  was wrong with one that is, is not worth 10 ms.
+
 ## [2.3.1] - 2026-08-16
 
 ### Fixed

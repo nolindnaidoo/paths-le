@@ -133,9 +133,12 @@ pixelactions and scrape-le:
   is already more than most tools carry, and every one of them is
   justified by a comment in `Cargo.toml` — as is the reader that is
   *not* a dependency: CSV is spelled out by hand in `extract/csv.rs`,
-  because no Rust reader answers a malformed quote the way `csv-parse`
-  does. Justify any addition; prefer the standard library; prefer what
-  is already in the tree.
+  because no Rust reader answers a malformed quote the way the extension
+  does, and no CSV library on either side can both name which
+  malformation happened and let a no-break space through. The extension
+  carries the same reader in TypeScript; the two are held equal by
+  `fixtures/mcp-extract-paths.json`. Justify any addition; prefer the
+  standard library; prefer what is already in the tree.
 - **No network, ever.** An `https://` path is classified and left alone.
   There is no telemetry.
 - **Nothing writes.** No `--fix`, no rewriting, no temp files outside

@@ -153,6 +153,7 @@ describe('extract_paths', () => {
 				fileType: string;
 				paths: { value: string; type: string; line?: number }[];
 			};
+			diagnostics: { severity: string; code: string; message: string }[];
 			meta: { count: number; truncated: boolean };
 		};
 	};
@@ -211,6 +212,39 @@ describe('extract_paths', () => {
 		await expect(call({ format: 'json' })).rejects.toThrow(
 			/content is required/,
 		);
+	});
+
+	/**
+	 * The refusal has to reach the caller. A malformed CSV holding `/etc/passwd`
+	 * used to come back as an empty result with an empty `diagnostics`, which a
+	 * model reads as a file that is clean — the silent miss this tool exists to
+	 * prevent. `fixtures/mcp-extract-paths.json` pins the same envelope against
+	 * the crate's server.
+	 */
+	it('names a document its reader refused', async () => {
+		const result = await call({
+			content: '"name,size\n/etc/passwd,1\n',
+			format: 'csv',
+		});
+		expect(result.ok).toBe(false);
+		expect(result.data.paths).toEqual([]);
+		expect(result.diagnostics).toEqual([
+			{
+				severity: 'error',
+				code: 'parsing',
+				message: 'Invalid CSV: quoted field is never closed (row 1, cell 1)',
+			},
+		]);
+	});
+
+	it('says nothing extra about a document that reads', async () => {
+		const result = await call({
+			content: 'name,path\napp,/etc/passwd\n',
+			format: 'csv',
+		});
+		expect(result.ok).toBe(true);
+		expect(result.diagnostics).toEqual([]);
+		expect(result.meta.count).toBe(1);
 	});
 });
 

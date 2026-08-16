@@ -204,6 +204,24 @@ const FORMATS: readonly Format[] = [
 			{ name: 'mid-line', build: (v) => `a,b,c\n1,${csvCell(v)},3\n` },
 			{ name: 'header', build: (v) => `${csvCell(v)},two\n1,2\n` },
 			{ name: 'eof-no-newline', build: (v) => `one,two\n${csvCell(v)},2` },
+			// The refusals. Both servers have to agree on the *message* here,
+			// not just on the absence of paths: a document that comes back
+			// empty from one and named from the other is the silent miss this
+			// tool exists to prevent, one server at a time. Every wrapper
+			// above is well-formed, so nothing generated ever reached this
+			// half of the reader.
+			{ name: 'mis-quoted', build: (v) => `${csvCell(v)}x,two\n1,2\n` },
+			{
+				name: 'unterminated',
+				safe: noQuote,
+				build: (v) => `"${v},two\n1,2\n`,
+			},
+			// A closing quote followed by a space that is not one byte wide —
+			// which `csv-parse` refused and neither reader does.
+			{
+				name: 'multi-byte-space',
+				build: (v) => `${csvCell(v)}\u{a0},two\n1,2\n`,
+			},
 		],
 	},
 	{

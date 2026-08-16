@@ -48,4 +48,30 @@ describe('extraction characterization', () => {
 		expect(result.errors).toHaveLength(0);
 		expect(result.paths.map((path) => path.value)).toEqual(['./data/in.csv']);
 	});
+
+	/**
+	 * The one extractor that refuses, and the only reason the engine has an error
+	 * channel at all. A refusal that reported no paths and no error would be
+	 * indistinguishable from a clean document — this asserts the difference is
+	 * observable at the engine, not only at the MCP envelope.
+	 */
+	it('a document its reader refused fails with the reason named', async () => {
+		const result = await extractPaths('"name,size\n/etc/passwd,1\n', 'csv');
+		expect(result.success).toBe(false);
+		expect(result.paths).toHaveLength(0);
+		expect(result.errors).toHaveLength(1);
+		expect(result.errors[0]?.category).toBe('parsing');
+		expect(result.errors[0]?.severity).toBe('error');
+		expect(result.errors[0]?.message).toBe(
+			'Invalid CSV: quoted field is never closed (row 1, cell 1)',
+		);
+	});
+
+	it('a tab-separated document its reader refused says TSV', async () => {
+		const result = await extractPaths('"./no-extension",two\n1,2\n', 'tsv');
+		expect(result.success).toBe(false);
+		expect(result.errors[0]?.message).toBe(
+			'Invalid TSV: a closing quote is followed by more than whitespace (row 1, cell 1)',
+		);
+	});
 });

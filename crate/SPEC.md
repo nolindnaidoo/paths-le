@@ -217,16 +217,46 @@ These are the extension's current answers, pinned by
   base64 payload contains commas. The tail is reported as a path with
   kind `unknown`. Verified against the extension rather than assumed;
   `fixtures/documents/srcset-data-uri.html` pins it on both sides.
-- **A malformed quote refuses the whole CSV document.** A quote left
-  open at the end, or anything but whitespace between a closing quote
-  and the end of its cell, and no path is reported from any row — the
-  extension's reader throws and its `catch` returns `[]`. The case that
-  matters is a file quoted for one delimiter and read with the other:
-  `"./a",b` on tabs is a single cell whose quoting closes in the middle
-  of it. It is *not* the path `./a,b`; that path is nowhere in the file.
-  `csv-parse` under `relax_quotes` keeps a quote inside an unquoted cell
-  and refuses this, and `extract/csv.rs` is written by hand to answer the
-  same way — no Rust reader does.
+- **A malformed quote refuses the whole CSV document, and says so.** A
+  quote left open at the end, or anything but whitespace between a
+  closing quote and the end of its cell, and no path is reported from any
+  row. The case that matters is a file quoted for one delimiter and read
+  with the other: `"./a",b` on tabs is a single cell whose quoting closes
+  in the middle of it. It is *not* the path `./a,b`; that path is nowhere
+  in the file.
+
+  The refusal is **named, never silent**. Both frontends emit one
+  diagnostic — severity `error`, code `parsing` — carrying the message
+  that says which malformation happened and where:
+
+  ```
+  Invalid CSV: quoted field is never closed (row 1, cell 1)
+  Invalid CSV: a closing quote is followed by more than whitespace (row 3, cell 2)
+  ```
+
+  `TSV` replaces `CSV` when the delimiter is a tab. The coordinates are
+  cell coordinates, the same ones a reported path carries — `row 3,
+  cell 2` is what a result would have called `CSV cell [3,2]` — because a
+  byte offset would not come out the same from two frontends that count a
+  document's length in different units. An empty result carrying an empty
+  `diagnostics` is indistinguishable from a clean file, which is the one
+  outcome this tool may never produce.
+
+- **Neither frontend delegates the CSV reading.** `extract/csv.rs` and
+  the extension's `src/extraction/formats/csv.ts` are the same reader
+  spelled out in two languages, held equal by
+  `fixtures/mcp-extract-paths.json`. No Rust reader answers a malformed
+  quote the way `csv-parse` does — the `csv` crate recovers and reports a
+  path nobody wrote — and `csv-parse` itself *throws*, so nothing on the
+  extension's side could name which malformation happened or where. The
+  rules are `csv-parse`'s under `trim`, `relax_quotes`,
+  `skip_empty_lines` and `relax_column_count`, with **one deliberate
+  exception**: `csv-parse` walks the whitespace run after a closing quote
+  one *byte* at a time, so `"name"<U+00A0>,size` refused where
+  `"name" ,size` was read. A no-break space is an ordinary thing to find
+  in a spreadsheet export and a document carrying one is not malformed,
+  so both readers step the whole character. Whitespace is whitespace
+  whatever its encoded length.
 
 ### Out of parity scope
 
@@ -257,7 +287,7 @@ What follows from that split, and why:
 | The walk, resolution, exit codes, `--strict`, JSON Lines on stdout | A terminal answers about a tree and a script branches on the answer. An editor has neither a tree nor an exit code. |
 | A file read by the generic scan is not resolved unless `--resolve` asks | A scan is generous by construction. In an editor a human glances at a generous list and moves on; a `missing` verdict is a claim, and a claim needs evidence. |
 | A relative path resolves against the directory of the file it was found in, not the workspace folder | See "Resolution — the enhancement". `./helper` in `src/app.ts` means a sibling of `app.ts`, and that is the dominant case on a command line. |
-| Extraction can fail here with a parsing diagnostic; the extension's engine cannot report one | The regex-driven extractors have a backtracking budget, and exhausting it is a refusal rather than a wrong answer. The extension's engine has no channel to say so. Both return no paths; only this one says why. |
+| A spent backtracking budget is a parsing diagnostic here and nothing on the extension's side | The regex-driven extractors have a budget, and exhausting it is a refusal rather than a wrong answer. The extension's engine has no equivalent failure to report. Both return no paths; only this one says why. **A malformed CSV is not in this row** — that refusal is shared, and both frontends emit the same diagnostic for it. |
 
 Anything else is drift. A difference that does not follow from IDE-first
 versus terminal-first is a bug in one of the two, and it belongs in this
@@ -328,7 +358,11 @@ artefact of the call rather than part of the path.
 - **1** — at least one finding: `missing`, `escapes-root` or
   `non-canonical`, plus `symlinked` under `--deny-symlinks`.
 - **2** — the question was malformed: an unknown flag, an unreadable
-  input, a path that does not exist, a `--root` that is not a directory.
+  input, a path that does not exist, a `--root` that is not a directory,
+  or a document a format reader refused. The last one is the general
+  rule stated above: a file carrying an `error` diagnostic was not
+  examined, and a run holding one exits 2 rather than reporting a clean
+  result that quietly skipped it.
 
 A run over many files exits with the worst outcome in it. **Exit 1 is not
 an error** — it is the tool answering "no". Only exit 2 means the tool
