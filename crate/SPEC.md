@@ -217,6 +217,16 @@ These are the extension's current answers, pinned by
   base64 payload contains commas. The tail is reported as a path with
   kind `unknown`. Verified against the extension rather than assumed;
   `fixtures/documents/srcset-data-uri.html` pins it on both sides.
+- **A malformed quote refuses the whole CSV document.** A quote left
+  open at the end, or anything but whitespace between a closing quote
+  and the end of its cell, and no path is reported from any row — the
+  extension's reader throws and its `catch` returns `[]`. The case that
+  matters is a file quoted for one delimiter and read with the other:
+  `"./a",b` on tabs is a single cell whose quoting closes in the middle
+  of it. It is *not* the path `./a,b`; that path is nowhere in the file.
+  `csv-parse` under `relax_quotes` keeps a quote inside an unquoted cell
+  and refuses this, and `extract/csv.rs` is written by hand to answer the
+  same way — no Rust reader does.
 
 ### Out of parity scope
 

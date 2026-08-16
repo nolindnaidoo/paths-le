@@ -129,10 +129,13 @@ pixelactions and scrape-le:
 - **No async runtime.** This tool reads files and asks the filesystem
   about them. There is nothing to await.
 - **`unsafe` is forbidden crate-wide** (`[lints.rust]`).
-- **Dependencies are a cost.** Five format parsers and two regex engines
+- **Dependencies are a cost.** Four format parsers and two regex engines
   is already more than most tools carry, and every one of them is
-  justified by a comment in `Cargo.toml`. Justify any addition; prefer
-  the standard library; prefer what is already in the tree.
+  justified by a comment in `Cargo.toml` — as is the reader that is
+  *not* a dependency: CSV is spelled out by hand in `extract/csv.rs`,
+  because no Rust reader answers a malformed quote the way `csv-parse`
+  does. Justify any addition; prefer the standard library; prefer what
+  is already in the tree.
 - **No network, ever.** An `https://` path is classified and left alone.
   There is no telemetry.
 - **Nothing writes.** No `--fix`, no rewriting, no temp files outside

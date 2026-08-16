@@ -7,6 +7,40 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **A CSV cell whose quoting is malformed no longer invents a path.**
+  The `csv` crate recovers from a quote that closes in the middle of a
+  cell by joining the quoted section to whatever follows it. Read
+  `"./no-extension",two` with a tab between cells — one cell, quoted for
+  a comma file — and it answered `./no-extension,two`, reported it as a
+  relative path, and resolved it: **a finding for a path that appears
+  nowhere in the file**. The npm server refuses the document instead, so
+  the two disagreed, and `check-extraction-differential.ts` was red on
+  `main` because of it.
+
+  `extract/csv.rs` now carries the reader rather than calling one. The
+  `csv` crate has no `relax_quotes` equivalent and turning its quoting
+  off breaks the well-formed case — `"a,b",c` has to stay two cells — so
+  there was no setting that answered correctly. A quote opens a cell
+  only where nothing precedes it, a doubled quote inside one is a quote
+  of text, and anything but whitespace between a closing quote and the
+  end of its cell refuses the whole document, exactly as `csv-parse`
+  does under the options the extension passes it. Refusing is the point:
+  a cell somebody quoted wrong is not a path, and guessing one is the
+  failure this family exists to prevent.
+
+  Two smaller disagreements went with it. A row of nothing but
+  whitespace is now dropped like an empty one instead of shifting every
+  row number after it, and the row separator is fixed by the first one
+  outside a quoted cell, so a `\r` in a `\n` document is text.
+
+### Removed
+
+- The `csv` dependency, which nothing calls now.
+
 ## [0.3.1] - 2026-08-15
 
 ### Fixed

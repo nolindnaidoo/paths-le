@@ -52,8 +52,11 @@ regex = "1"
 fancy-regex = "0.19"
 # The format parsers, each chosen to match what the extension uses:
 # jsonc-parser for jsonc-parser (comments, trailing commas, real
-# offsets), toml for @iarna/toml, csv for csv-parse. dotenv, HTML, CSS
-# and JavaScript are regex in the extension and regex here.
+# offsets), toml for @iarna/toml. dotenv, HTML, CSS and JavaScript are
+# regex in the extension and regex here. CSV has no entry: no Rust
+# reader answers a malformed quote the way `csv-parse` does under
+# `relax_quotes`, so `extract/csv.rs` spells that reader out instead —
+# see the comment on `rows` there.
 jsonc-parser = "0.33"
 # `preserve_order` is not optional. Without it a TOML table is a
 # BTreeMap and iterates alphabetically, so extraction order — and with
@@ -61,7 +64,6 @@ jsonc-parser = "0.33"
 # following the document. The corpus catches this immediately, which is
 # the only reason it is written down here rather than discovered twice.
 toml = { version = "1", features = ["preserve_order"] }
-csv = "1"
 # saphyr for js-yaml, matching what numbers-le pairs them as. A YAML
 # document is where the paths in a repository's CI configs, Kubernetes
 # manifests and compose files live, and there is no reading one without

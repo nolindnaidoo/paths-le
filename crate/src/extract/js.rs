@@ -45,6 +45,12 @@ pub(crate) fn trim_start(value: &str) -> &str {
     value.trim_start_matches(is_js_whitespace)
 }
 
+/// `String.prototype.trimRight` — what `csv-parse` applies to a cell
+/// that was not quoted.
+pub(crate) fn trim_end(value: &str) -> &str {
+    value.trim_end_matches(is_js_whitespace)
+}
+
 /// `content.trim().length === 0`, the guard every extractor opens with.
 pub(crate) fn is_blank(value: &str) -> bool {
     trim(value).is_empty()
@@ -105,6 +111,8 @@ mod tests {
     fn trimming_matches_the_ordinary_cases() {
         assert_eq!(trim("  a b  "), "a b");
         assert_eq!(trim_start("  a  "), "a  ");
+        assert_eq!(trim_end("  a  "), "  a");
+        assert_eq!(trim_end(""), "");
         assert_eq!(trim(""), "");
         assert!(is_blank(" \t\n "));
         assert!(!is_blank(" x "));
