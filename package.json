@@ -300,7 +300,7 @@
 	},
 	"dependencies": {
 		"@iarna/toml": "^2.2.5",
-		"js-yaml": "^5.2.3",
+		"js-yaml": "^5.4.1",
 		"jsonc-parser": "^3.3.1"
 	}
 }
