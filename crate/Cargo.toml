@@ -70,7 +70,7 @@ toml = { version = "1", features = ["preserve_order"] }
 # a parser: indentation, anchors, block scalars and flow collections are
 # not a regex. Positions still come from a forward-moving text search,
 # the way TOML's do, so the two parsers only have to agree on values.
-saphyr = "0.0.11"
+saphyr = "0.1.0"
 # The walker. `ignore` is ripgrep's, so "what this tool walks" and "what
 # ripgrep walks" are the same answer — which is the answer a person
 # auditing a repository already has in their head.
