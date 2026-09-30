@@ -42,10 +42,9 @@ or is a bug, and is ported anyway because parity is the contract:
   file exists.
 - **`documents/paths.env`** covers the double-emission case: a line whose
   key is itself path-like yields two results, value first.
-- **`documents/paths.json`** contains `example.com`, which is reported as
-  a `file`. A bare domain is indistinguishable from a filename without a
-  TLD list; the limitation is documented in SPEC.md and pinned here so it
-  cannot be "fixed" on one side only.
+- **`documents/paths.json`** contains `example.com`, which is not
+  extracted: a bare domain is not a path (SPEC.md), and `heuristics.json`
+  pins where that rule stops — `docs.rs` and `notes.org` are still paths.
 - **`documents/paths.json`** also contains `1.8.1` and
   `documents/paths.csv` contains `3.4.5`, neither of which is extracted —
   the numeric-dotted guard that keeps version strings and IP addresses

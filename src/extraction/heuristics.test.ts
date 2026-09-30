@@ -30,8 +30,12 @@ describe('isPathLike', () => {
 		['my dir/file.txt', false, 'dir/file with space'],
 		['a="b.txt"', false, 'contains quote'],
 		['what?.txt', false, 'contains forbidden char'],
-		// documented limitation
-		['example.com', true, 'bare domain (documented limitation)'],
+		// a bare domain is not a path; a file with a ccTLD-shaped
+		// extension still is
+		['example.com', false, 'bare domain'],
+		['www.example.org', false, 'www host'],
+		['docs.rs', true, 'ccTLD-shaped extension'],
+		['notes.org', true, 'org-mode file'],
 	];
 
 	for (const [input, expected, label] of CASES) {

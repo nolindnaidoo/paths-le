@@ -78,6 +78,34 @@
 		},
 		{
 			"input": "example.com",
+			"expected": false
+		},
+		{
+			"input": "EXAMPLE.COM",
+			"expected": false
+		},
+		{
+			"input": "api.github.com",
+			"expected": false
+		},
+		{
+			"input": "www.example.org",
+			"expected": false
+		},
+		{
+			"input": "docs.rs",
+			"expected": true
+		},
+		{
+			"input": "notes.org",
+			"expected": true
+		},
+		{
+			"input": "Preview.app",
+			"expected": true
+		},
+		{
+			"input": "github.com/foo/bar",
 			"expected": true
 		},
 		{

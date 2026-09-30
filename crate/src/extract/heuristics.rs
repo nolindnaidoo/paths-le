@@ -7,10 +7,11 @@
 //! whitespace, and `name.ext` must not be purely numeric, which is what
 //! keeps version strings (1.8.1) and IP addresses out of the results.
 //!
-//! Known limitation, ported deliberately: a bare domain
-//! (`example.com`) still matches `name.ext`, being indistinguishable
-//! from a filename without a TLD list. `fixtures/heuristics.json` pins
-//! it on both sides so it cannot be "fixed" on one only.
+//! A bare domain is not a path: `www.` anything, or a slash-free name
+//! ending in a TLD no common file type uses. A general TLD list cannot
+//! work — `.py`, `.md`, `.sh` and `.rs` are country codes — so `docs.rs`
+//! is still a path and `example.com` is not. `fixtures/heuristics.json`
+//! pins both on both sides.
 
 use std::sync::LazyLock;
 
@@ -70,6 +71,14 @@ static WEAK_PATTERNS: LazyLock<Vec<Regex>> = LazyLock::new(|| {
 static NUMERIC_DOTTED: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[0-9.]+$").expect("a constant pattern compiles"));
 
+/// The extension's `i` flag without `u` folds ASCII only, hence `-u`.
+static BARE_DOMAIN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"(?i-u)^(?:www\.[A-Za-z0-9.-]+|[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.(?:com|net|edu|gov|mil|int))$",
+    )
+    .expect("a constant pattern compiles")
+});
+
 static WINDOWS_DRIVE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[A-Za-z]:[\\/]").expect("a constant pattern compiles"));
 
@@ -90,7 +99,7 @@ pub(crate) fn is_path_like(value: &str) -> bool {
     {
         return true;
     }
-    if NUMERIC_DOTTED.is_match(value) {
+    if NUMERIC_DOTTED.is_match(value) || BARE_DOMAIN.is_match(value) {
         return false;
     }
     WEAK_PATTERNS.iter().any(|pattern| pattern.is_match(value))
@@ -218,9 +227,18 @@ mod tests {
     }
 
     #[test]
-    fn the_bare_domain_limitation_is_ported_deliberately() {
-        assert!(is_path_like("example.com"));
-        assert_eq!(classify_path_type("example.com"), PathType::File);
+    fn a_bare_domain_is_not_a_path_and_a_cctld_extension_still_is() {
+        for domain in [
+            "example.com",
+            "EXAMPLE.COM",
+            "api.github.com",
+            "www.example.org",
+        ] {
+            assert!(!is_path_like(domain), "{domain}");
+        }
+        for path in ["docs.rs", "notes.org", "Preview.app", "github.com/foo/bar"] {
+            assert!(is_path_like(path), "{path}");
+        }
     }
 
     #[test]

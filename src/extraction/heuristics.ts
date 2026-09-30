@@ -12,8 +12,11 @@ import type { PathType } from '../types';
  * and `name.ext` must not be purely numeric — this is what keeps
  * version strings (1.8.1) and IP addresses out of the results.
  *
- * Known limitation: bare domains (`example.com`) still match `name.ext`
- * — indistinguishable from a filename without a TLD list.
+ * A bare domain is not a path: `www.` anything, or a slash-free name
+ * ending in a TLD no common file type uses. A general TLD list cannot
+ * work — `.py`, `.md`, `.sh` and `.rs` are country codes — so `docs.rs`
+ * is still a path and `example.com` is not. `.org` and `.app` stay paths
+ * too: org-mode files and macOS bundles.
  */
 
 const FORBIDDEN = `"'<>|*?`;
@@ -29,6 +32,8 @@ const WEAK_PATTERNS: readonly RegExp[] = [
 	/^[^\s"'<>|*?]+\/[^\s"'<>|*?]+$/, // dir/file
 ];
 const NUMERIC_DOTTED = /^[\d.]+$/;
+const BARE_DOMAIN =
+	/^(?:www\.[A-Za-z0-9.-]+|[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.(?:com|net|edu|gov|mil|int))$/i;
 
 export function isPathLike(value: string): boolean {
 	if (value.length < 2) return false;
@@ -38,7 +43,7 @@ export function isPathLike(value: string): boolean {
 		return true;
 	}
 
-	if (NUMERIC_DOTTED.test(value)) {
+	if (NUMERIC_DOTTED.test(value) || BARE_DOMAIN.test(value)) {
 		return false;
 	}
 

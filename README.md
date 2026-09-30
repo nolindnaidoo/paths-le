@@ -151,7 +151,7 @@ malformed** — so `paths-le --strict .` is a CI step as it stands.
 | YAML | `yaml` | Path-like scalar values and keys, across every document in the file |
 | Everything else | any other language ID | A text scan: quoted tokens, and undelimited runs that carry a path separator |
 
-Positions are real source positions for JS/TS, JSON/JSONC, HTML, CSS and the text scan (exact line and column of the path); TOML and YAML positions are located in the source text and can be approximate for repeated identical values; CSV positions are row/cell coordinates. Version strings (`1.8.1`) and IP addresses are never treated as paths, and `data:`/`javascript:` URLs are excluded from HTML/CSS extraction. Known limitation: bare domains like `example.com` are indistinguishable from filenames and are extracted.
+Positions are real source positions for JS/TS, JSON/JSONC, HTML, CSS and the text scan (exact line and column of the path); TOML and YAML positions are located in the source text and can be approximate for repeated identical values; CSV positions are row/cell coordinates. Version strings (`1.8.1`) and IP addresses are never treated as paths, and `data:`/`javascript:` URLs are excluded from HTML/CSS extraction. Bare domains (`example.com`, `www.example.org`) are not paths; a name ending in a country-code extension such as `docs.rs` still is.
 
 The text scan claims a bare `name.ext` only inside quotes. `os.path` in a Python file and `main.py` are the same shape, and no rule short of a dictionary separates them — but source quotes its filenames and does not quote its attribute access, so the quoting does. A YAML scalar holding a shell command (`run: node ./scripts/build.js`) is one token containing spaces, so no path is claimed from it, exactly as in JSON and TOML.
 
@@ -236,11 +236,11 @@ a build only tells you how busy the runner was.
 | Metric | Coverage |
 | --- | --- |
 | Statements | 92.64% |
-| Branches | 86.52% |
+| Branches | 86.57% |
 | Functions | 94.96% |
-| Lines | 93.47% |
+| Lines | 93.48% |
 
-318 test cases across 22 files, plus an integration suite that runs
+321 test cases across 22 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 
