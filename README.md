@@ -90,7 +90,7 @@ Most hosts read a JSON config. Add one entry:
 }
 ```
 
-`-y` skips the install prompt on first run. Pin a version if you would rather not track releases — `paths-le-mcp@2.3.1`.
+`-y` skips the install prompt on first run. Pin a version if you would rather not track releases — `paths-le-mcp@2.3.2`.
 
 Prefer not to go through `npx` on every launch? Install it once and point at the binary instead:
 
@@ -235,10 +235,10 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 92.70% |
-| Branches | 87.04% |
-| Functions | 94.93% |
-| Lines | 93.67% |
+| Statements | 92.64% |
+| Branches | 86.52% |
+| Functions | 94.96% |
+| Lines | 93.47% |
 
 318 test cases across 22 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
