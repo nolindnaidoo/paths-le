@@ -162,10 +162,13 @@ numeric, which is what keeps version strings (`1.8.1`) and IP addresses
 `"'<>|*?` are forbidden anywhere in a candidate. Anything shorter than
 two characters is rejected.
 
-**Known limitation, ported deliberately:** a bare domain (`example.com`)
-matches `name.ext` and is reported as a `file`. It is indistinguishable
-from a filename without a TLD list, and the extension carries the same
-behaviour. `fixtures/heuristics.json` pins it on both sides.
+**A bare domain is not a path**: `www.` anything, or a slash-free name
+ending in `com`, `net`, `edu`, `gov`, `mil` or `int`, TLDs no common file
+type uses. A general TLD list cannot work, because `.py`, `.md`, `.sh` and
+`.rs` are country codes, so `docs.rs` is still a path; `.org` and `.app`
+stay paths too, for org-mode files and macOS bundles. The extension
+carries the same rule, and `fixtures/heuristics.json` pins it on both
+sides.
 
 ### Classification
 

@@ -536,15 +536,6 @@ exports[`extraction characterization > paths.json as json 1`] = `
       "value": "https://example.com/docs",
     },
     {
-      "context": "JSON domain",
-      "position": {
-        "column": 13,
-        "line": 5,
-      },
-      "type": "file",
-      "value": "example.com",
-    },
-    {
       "context": "JSON config.output",
       "position": {
         "column": 14,

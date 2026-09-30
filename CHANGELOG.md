@@ -9,6 +9,17 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
+## [Unreleased]
+
+### Fixed
+
+- **A bare domain is no longer reported as a path.** `example.com`,
+  `api.github.com` and `www.example.org` matched the `name.ext` rule and
+  came back as files. A slash-free name ending in `com`, `net`, `edu`,
+  `gov`, `mil` or `int`, or starting with `www.`, is now left out. A
+  general TLD list was not an option, because `.py`, `.md`, `.sh` and
+  `.rs` are country codes: `docs.rs` and `notes.org` are still paths.
+
 ## [2.3.2] - 2026-09-29
 
 ### Fixed

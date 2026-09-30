@@ -7,6 +7,17 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **A bare domain is no longer reported as a path.** `example.com`,
+  `api.github.com` and `www.example.org` matched the `name.ext` rule and
+  came back as files. A slash-free name ending in `com`, `net`, `edu`,
+  `gov`, `mil` or `int`, or starting with `www.`, is now left out. A
+  general TLD list was not an option, because `.py`, `.md`, `.sh` and
+  `.rs` are country codes: `docs.rs` and `notes.org` are still paths.
+
 ## [0.3.3] - 2026-09-29
 
 ### Fixed

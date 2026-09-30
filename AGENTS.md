@@ -329,7 +329,7 @@ Order matters beyond this repo: npm must be published *before* any Zed registry 
 
 ## Known limitations (documented, not bugs)
 
-- Bare domains (`example.com`) match the `name.ext` heuristic.
+- A bare-domain rule keeps `example.com` out, but a domain on a ccTLD that is also a file extension (`docs.rs`, `site.io`) still reads as a path.
 - TOML positions come from forward-locate over the source (no offsets from @iarna/toml); repeated identical values resolve to successive occurrences.
 - CSV positions are row/cell coordinates, not character offsets.
 - JS/TS extraction is regex-based: `from '…'` inside a string literal or comment can false-positive; only module-specifier contexts are targeted, not arbitrary string paths.

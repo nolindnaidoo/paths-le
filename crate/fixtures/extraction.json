@@ -187,13 +187,6 @@
 				"context": "JSON homepage"
 			},
 			{
-				"value": "example.com",
-				"type": "file",
-				"line": 5,
-				"column": 13,
-				"context": "JSON domain"
-			},
-			{
 				"value": "/var/log/app.log",
 				"type": "absolute",
 				"line": 7,

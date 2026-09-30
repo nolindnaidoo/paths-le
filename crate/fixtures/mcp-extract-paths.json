@@ -22,12 +22,6 @@
 						"column": 15
 					},
 					{
-						"value": "example.com",
-						"type": "file",
-						"line": 5,
-						"column": 13
-					},
-					{
 						"value": "/var/log/app.log",
 						"type": "absolute",
 						"line": 7,
@@ -63,7 +57,7 @@
 			"diagnostics": [],
 			"meta": {
 				"tool": "extract_paths",
-				"count": 8,
+				"count": 7,
 				"truncated": false
 			}
 		}
