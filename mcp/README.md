@@ -15,8 +15,8 @@
   </a>
 </p>
 
-An [MCP](https://modelcontextprotocol.io) server that extracts URLs from
-documentation, configuration and code — the extraction engine behind the
+An [MCP](https://modelcontextprotocol.io) server that extracts file and directory paths
+from configuration, markup and code — the extraction engine behind the
 [Paths-LE](https://letools.dev/tools/paths-le)
 editor extension, exposed as a tool an agent can call.
 
@@ -90,8 +90,8 @@ If that prints the tool name, the server works.
 
 | argument | type | |
 |---|---|---|
-| `content` | string | **required.** The text to scan. |
-| `format` | string | One of `csv`, `toml`, `dotenv`, `javascript`, `typescript`, `json`, `html`, `css`, `yaml`, `markdown`. Common extensions and aliases (`ts`, `tsx`, `jsonc`, `scss`, `env`, `yml`…) are accepted. Optional: with neither this nor `filename`, the content is scanned as text. |
+| `content` | string | **required.** The document text to scan. |
+| `format` | string | One of `csv`, `tsv`, `toml`, `dotenv`, `javascript`, `typescript`, `json`, `html`, `css`, `yaml`, `markdown`. Common extensions and aliases (`ts`, `tsx`, `jsonc`, `scss`, `env`, `yml`…) are accepted. Optional: with neither this nor `filename`, the content is scanned as text. |
 | `filename` | string | Used to infer `format` when it is absent — `tsconfig.json` resolves to `json`, `.env` to `dotenv`, `ci.yml` to `yaml`. A name that resolves to nothing gets the text scan. |
 | `dedupe` | boolean | Collapse repeats to the first occurrence. Default `false`. |
 | `maxResults` | number | Default `500`, ceiling `5000`. |
@@ -107,13 +107,17 @@ the file open in front of you.
   "ok": true,
   "data": {
     "paths": [
-      { "value": "./dist/index.js", "type": "relative", "line": 2, "column": 12 },
-      { "value": "guide/setup.md", "type": "file", "line": 3, "column": 12 }
+      {"value": "./dist/index.js", "type": "relative", "line": 1, "column": 11},
+      {"value": "guide/setup.md", "type": "file", "line": 1, "column": 38}
     ],
     "fileType": "json"
   },
   "diagnostics": [],
-  "meta": { "tool": "extract_paths", "count": 2, "truncated": false }
+  "meta": {
+    "tool": "extract_paths",
+    "count": 2,
+    "truncated": false
+  }
 }
 ```
 
@@ -170,7 +174,7 @@ Architecture. [nolindnaidoo.com](https://nolindnaidoo.com) ·
 
 Twelve Rust tools built the same way: small, single-purpose, and driven by a
 machine rather than a person. pixelcoords and pixelactions make up one loop —
-pixelcoords answers *where*, pixelactions *acts* there. The nine LE crates are
+pixelcoords answers *where*, pixelactions *acts* there. The ten LE crates are
 the terminal half of the extensions they sit in: the same detection, held to
 the extension's own corpus, and an exit code instead of a results editor.
 
@@ -186,6 +190,7 @@ the extension's own corpus, and an exit code instead of a results editor.
 | **[numbers-le](https://github.com/nolindnaidoo/numbers-le/tree/main/crate)** | Find every hardcoded number in a codebase so a person can check them | [crates.io](https://crates.io/crates/numbers-le) |
 | **[envsync-le](https://github.com/nolindnaidoo/envsync-le/tree/main/crate)** | Compare the dotenv files in a tree and say which keys are missing from which | [crates.io](https://crates.io/crates/envsync-le) |
 | **[colors-le](https://github.com/nolindnaidoo/colors-le/tree/main/crate)** | Find every colour in a codebase, and say which are not in your palette | [crates.io](https://crates.io/crates/colors-le) |
+| **[dates-le](https://github.com/nolindnaidoo/dates-le/tree/main/crate)** | Extract every date and timestamp, and the exact instant each one resolves to | [crates.io](https://crates.io/crates/dates-le) |
 | **[scrape-le](https://github.com/nolindnaidoo/scrape-le/tree/main/crate)** | Check whether a page is scrapeable before the scraper is written | [crates.io](https://crates.io/crates/scrape-le) |
 
 ## Licence
