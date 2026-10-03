@@ -240,7 +240,7 @@ a build only tells you how busy the runner was.
 | Functions | 94.96% |
 | Lines | 93.48% |
 
-326 test cases across 23 files, plus an integration suite that runs
+327 test cases across 23 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 
