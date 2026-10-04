@@ -1,5 +1,9 @@
 {
 	"No active editor found": "Не знайдено активного редактора",
+	"Enjoying {0}? A rating helps other developers find it.": "Подобається {0}? Оцінка допомагає іншим розробникам знайти це розширення.",
+	"Rate": "Оцінити",
+	"Later": "Пізніше",
+	"Don't Ask Again": "Більше не питати",
 	"Sorted {0} paths ({1})": "Відсортовано {0} шляхів ({1})",
 	"Alphabetical (A → Z)": "Алфавітний (A → Z)",
 	"Alphabetical (Z → A)": "За алфавітом (Z → A)",

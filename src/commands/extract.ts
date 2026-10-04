@@ -3,6 +3,7 @@ import { getConfiguration } from '../config/config';
 import { extractPaths } from '../extraction/extract';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
+import type { RatingPrompt } from '../ui/ratingPrompt';
 import type { StatusBar } from '../ui/statusBar';
 import { sanitizeErrorMessage } from '../utils/errors';
 import {
@@ -19,6 +20,7 @@ export function registerExtractCommand(
 		telemetry: Telemetry;
 		notifier: Notifier;
 		statusBar: StatusBar;
+		ratingPrompt: RatingPrompt;
 	}>,
 ): void {
 	const command = vscode.commands.registerCommand(

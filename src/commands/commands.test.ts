@@ -158,6 +158,7 @@ describe('paths-le.extractPaths', () => {
 				hideProgress: () => {},
 				dispose: () => {},
 			},
+			ratingPrompt: { recordSuccess: async () => {} },
 		});
 
 		_setConfig('paths-le.copyToClipboardEnabled', true);
@@ -236,6 +237,7 @@ describe('paths-le.extractPaths', () => {
 				hideProgress: () => {},
 				dispose: () => {},
 			},
+			ratingPrompt: { recordSuccess: async () => {} },
 		});
 
 		// Changed deliberately: this used to assert the unsupported-format

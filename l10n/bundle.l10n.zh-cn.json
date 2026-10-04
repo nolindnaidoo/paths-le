@@ -1,5 +1,9 @@
 {
 	"No active editor found": "未找到活动编辑器",
+	"Enjoying {0}? A rating helps other developers find it.": "喜欢 {0} 吗？评分可以帮助其他开发者发现它。",
+	"Rate": "评分",
+	"Later": "稍后",
+	"Don't Ask Again": "不再询问",
 	"Sorted {0} paths ({1})": "已排序 {0} 个路径（共 {1} 个）",
 	"Alphabetical (A → Z)": "按字母排序（A → Z）",
 	"Alphabetical (Z → A)": "按字母顺序（Z → A）",

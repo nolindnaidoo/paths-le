@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
+import type { RatingPrompt } from '../ui/ratingPrompt';
 import { fullDocumentRange } from '../utils/document';
 import { positioned } from '../utils/positions';
 
@@ -22,7 +23,11 @@ export async function displayResults(
 		postProcessOpenInNewFile: boolean;
 		showPositions: boolean;
 	},
-	deps: Readonly<{ notifier: Notifier; telemetry: Telemetry }>,
+	deps: Readonly<{
+		notifier: Notifier;
+		telemetry: Telemetry;
+		ratingPrompt: RatingPrompt;
+	}>,
 ): Promise<void> {
 	const all = formattedPaths.join('\n');
 	const pathsContent = positioned(all, config.showPositions);
@@ -140,7 +145,11 @@ async function copyResults(content: string, notifier: Notifier): Promise<void> {
 export function showSuccessMessage(
 	pathCount: number,
 	languageId: string,
-	deps: Readonly<{ notifier: Notifier; telemetry: Telemetry }>,
+	deps: Readonly<{
+		notifier: Notifier;
+		telemetry: Telemetry;
+		ratingPrompt: RatingPrompt;
+	}>,
 ): void {
 	deps.notifier.showInfo(
 		vscode.l10n.t('Extracted {0} paths from document', pathCount),
@@ -149,4 +158,7 @@ export function showSuccessMessage(
 		count: pathCount,
 		language: languageId,
 	});
+	// Not awaited: it resolves when the toast is answered, and a command that
+	// waited on that would stay pending for as long as the toast is ignored.
+	void deps.ratingPrompt.recordSuccess();
 }

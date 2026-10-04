@@ -1,5 +1,9 @@
 {
 	"No active editor found": "Không tìm thấy trình chỉnh sửa hoạt động",
+	"Enjoying {0}? A rating helps other developers find it.": "Bạn thích {0}? Một lượt đánh giá giúp các nhà phát triển khác tìm thấy tiện ích này.",
+	"Rate": "Đánh giá",
+	"Later": "Để sau",
+	"Don't Ask Again": "Không hỏi lại",
 	"Sorted {0} paths ({1})": "Đã sắp xếp {0} đường dẫn ({1})",
 	"Alphabetical (A → Z)": "Theo thứ tự alphabet (A → Z)",
 	"Alphabetical (Z → A)": "Theo thứ tự chữ cái (Z → A)",
