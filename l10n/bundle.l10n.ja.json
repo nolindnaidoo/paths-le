@@ -1,5 +1,9 @@
 {
 	"No active editor found": "アクティブなエディタが見つかりません",
+	"Enjoying {0}? A rating helps other developers find it.": "{0} を気に入っていただけましたか？評価は、他の開発者がこの拡張機能を見つける助けになります。",
+	"Rate": "評価する",
+	"Later": "後で",
+	"Don't Ask Again": "今後表示しない",
 	"Sorted {0} paths ({1})": "{0} パスをソートしました（{1} 件）",
 	"Alphabetical (A → Z)": "アルファベット順 (A → Z)",
 	"Alphabetical (Z → A)": "アルファベット順（Z → A）",

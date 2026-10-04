@@ -1,5 +1,9 @@
 {
 	"No active editor found": "활성 편집기 없음",
+	"Enjoying {0}? A rating helps other developers find it.": "{0}이(가) 마음에 드시나요? 평점을 남기면 다른 개발자가 찾는 데 도움이 됩니다.",
+	"Rate": "평가하기",
+	"Later": "나중에",
+	"Don't Ask Again": "다시 묻지 않기",
 	"Sorted {0} paths ({1})": "{0} 경로 정렬 완료 ({1}개)",
 	"Alphabetical (A → Z)": "알파벳순 (A → Z)",
 	"Alphabetical (Z → A)": "알파벳순 (Z → A)",

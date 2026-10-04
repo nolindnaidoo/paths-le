@@ -14,6 +14,7 @@ import {
 import { activate, deactivate } from '../extension';
 import type { Telemetry } from '../telemetry/telemetry';
 import { createNotifier } from '../ui/notifier';
+import type { RatingPrompt } from '../ui/ratingPrompt';
 import type { StatusBar } from '../ui/statusBar';
 import { registerExtractCommand } from './extract';
 
@@ -30,7 +31,7 @@ function makeContext() {
 	return _createExtensionContext() as never;
 }
 
-function makeDeps(events: string[] = []) {
+function makeDeps(events: string[] = [], successes: number[] = []) {
 	const telemetry: Telemetry = {
 		event: (name) => events.push(name),
 		dispose: () => {},
@@ -40,7 +41,12 @@ function makeDeps(events: string[] = []) {
 		hideProgress: () => {},
 		dispose: () => {},
 	} as unknown as StatusBar;
-	return { telemetry, notifier: createNotifier(), statusBar };
+	const ratingPrompt: RatingPrompt = {
+		recordSuccess: async () => {
+			successes.push(1);
+		},
+	};
+	return { telemetry, notifier: createNotifier(), statusBar, ratingPrompt };
 }
 
 async function runCommand(id: string): Promise<void> {
@@ -221,6 +227,25 @@ describe('extract: rejected in-place edit', () => {
 			_shownMessages().some((m) => String(m.message).includes('Extracted')),
 		).toBe(false);
 		expect(events).not.toContain('extract-success');
+	});
+
+	it('does not count a rejected edit towards the rating prompt', async () => {
+		const successes: number[] = [];
+		registerExtractCommand(makeContext(), makeDeps([], successes));
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setApplyEditResult(false);
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(successes).toHaveLength(0);
+	});
+
+	it('counts a delivered extraction towards the rating prompt', async () => {
+		const successes: number[] = [];
+		registerExtractCommand(makeContext(), makeDeps([], successes));
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(successes).toHaveLength(1);
 	});
 
 	it('announces the count when the edit applies', async () => {

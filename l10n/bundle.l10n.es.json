@@ -1,5 +1,9 @@
 {
 	"No active editor found": "No se encontró ningún editor activo",
+	"Enjoying {0}? A rating helps other developers find it.": "¿Te gusta {0}? Una valoración ayuda a otros desarrolladores a encontrarlo.",
+	"Rate": "Valorar",
+	"Later": "Más tarde",
+	"Don't Ask Again": "No volver a preguntar",
 	"Sorted {0} paths ({1})": "{0} rutas ordenadas ({1})",
 	"Alphabetical (A → Z)": "Alfabético (A → Z)",
 	"Alphabetical (Z → A)": "Alfabética (Z → A)",
