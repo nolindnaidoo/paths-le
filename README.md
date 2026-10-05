@@ -38,7 +38,7 @@
 
 ## What it does
 
-Open a file, press `Ctrl+Alt+P` (`Cmd+Alt+P` on Mac), and every file path in the document lands in a new editor — deduplicate and sort it from there. Works in VS Code and in VS Code–based editors like Cursor and VSCodium (installable from Open VSX).
+Open a file, run `Paths-LE: Extract Paths`, and every file path in the document lands in a new editor — deduplicate and sort it from there. Works in VS Code and in VS Code–based editors like Cursor and VSCodium (installable from Open VSX).
 
 - **Import analysis** — extract local imports from JS/TS, including multi-line import statements; npm package names are filtered out
 - **Asset auditing** — every `src`, `href`, `srcset`, `url()`, and `@import` in HTML/CSS
@@ -157,11 +157,13 @@ The text scan claims a bare `name.ext` only inside quotes. `os.path` in a Python
 
 | Command | Description |
 |---|---|
-| `Paths-LE: Extract Paths` (`Ctrl+Alt+P` / `Cmd+Alt+P`) | Extract all paths from the active document |
+| `Paths-LE: Extract Paths` | Extract all paths from the active document |
 | `Paths-LE: Deduplicate Paths` | Remove duplicate lines from the results |
 | `Paths-LE: Sort Paths` | Sort results alphabetically or by length |
 | `Paths-LE: Open Settings` | Open Paths-LE settings |
 | `Paths-LE: Help` | Built-in documentation |
+
+No command is bound to a key by default. Give any of them one under **Keyboard Shortcuts** in the editor.
 
 ## Settings
 

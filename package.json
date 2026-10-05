@@ -133,14 +133,6 @@
 				"category": "%manifest.command.category%"
 			}
 		],
-		"keybindings": [
-			{
-				"command": "paths-le.extractPaths",
-				"key": "ctrl+alt+p",
-				"mac": "cmd+alt+p",
-				"when": "editorTextFocus"
-			}
-		],
 		"menus": {
 			"editor/context": [
 				{
