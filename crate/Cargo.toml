@@ -57,7 +57,7 @@ fancy-regex = "0.19"
 # reader answers a malformed quote the way `csv-parse` does under
 # `relax_quotes`, so `extract/csv.rs` spells that reader out instead —
 # see the comment on `rows` there.
-jsonc-parser = "0.33"
+jsonc-parser = "0.34"
 # `preserve_order` is not optional. Without it a TOML table is a
 # BTreeMap and iterates alphabetically, so extraction order — and with
 # it the forward-moving position locator the extension uses — stops
