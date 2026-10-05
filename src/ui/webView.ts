@@ -142,7 +142,7 @@ function getHelpHtml(): string {
     <h2>🚀 Quick Start</h2>
     <ol>
         <li>Open a file containing paths (JSON, JavaScript, CSV, etc.)</li>
-        <li>Press <span class="command">Ctrl+Alt+P</span> (or <span class="command">Cmd+Alt+P</span> on Mac)</li>
+        <li>Run <span class="command">Paths-LE: Extract Paths</span> from the command palette</li>
         <li>View extracted paths in a new document</li>
     </ol>
 
