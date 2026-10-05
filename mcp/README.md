@@ -46,11 +46,10 @@ claude mcp add paths-le -- npx -y paths-le-mcp
 }
 ```
 
-**VS Code and Zed** need nothing here. Install the extension instead — it
+**VS Code** needs nothing here. Install the extension instead — it
 carries this server and registers it for you:
 [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le)
 · [Open VSX](https://open-vsx.org/extension/nolindnaidoo/paths-le)
-· [Zed](https://zed.dev/docs/ai/mcp) *(no listing yet — add it by hand)*
 
 **No Node?** The same `extract_paths` tool ships in a static Rust binary:
 `cargo install paths-le`, then `paths-le mcp`
