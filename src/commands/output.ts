@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import { fullDocumentRange } from '../utils/document';
+import { positioned } from '../utils/positions';
 
 /**
  * Where extraction results go, and what the user is told afterwards.
@@ -15,30 +16,29 @@ export async function displayResults(
 	pathCount: number,
 	document: vscode.TextDocument,
 	config: {
+		clipboardIncludesPositions: boolean;
 		copyToClipboardEnabled: boolean;
 		openResultsSideBySide: boolean;
 		postProcessOpenInNewFile: boolean;
+		showPositions: boolean;
 	},
 	deps: Readonly<{ notifier: Notifier; telemetry: Telemetry }>,
 ): Promise<void> {
-	const pathsContent = formattedPaths.join('\n');
+	const all = formattedPaths.join('\n');
+	const pathsContent = positioned(all, config.showPositions);
+	// The copy is its own text: whether it carries positions is a separate setting.
+	const forClipboard = config.copyToClipboardEnabled
+		? positioned(all, config.clipboardIncludesPositions)
+		: undefined;
 
 	if (config.openResultsSideBySide) {
-		await openInSideBySide(
-			pathsContent,
-			config.copyToClipboardEnabled,
-			deps.notifier,
-		);
+		await openInSideBySide(pathsContent, forClipboard, deps.notifier);
 		showSuccessMessage(pathCount, document.languageId, deps);
 		return;
 	}
 
 	if (config.postProcessOpenInNewFile) {
-		await openInNewFile(
-			pathsContent,
-			config.copyToClipboardEnabled,
-			deps.notifier,
-		);
+		await openInNewFile(pathsContent, forClipboard, deps.notifier);
 		showSuccessMessage(pathCount, document.languageId, deps);
 		return;
 	}
@@ -46,7 +46,7 @@ export async function displayResults(
 	const replaced = await replaceCurrentDocument(
 		document,
 		pathsContent,
-		config.copyToClipboardEnabled,
+		forClipboard,
 		deps.notifier,
 	);
 	if (!replaced) {
@@ -62,7 +62,7 @@ export async function displayResults(
 
 async function openInSideBySide(
 	content: string,
-	copyToClipboard: boolean,
+	forClipboard: string | undefined,
 	notifier: Notifier,
 ): Promise<void> {
 	const doc = await vscode.workspace.openTextDocument({
@@ -71,14 +71,14 @@ async function openInSideBySide(
 	});
 	await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside);
 
-	if (copyToClipboard) {
-		await copyResults(content, notifier);
+	if (forClipboard !== undefined) {
+		await copyResults(forClipboard, notifier);
 	}
 }
 
 async function openInNewFile(
 	content: string,
-	copyToClipboard: boolean,
+	forClipboard: string | undefined,
 	notifier: Notifier,
 ): Promise<void> {
 	const doc = await vscode.workspace.openTextDocument({
@@ -87,8 +87,8 @@ async function openInNewFile(
 	});
 	await vscode.window.showTextDocument(doc);
 
-	if (copyToClipboard) {
-		await copyResults(content, notifier);
+	if (forClipboard !== undefined) {
+		await copyResults(forClipboard, notifier);
 	}
 }
 
@@ -96,7 +96,7 @@ async function openInNewFile(
 async function replaceCurrentDocument(
 	document: vscode.TextDocument,
 	content: string,
-	copyToClipboard: boolean,
+	forClipboard: string | undefined,
 	notifier: Notifier,
 ): Promise<boolean> {
 	const edit = new vscode.WorkspaceEdit();
@@ -109,8 +109,8 @@ async function replaceCurrentDocument(
 		return false;
 	}
 
-	if (copyToClipboard) {
-		await copyResults(content, notifier);
+	if (forClipboard !== undefined) {
+		await copyResults(forClipboard, notifier);
 	}
 	return true;
 }

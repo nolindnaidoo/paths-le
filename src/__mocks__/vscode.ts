@@ -218,11 +218,17 @@ export const workspace = {
 			},
 		};
 	},
-	openTextDocument: async (options?: { content?: string; language?: string }) =>
-		_createDocument({
+	openTextDocument: async (options?: {
+		content?: string;
+		language?: string;
+	}) => {
+		const document = _createDocument({
 			content: options?.content ?? '',
 			languageId: options?.language ?? 'plaintext',
-		}),
+		});
+		openedDocuments.push(document);
+		return document;
+	},
 	applyEdit: async (edit: WorkspaceEdit) => {
 		// A hardcoded true made every rejected-edit path untestable, and those
 		// are the paths where a command announces a result over a document it
@@ -426,11 +432,21 @@ export const FileType = {
 /** Reset all mutable mock state between tests. */
 const shownDocumentOptions: Array<{ viewColumn?: number }> = [];
 
+// What a command put in front of the user: the documents it opened, in order.
+const openedDocuments: ReturnType<typeof _createDocument>[] = [];
+
+export function _openedDocuments(): readonly ReturnType<
+	typeof _createDocument
+>[] {
+	return openedDocuments;
+}
+
 export function _shownDocumentOptions(): readonly { viewColumn?: number }[] {
 	return shownDocumentOptions;
 }
 
 export function _resetMockState(): void {
+	openedDocuments.length = 0;
 	clipboardError = undefined;
 	applyEditResult = true;
 	shownDocumentOptions.length = 0;

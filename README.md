@@ -171,7 +171,9 @@ No command is bound to a key by default. Give any of them one under **Keyboard S
 |---|---|---|
 | `paths-le.openResultsSideBySide` | `true` | Open results beside the current editor |
 | `paths-le.postProcess.openInNewFile` | `true` | Open results in a new file (when not side-by-side) |
+| `paths-le.showPositions` | `false` | Show the line and column of each path |
 | `paths-le.copyToClipboardEnabled` | `false` | Also copy results to the clipboard |
+| `paths-le.clipboardIncludesPositions` | `false` | Include the line and column in that copy |
 | `paths-le.notificationsLevel` | `silent` | `all` = every notification, `important` = warnings + errors, `silent` = errors only |
 | `paths-le.safety.enabled` | `true` | Guardrails for very large files |
 | `paths-le.safety.fileSizeWarnBytes` | `1000000` | Refuse extraction above this file size |
@@ -235,12 +237,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 92.64% |
-| Branches | 86.57% |
-| Functions | 94.96% |
-| Lines | 93.48% |
+| Statements | 92.81% |
+| Branches | 86.89% |
+| Functions | 95.23% |
+| Lines | 93.62% |
 
-327 test cases across 23 files, plus an integration suite that runs
+339 test cases across 24 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 
