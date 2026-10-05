@@ -9,6 +9,7 @@ import {
 	getWorkspaceFolderForPath,
 	resolvePathCanonical,
 } from '../utils/pathResolver';
+import { withPosition } from '../utils/positions';
 import { handleSafetyChecks } from '../utils/safety';
 import { displayResults } from './output';
 
@@ -81,13 +82,13 @@ export function registerExtractCommand(
 				deps,
 			);
 
-			await displayResults(
-				formattedPaths,
-				result.paths.length,
-				document,
-				config,
-				deps,
+			// Each path with where it was found. Whether that is shown, or copied,
+			// is decided where the text is delivered.
+			const lines = formattedPaths.map((path, index) =>
+				withPosition(path, result.paths[index]?.position),
 			);
+
+			await displayResults(lines, result.paths.length, document, config, deps);
 
 			deps.statusBar.hideProgress();
 		},

@@ -51,6 +51,21 @@ describe('paths-le.postProcess.dedupe', () => {
 		);
 	});
 
+	it('dedupes by path when positions are shown, keeping the first, and says so', async () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerDedupeCommand(makeContext(), createNotifier());
+		_setActiveEditor(
+			_createDocument({ content: '1:1\t/a\n2:1\t/b\n9:4\t/a\n' }),
+		);
+		await runCommand('paths-le.postProcess.dedupe');
+
+		// Whole lines all differ here. Only by path is there a duplicate at all.
+		expect(appliedEdits[0]?.replacements[0]?.newText).toBe('1:1\t/a\n2:1\t/b');
+		expect(_shownMessages()[0]?.message).toBe(
+			'Removed 1 duplicate paths (2 remaining). Each path shows its first position only.',
+		);
+	});
+
 	it('suppresses the success toast at the default silent level', async () => {
 		registerDedupeCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/a\n/a' }));
@@ -76,6 +91,25 @@ describe('paths-le.postProcess.sort', () => {
 
 		expect(appliedEdits[0]?.replacements[0]?.newText).toBe('/a\n/b\n/c');
 		expect(_shownMessages()[0]?.message).toContain('Sorted 3 paths');
+	});
+
+	it('sorts by path when positions are shown, and each keeps its own', async () => {
+		registerSortCommand(makeContext(), createNotifier());
+		_setActiveEditor(
+			_createDocument({ content: '1:1\t/c\n2:1\t/a\n10:1\t/b' }),
+		);
+		_respondToQuickPick(
+			(items) =>
+				(items as Array<{ label: string; value: string }>).find(
+					(item) => item.value === 'asc',
+				) ?? items[0],
+		);
+		await runCommand('paths-le.postProcess.sort');
+
+		// By the line number these would come out 1, 10, 2.
+		expect(appliedEdits[0]?.replacements[0]?.newText).toBe(
+			'2:1\t/a\n10:1\t/b\n1:1\t/c',
+		);
 	});
 
 	it('sorts by length descending', async () => {
@@ -139,6 +173,46 @@ describe('paths-le.extractPaths', () => {
 		expect(events).toContain('command-extract-paths');
 		expect(events).toContain('info:Extracted 1 paths from document');
 		const { _clipboardText } = await import('../__mocks__/vscode');
+		expect(_clipboardText()).toBe('./lib/util');
+	});
+
+	it('leads each path with its position when asked, on screen and in the copy separately', async () => {
+		const { registerExtractCommand } = await import('./extract');
+		const { _clipboardText, _openedDocuments } = await import(
+			'../__mocks__/vscode'
+		);
+		const context = {
+			subscriptions: [],
+			globalState: { get: () => false, update: async () => {} },
+		} as never;
+		registerExtractCommand(context, {
+			telemetry: { event: () => {}, dispose: () => {} },
+			notifier: {
+				showInfo: () => {},
+				showWarning: () => {},
+				showError: () => {},
+			},
+			statusBar: {
+				showProgress: () => {},
+				hideProgress: () => {},
+				dispose: () => {},
+			},
+		});
+		_setConfig('paths-le.copyToClipboardEnabled', true);
+		_setConfig('paths-le.showPositions', true);
+		_setActiveEditor(
+			_createDocument({
+				content: 'import { x } from "./lib/util";',
+				languageId: 'javascript',
+			}),
+		);
+
+		await runCommand('paths-le.extractPaths');
+
+		expect(_openedDocuments().at(-1)?.getText()).toMatch(
+			/^1:\d+\t\.\/lib\/util$/,
+		);
+		// The clipboard has its own setting, and that one is still off.
 		expect(_clipboardText()).toBe('./lib/util');
 	});
 

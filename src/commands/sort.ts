@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { Notifier } from '../ui/notifier';
 import { fullDocumentRange } from '../utils/document';
+import { onValues } from '../utils/positions';
 
 type SortOrder = 'asc' | 'desc' | 'length-asc' | 'length-desc';
 
@@ -29,7 +30,10 @@ export function registerSortCommand(
 
 			const document = editor.document;
 			const lines = extractLines(document.getText());
-			const sorted = sortLines(lines, sortOption.value);
+			// By value, so a position shown on a line travels with it.
+			const sorted = onValues(lines, (values) =>
+				sortLines(values, sortOption.value),
+			);
 
 			const replaced = await replaceDocumentContent(document, sorted);
 			if (!replaced) {

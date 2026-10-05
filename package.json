@@ -162,6 +162,11 @@
 		"configuration": {
 			"title": "%manifest.settings.title%",
 			"properties": {
+				"paths-le.clipboardIncludesPositions": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.clipboard.positions.desc%"
+				},
 				"paths-le.copyToClipboardEnabled": {
 					"type": "boolean",
 					"default": false,
@@ -208,6 +213,11 @@
 					"default": 50000,
 					"minimum": 100,
 					"description": "%manifest.settings.safety.warn.large-output.desc%"
+				},
+				"paths-le.showPositions": {
+					"type": "boolean",
+					"default": false,
+					"description": "%manifest.settings.show.positions.desc%"
 				},
 				"paths-le.statusBar.enabled": {
 					"type": "boolean",

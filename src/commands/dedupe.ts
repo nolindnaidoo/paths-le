@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { Notifier } from '../ui/notifier';
 import { fullDocumentRange } from '../utils/document';
+import { hasPosition, onValues } from '../utils/positions';
 
 export function registerDedupeCommand(
 	context: vscode.ExtensionContext,
@@ -22,7 +23,9 @@ export function registerDedupeCommand(
 				.map((line) => line.trim())
 				.filter((line) => line.length > 0);
 
-			const deduped = deduplicateLines(lines);
+			// By value: with positions shown every line is different, and a
+			// dedupe over whole lines would remove nothing.
+			const deduped = onValues(lines, deduplicateLines);
 
 			const edit = new vscode.WorkspaceEdit();
 			edit.replace(
@@ -41,8 +44,11 @@ export function registerDedupeCommand(
 			}
 
 			const removedCount = lines.length - deduped.length;
+			const firstOnly = lines.some(hasPosition)
+				? '. Each path shows its first position only.'
+				: '';
 			notifier.showInfo(
-				`Removed ${removedCount} duplicate paths (${deduped.length} remaining)`,
+				`Removed ${removedCount} duplicate paths (${deduped.length} remaining)${firstOnly}`,
 			);
 		},
 	);

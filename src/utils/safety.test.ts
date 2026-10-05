@@ -5,6 +5,7 @@ import { handleSafetyChecks } from './safety';
 
 function makeConfig(overrides: Partial<Configuration> = {}): Configuration {
 	return {
+		clipboardIncludesPositions: false,
 		copyToClipboardEnabled: false,
 		notificationsLevel: 'silent',
 		postProcessOpenInNewFile: true,
@@ -12,6 +13,7 @@ function makeConfig(overrides: Partial<Configuration> = {}): Configuration {
 		safetyEnabled: true,
 		safetyFileSizeWarnBytes: 1_000_000,
 		safetyLargeOutputLinesThreshold: 50_000,
+		showPositions: false,
 		statusBarEnabled: true,
 		telemetryEnabled: false,
 		resolution: { resolveSymlinks: false, resolveWorkspaceRelative: false },
