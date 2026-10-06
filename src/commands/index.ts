@@ -4,6 +4,7 @@ import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
 import { registerDedupeCommand } from './dedupe';
 import { registerExtractCommand } from './extract';
+import { registerExtractWorkspaceCommands } from './extractWorkspace';
 import { registerHelpCommand } from './help';
 import { registerSortCommand } from './sort';
 
@@ -16,6 +17,7 @@ export function registerCommands(
 	}>,
 ): void {
 	registerExtractCommand(context, deps);
+	registerExtractWorkspaceCommands(context, deps);
 	registerDedupeCommand(context, deps.notifier);
 	registerSortCommand(context, deps.notifier);
 	registerHelpCommand(context, deps);

@@ -80,5 +80,16 @@ export interface Configuration {
 	readonly showPositions: boolean;
 	readonly statusBarEnabled: boolean;
 	readonly telemetryEnabled: boolean;
+	/** Globs read whatever the excludes and `.gitignore` say. */
+	readonly workspaceScanAlwaysInclude: readonly string[];
+	/** Globs left out on top of the built-in list. */
+	readonly workspaceScanExcludes: readonly string[];
+	readonly workspaceScanMaxFiles: number;
+	/** The most occurrences one folder scan lists before it stops reading. */
+	readonly workspaceScanMaxResults: number;
+	readonly workspaceScanPatterns: readonly string[];
+	readonly workspaceScanRespectGitignore: boolean;
+	readonly workspaceScanSkipBinaryFiles: boolean;
+	readonly workspaceScanUseDefaultExcludes: boolean;
 	readonly resolution: PathResolutionConfig;
 }
