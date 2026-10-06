@@ -59,6 +59,18 @@ function refused(message: string): ExtractionResult {
 	});
 }
 
+/**
+ * The same extraction with nothing to await, for a caller that reads many
+ * files in a row. A document its format reader refused comes back as the
+ * refusal, so the caller can say which file it was and why.
+ */
+export function extractPathsFromText(
+	content: string,
+	languageId: string,
+): ReturnType<typeof extractPathsByFileType> {
+	return extractPathsByFileType(content, determineFileType(languageId));
+}
+
 function extractPathsByFileType(
 	content: string,
 	fileType: FileType,

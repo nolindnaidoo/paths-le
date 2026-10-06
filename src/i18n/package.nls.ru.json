@@ -1,6 +1,8 @@
 {
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Извлечение путей",
+	"manifest.command.extract-workspace.title": "Извлечь пути из рабочей области",
+	"manifest.command.extract-folder.title": "Извлечь пути из папки",
 	"manifest.command.dedupe.title": "Удаление дубликатов путей",
 	"manifest.command.sort.title": "Сортировка путей",
 	"manifest.command.settings.title": "Открыть настройки",
@@ -25,5 +27,13 @@
 	"manifest.settings.resolution.workspace.desc": "Разрешать пути относительно папок рабочей области в монорепозиториях",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ ПРЕДУПРЕЖДЕНИЕ БЕЗОПАСНОСТИ**: Включение этого параметра может раскрыть конфиденциальные пути файловой системы в извлечённом выводе. Включайте только в доверенных средах. Разрешает пути относительно папок рабочей области в монорепозиториях.",
 	"manifest.capability.untrusted-workspaces.desc": "Ограниченная функциональность в недоверенных рабочих пространствах",
-	"manifest.mcp.label": "Инструменты извлечения путей Paths-LE для режима агента"
+	"manifest.mcp.label": "Инструменты извлечения путей Paths-LE для режима агента",
+	"manifest.settings.workspace.excludes.desc": "Glob-шаблоны дополнительных файлов, которые пропускает сканирование папки или рабочей области, помимо встроенного списка. Пример: **/fixtures/**",
+	"manifest.settings.workspace.max-files.desc": "Наибольшее число файлов, которое читает одно сканирование папки или рабочей области",
+	"manifest.settings.workspace.max-results.desc": "Наибольшее число результатов, которое сообщает одно сканирование папки или рабочей области, прежде чем прекратить чтение",
+	"manifest.settings.workspace.patterns.desc": "Glob-шаблоны файлов, которые читает сканирование папки или рабочей области",
+	"manifest.settings.workspace.gitignore.desc": "Пропускать файлы, которые пропускают файлы .gitignore проекта",
+	"manifest.settings.workspace.always-include.desc": "Glob-шаблоны файлов, которые сканирование папки или рабочей области читает, даже если встроенный список или .gitignore их пропустили бы. Пример: **/vendor/**",
+	"manifest.settings.workspace.binary.desc": "Пропускать изображения, шрифты, архивы и другие нетекстовые файлы",
+	"manifest.settings.workspace.default-excludes.desc": "Пропускать папки зависимостей, результаты сборки, кэши и lock-файлы, например node_modules, dist, .next и package-lock.json"
 }

@@ -1,6 +1,8 @@
 {
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Extraer rutas",
+	"manifest.command.extract-workspace.title": "Extraer rutas del área de trabajo",
+	"manifest.command.extract-folder.title": "Extraer rutas de la carpeta",
 	"manifest.command.dedupe.title": "Deduplicar rutas",
 	"manifest.command.sort.title": "Ordenar rutas",
 	"manifest.command.settings.title": "Abrir configuración",
@@ -25,5 +27,13 @@
 	"manifest.settings.resolution.workspace.desc": "Resolver rutas relativas a las carpetas del área de trabajo en monorepos",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ ADVERTENCIA DE SEGURIDAD**: Habilitar esta configuración puede exponer rutas sensibles del sistema de archivos en la salida extraída. Habilítela solo en entornos de confianza. Resuelve rutas relativas a las carpetas del área de trabajo en monorepos.",
 	"manifest.capability.untrusted-workspaces.desc": "Funcionalidad limitada en espacios de trabajo no confiables",
-	"manifest.mcp.label": "Herramientas de extracción de rutas Paths-LE para el modo de agente"
+	"manifest.mcp.label": "Herramientas de extracción de rutas Paths-LE para el modo de agente",
+	"manifest.settings.workspace.excludes.desc": "Patrones glob de más archivos que omite un análisis de carpeta o de área de trabajo, además de la lista integrada. Ejemplo: **/fixtures/**",
+	"manifest.settings.workspace.max-files.desc": "El máximo de archivos que lee un análisis de carpeta o de área de trabajo",
+	"manifest.settings.workspace.max-results.desc": "El máximo de resultados que informa un análisis de carpeta o de área de trabajo antes de dejar de leer",
+	"manifest.settings.workspace.patterns.desc": "Patrones glob de los archivos que lee un análisis de carpeta o de área de trabajo",
+	"manifest.settings.workspace.gitignore.desc": "Omitir los archivos que omiten los archivos .gitignore del proyecto",
+	"manifest.settings.workspace.always-include.desc": "Patrones glob de los archivos que un análisis de carpeta o de área de trabajo lee aunque la lista integrada o .gitignore los omitirían. Ejemplo: **/vendor/**",
+	"manifest.settings.workspace.binary.desc": "Omitir imágenes, fuentes, archivos comprimidos y otros archivos que no son texto",
+	"manifest.settings.workspace.default-excludes.desc": "Omitir carpetas de dependencias, resultados de compilación, cachés y archivos de bloqueo, como node_modules, dist, .next y package-lock.json"
 }

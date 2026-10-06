@@ -20,6 +20,14 @@ export const CONFIG_DEFAULTS = Object.freeze({
 	showPositions: false,
 	statusBarEnabled: true,
 	telemetryEnabled: false,
+	workspaceScanAlwaysInclude: Object.freeze([]) as readonly string[],
+	workspaceScanExcludes: Object.freeze([]) as readonly string[],
+	workspaceScanMaxFiles: 5000,
+	workspaceScanMaxResults: 10000,
+	workspaceScanPatterns: Object.freeze(['**/*']) as readonly string[],
+	workspaceScanRespectGitignore: true,
+	workspaceScanSkipBinaryFiles: true,
+	workspaceScanUseDefaultExcludes: true,
 	resolveSymlinks: false,
 	resolveWorkspaceRelative: false,
 });
@@ -81,6 +89,48 @@ export function getConfiguration(): Configuration {
 			'telemetryEnabled',
 			CONFIG_DEFAULTS.telemetryEnabled,
 		),
+		workspaceScanAlwaysInclude: readStrings(
+			config,
+			'workspace.scanAlwaysInclude',
+			CONFIG_DEFAULTS.workspaceScanAlwaysInclude,
+		),
+		workspaceScanExcludes: readStrings(
+			config,
+			'workspace.scanExcludes',
+			CONFIG_DEFAULTS.workspaceScanExcludes,
+		),
+		workspaceScanMaxFiles: readNumber(
+			config,
+			'workspace.scanMaxFiles',
+			CONFIG_DEFAULTS.workspaceScanMaxFiles,
+			1,
+		),
+		workspaceScanMaxResults: readNumber(
+			config,
+			'workspace.scanMaxResults',
+			CONFIG_DEFAULTS.workspaceScanMaxResults,
+			1,
+		),
+		workspaceScanPatterns: readStrings(
+			config,
+			'workspace.scanPatterns',
+			CONFIG_DEFAULTS.workspaceScanPatterns,
+		),
+		workspaceScanRespectGitignore: readBoolean(
+			config,
+			'workspace.scanRespectGitignore',
+			CONFIG_DEFAULTS.workspaceScanRespectGitignore,
+		),
+		workspaceScanSkipBinaryFiles: readBoolean(
+			config,
+			'workspace.scanSkipBinaryFiles',
+			CONFIG_DEFAULTS.workspaceScanSkipBinaryFiles,
+		),
+		workspaceScanUseDefaultExcludes: readBoolean(
+			config,
+			'workspace.scanUseDefaultExcludes',
+			CONFIG_DEFAULTS.workspaceScanUseDefaultExcludes,
+		),
 		resolution: Object.freeze({
 			resolveSymlinks: readBoolean(
 				config,
@@ -94,6 +144,19 @@ export function getConfiguration(): Configuration {
 			),
 		}),
 	});
+}
+
+function readStrings(
+	config: vscode.WorkspaceConfiguration,
+	key: string,
+	defaultValue: readonly string[],
+): readonly string[] {
+	const value = config.get<unknown>(key, defaultValue);
+	return Object.freeze(
+		Array.isArray(value)
+			? value.filter((item): item is string => typeof item === 'string')
+			: [...defaultValue],
+	);
 }
 
 function readBoolean(

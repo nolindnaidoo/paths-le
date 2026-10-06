@@ -1,6 +1,8 @@
 {
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Ekstraksi Jalur",
+	"manifest.command.extract-workspace.title": "Ekstrak Jalur dari Ruang Kerja",
+	"manifest.command.extract-folder.title": "Ekstrak Jalur dari Folder",
 	"manifest.command.dedupe.title": "Hapus Jalur Duplikat",
 	"manifest.command.sort.title": "Urutkan Jalur",
 	"manifest.command.settings.title": "Buka Pengaturan",
@@ -25,5 +27,13 @@
 	"manifest.settings.resolution.workspace.desc": "Selesaikan jalur relatif terhadap folder ruang kerja dalam monorepo",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ PERINGATAN KEAMANAN**: Mengaktifkan pengaturan ini dapat mengekspos jalur sistem file sensitif dalam keluaran ekstraksi. Aktifkan hanya di lingkungan tepercaya. Menyelesaikan jalur relatif terhadap folder ruang kerja dalam monorepo.",
 	"manifest.capability.untrusted-workspaces.desc": "Fungsi terbatas di ruang kerja yang tidak tepercaya",
-	"manifest.mcp.label": "Alat ekstraksi jalur Paths-LE untuk mode agen"
+	"manifest.mcp.label": "Alat ekstraksi jalur Paths-LE untuk mode agen",
+	"manifest.settings.workspace.excludes.desc": "Pola glob file tambahan yang dilewati oleh pemindaian folder atau ruang kerja, di luar daftar bawaan. Contoh: **/fixtures/**",
+	"manifest.settings.workspace.max-files.desc": "Jumlah file terbanyak yang dibaca oleh satu pemindaian folder atau ruang kerja",
+	"manifest.settings.workspace.max-results.desc": "Jumlah hasil terbanyak yang dilaporkan oleh satu pemindaian folder atau ruang kerja sebelum berhenti membaca",
+	"manifest.settings.workspace.patterns.desc": "Pola glob file yang dibaca oleh pemindaian folder atau ruang kerja",
+	"manifest.settings.workspace.gitignore.desc": "Lewati file yang dilewati oleh file .gitignore proyek",
+	"manifest.settings.workspace.always-include.desc": "Pola glob file yang tetap dibaca oleh pemindaian folder atau ruang kerja meskipun daftar bawaan atau .gitignore akan melewatinya. Contoh: **/vendor/**",
+	"manifest.settings.workspace.binary.desc": "Lewati gambar, font, arsip, dan file lain yang bukan teks",
+	"manifest.settings.workspace.default-excludes.desc": "Lewati folder dependensi, keluaran build, cache, dan lockfile, seperti node_modules, dist, .next, dan package-lock.json"
 }

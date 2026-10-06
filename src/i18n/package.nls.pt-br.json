@@ -1,6 +1,8 @@
 {
 	"manifest.command.category": "Paths-LE",
 	"manifest.command.extract.title": "Extrair caminhos",
+	"manifest.command.extract-workspace.title": "Extrair caminhos do espaço de trabalho",
+	"manifest.command.extract-folder.title": "Extrair caminhos da pasta",
 	"manifest.command.dedupe.title": "Desduplicar caminhos",
 	"manifest.command.sort.title": "Classificar caminhos",
 	"manifest.command.settings.title": "Abrir configurações",
@@ -25,5 +27,13 @@
 	"manifest.settings.resolution.workspace.desc": "Resolver caminhos relativos às pastas do espaço de trabalho em monorepos",
 	"manifest.settings.resolution.workspace.markdown": "**⚠️ AVISO DE SEGURANÇA**: Ativar esta configuração pode expor caminhos sensíveis do sistema de arquivos na saída extraída. Ative apenas em ambientes confiáveis. Resolve caminhos relativos às pastas do espaço de trabalho em monorepos.",
 	"manifest.capability.untrusted-workspaces.desc": "Funcionalidade limitada em áreas de trabalho não confiáveis",
-	"manifest.mcp.label": "Ferramentas de extração de caminhos Paths-LE para o modo de agente"
+	"manifest.mcp.label": "Ferramentas de extração de caminhos Paths-LE para o modo de agente",
+	"manifest.settings.workspace.excludes.desc": "Padrões glob de mais arquivos ignorados por uma verificação de pasta ou de espaço de trabalho, além da lista integrada. Exemplo: **/fixtures/**",
+	"manifest.settings.workspace.max-files.desc": "O máximo de arquivos lidos por uma verificação de pasta ou de espaço de trabalho",
+	"manifest.settings.workspace.max-results.desc": "O máximo de resultados informados por uma verificação de pasta ou de espaço de trabalho antes de parar de ler",
+	"manifest.settings.workspace.patterns.desc": "Padrões glob dos arquivos lidos por uma verificação de pasta ou de espaço de trabalho",
+	"manifest.settings.workspace.gitignore.desc": "Ignorar os arquivos que os arquivos .gitignore do projeto ignoram",
+	"manifest.settings.workspace.always-include.desc": "Padrões glob dos arquivos que uma verificação de pasta ou de espaço de trabalho lê mesmo quando a lista integrada ou o .gitignore os ignoraria. Exemplo: **/vendor/**",
+	"manifest.settings.workspace.binary.desc": "Ignorar imagens, fontes, arquivos compactados e outros arquivos que não são texto",
+	"manifest.settings.workspace.default-excludes.desc": "Ignorar pastas de dependências, saídas de build, caches e lockfiles, como node_modules, dist, .next e package-lock.json"
 }

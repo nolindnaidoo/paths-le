@@ -114,6 +114,89 @@ That prints the tool list and exits — if you see `extract_paths`, the server w
 
 </details>
 
+## Across a folder or a workspace
+
+Extract reads the document you have open. A scan reads many files from disk and gives one report.
+
+- **The whole workspace**: run `Paths-LE: Extract Paths from Workspace` from the command palette.
+- **One folder**: right-click it in the Explorer and choose `Extract Paths from Folder`, or run `Paths-LE: Extract Paths from Folder` and pick one.
+
+A project writes the same path in many places, so the report is the distinct paths, the most widely used first, with how often each is written and where:
+
+```markdown
+# Paths-LE workspace report
+
+`my-project` · 4 file(s) read · 2 distinct path(s), 4 occurrence(s) in 3 file(s)
+
+| Path | Occurrences | Files |
+|---|---|---|
+| `./lib/util` | 3 | 2 |
+| `./config/app.json` | 1 | 1 |
+
+## `./lib/util` (3)
+
+- `src/a.ts` · **1:20**, **2:20**
+- `src/b.ts` · **1:20**
+
+## `./config/app.json` (1)
+
+- `deploy.json` · **2:14**
+
+## Could not be read (1)
+
+- `bad.csv`: Invalid CSV: quoted field is never closed (row 1, cell 2)
+```
+
+That is with `paths-le.showPositions` on. It is off by default, and then each line is the file and how many times the path is in it: `src/a.ts (2)`. The copy on the clipboard follows `paths-le.clipboardIncludesPositions`, as it does for Extract.
+
+A file its format reader refused is listed with the reason, never passed over. A malformed CSV that holds a path is not the same as a file that holds none.
+
+A scan reports each path as written. It does not resolve symlinks or workspace-relative paths, whatever the `resolution` settings say: those describe one document on one machine.
+
+**What a scan reads.** Files come from disk, so an unsaved edit is not seen. A file over the safety size, or one that is not UTF-8 text, is left unread. It stops at 5,000 files or 10,000 listed occurrences. The report ends with a line for each thing it left out, so a short report is never mistaken for a clean project.
+
+**What it skips, and how to change that.** Three switches are on by default, and each can be turned off on its own in Settings:
+
+| Switch | Skips |
+|---|---|
+| `scanUseDefaultExcludes` | Dependency folders, build output, tool caches and lockfiles. The full list is below |
+| `scanRespectGitignore` | Whatever the project's `.gitignore` files skip |
+| `scanSkipBinaryFiles` | Images, fonts, archives and other files that are not text |
+
+Two lists adjust the result without turning a switch off. To skip more, add a pattern to `scanExcludes`. To read something a switch would skip, add it to `scanAlwaysInclude`:
+
+```jsonc
+{
+	// Also skip the test fixtures.
+	"paths-le.workspace.scanExcludes": ["**/fixtures/**"],
+	// Read the vendored code, though the built-in list skips it.
+	"paths-le.workspace.scanAlwaysInclude": ["**/vendor/**"]
+}
+```
+
+`Paths-LE: Open Settings` opens all of these in the Settings editor.
+
+<details>
+<summary>The built-in list</summary>
+
+Folders, wherever they appear:
+
+<!-- built-in-folders -->
+`.git`, `.hg`, `.svn`, `node_modules`, `bower_components`, `jspm_packages`, `.pnpm-store`, `.yarn`, `vendor`, `site-packages`, `Pods`, `Carthage`, `dist`, `build`, `out`, `target`, `_build`, `_site`, `dist-newstyle`, `zig-out`, `storybook-static`, `cdk.out`, `DerivedData`, `CMakeFiles`, `.next`, `.nuxt`, `.output`, `.svelte-kit`, `.angular`, `.astro`, `.docusaurus`, `.vuepress`, `.expo`, `.turbo`, `.parcel-cache`, `.cache`, `.sass-cache`, `.jekyll-cache`, `.dart_tool`, `.pub-cache`, `.gradle`, `.kotlin`, `.cxx`, `.externalNativeBuild`, `captures`, `ephemeral`, `.symlinks`, `.swiftpm`, `.build`, `.bundle`, `.stack-work`, `.zig-cache`, `.godot`, `elm-stuff`, `.vercel`, `.netlify`, `.serverless`, `.aws-sam`, `.terraform`, `.venv`, `venv`, `__pycache__`, `.tox`, `.nox`, `.mypy_cache`, `.pytest_cache`, `.ruff_cache`, `.ipynb_checkpoints`, `.eggs`, `coverage`, `htmlcov`, `.nyc_output`, `.vscode-test`, `.idea`, `.vs`, `xcuserdata`, `*.egg-info`
+<!-- /built-in-folders -->
+
+Files, wherever they appear:
+
+<!-- built-in-files -->
+`*.min.js`, `*.min.css`, `*.map`, `*.snap`, `*.lock`, `package-lock.json`, `pnpm-lock.yaml`, `npm-shrinkwrap.json`, `go.sum`, `*.pbxproj`, `*.iml`, `local.properties`, `output-metadata.json`, `.flutter-plugins`, `.flutter-plugins-dependencies`, `.packages`, `Generated.xcconfig`, `flutter_export_environment.sh`, `GeneratedPluginRegistrant.*`, `fastlane/report.xml`, `fastlane/test_output/**`, `doc/api/**`
+<!-- /built-in-files -->
+
+Not on the list, because they are ordinary folders in many projects: `bin`, `obj`, `tmp`, `logs`, `public`, `generated`. A project that generates those ignores them in git, and the scan reads `.gitignore`.
+
+</details>
+
+The settings that shape a scan are under [Settings](#settings).
+
 ## The CLI
 
 The same extraction runs from a terminal or an agent loop: a Rust CLI in
@@ -158,6 +241,8 @@ The text scan claims a bare `name.ext` only inside quotes. `os.path` in a Python
 | Command | Description |
 |---|---|
 | `Paths-LE: Extract Paths` | Extract all paths from the active document |
+| `Paths-LE: Extract Paths from Workspace` | The distinct paths in every file in the workspace, and where each one is |
+| `Paths-LE: Extract Paths from Folder` | The same for one folder. Also on a folder in the Explorer |
 | `Paths-LE: Deduplicate Paths` | Remove duplicate lines from the results |
 | `Paths-LE: Sort Paths` | Sort results alphabetically or by length |
 | `Paths-LE: Open Settings` | Open Paths-LE settings |
@@ -175,6 +260,14 @@ No command is bound to a key by default. Give any of them one under **Keyboard S
 | `paths-le.copyToClipboardEnabled` | `false` | Also copy results to the clipboard |
 | `paths-le.clipboardIncludesPositions` | `false` | Include the line and column in that copy |
 | `paths-le.notificationsLevel` | `silent` | `all` = every notification, `important` = warnings + errors, `silent` = errors only |
+| `paths-le.workspace.scanPatterns` | `["**/*"]` | The files a folder or workspace scan reads |
+| `paths-le.workspace.scanUseDefaultExcludes` | `true` | Skip dependency folders, build output, caches and lockfiles |
+| `paths-le.workspace.scanRespectGitignore` | `true` | Skip what the project's `.gitignore` files skip |
+| `paths-le.workspace.scanSkipBinaryFiles` | `true` | Skip images, fonts, archives and other files that are not text |
+| `paths-le.workspace.scanExcludes` | `[]` | More files to skip, as glob patterns |
+| `paths-le.workspace.scanAlwaysInclude` | `[]` | Files to read even when one of the three above would skip them |
+| `paths-le.workspace.scanMaxFiles` | `5000` | The most files one scan reads |
+| `paths-le.workspace.scanMaxResults` | `10000` | The most occurrences one scan lists before it stops reading |
 | `paths-le.safety.enabled` | `true` | Guardrails for very large files |
 | `paths-le.safety.fileSizeWarnBytes` | `1000000` | Refuse extraction above this file size |
 | `paths-le.safety.largeOutputLinesThreshold` | `50000` | Warn above this line count |
@@ -237,12 +330,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 92.81% |
-| Branches | 86.89% |
-| Functions | 95.23% |
-| Lines | 93.62% |
+| Statements | 93.42% |
+| Branches | 86.71% |
+| Functions | 96.31% |
+| Lines | 94.46% |
 
-339 test cases across 24 files, plus an integration suite that runs
+388 test cases across 27 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 

@@ -152,6 +152,12 @@ function getHelpHtml(): string {
     <p><span class="command">paths-le.extractPaths</span></p>
     <p>Extracts all file paths from the current document and displays them in a new file.</p>
 
+    <h3>Extract Paths from Workspace</h3>
+    <p>The distinct paths in every file in the workspace, read from disk, with how often each is written and where.</p>
+
+    <h3>Extract Paths from Folder</h3>
+    <p>The same for one folder. Also on a folder in the Explorer.</p>
+
     <h3>Deduplicate Paths</h3>
     <p><span class="command">paths-le.postProcess.dedupe</span></p>
     <p>Removes duplicate lines from the extraction results.</p>

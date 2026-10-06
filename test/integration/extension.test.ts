@@ -1,4 +1,7 @@
 import * as assert from 'node:assert';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import * as vscode from 'vscode';
 
 const EXTENSION_ID = 'nolindnaidoo.paths-le';
@@ -30,6 +33,8 @@ describe('Paths-LE integration', function () {
 		const commands = await vscode.commands.getCommands(true);
 		for (const id of [
 			'paths-le.extractPaths',
+			'paths-le.extractWorkspace',
+			'paths-le.extractFolder',
 			'paths-le.postProcess.dedupe',
 			'paths-le.postProcess.sort',
 			'paths-le.openSettings',
@@ -97,5 +102,28 @@ describe('Paths-LE integration', function () {
 		await vscode.commands.executeCommand('paths-le.postProcess.dedupe');
 
 		assert.strictEqual(editor.document.getText(), '/a\n/b\n/c');
+	});
+	it('extracts the distinct paths of a folder from disk, with how often and where', async () => {
+		const root = mkdtempSync(join(tmpdir(), 'paths-le-extract-'));
+		for (const dir of ['src', 'node_modules', 'generated']) mkdirSync(join(root, dir));
+		writeFileSync(join(root, '.gitignore'), 'generated/\n');
+		writeFileSync(join(root, 'src', 'a.ts'), "import { x } from './lib/util';\nimport { y } from './lib/util';\n");
+		writeFileSync(join(root, 'src', 'b.ts'), "import { x } from './lib/util';\n");
+		writeFileSync(join(root, 'node_modules', 'x.js'), "require('./skipped/dep');\n");
+		writeFileSync(join(root, 'generated', 'g.ts'), "import { g } from './generated/thing';\n");
+		writeFileSync(join(root, 'bad.csv'), 'a,"b\n');
+
+		await vscode.commands.executeCommand('paths-le.extractFolder', vscode.Uri.file(root));
+
+		const report = vscode.workspace.textDocuments.find(
+			(doc) => doc.languageId === 'markdown' && doc.getText().includes('paths-le-extract-'),
+		);
+		assert.ok(report, 'no workspace report was opened');
+		const text = report.getText();
+		assert.ok(text.includes('| `./lib/util` | 3 | 2 |'));
+		assert.ok(text.includes('- `src/a.ts` (2)\n- `src/b.ts`'));
+		assert.ok(!text.includes('skipped/dep') && !text.includes('generated/thing'));
+		assert.match(text, /^- `bad\.csv`: Invalid CSV: /m);
+		assert.match(text, /1 file\(s\) ignored by \.gitignore/);
 	});
 });
