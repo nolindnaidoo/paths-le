@@ -198,6 +198,7 @@ describe('paths-le.extractPaths', () => {
 				hideProgress: () => {},
 				dispose: () => {},
 			},
+			ratingPrompt: { recordSuccess: async () => {} },
 		});
 		_setConfig('paths-le.copyToClipboardEnabled', true);
 		_setConfig('paths-le.showPositions', true);
