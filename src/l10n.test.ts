@@ -11,9 +11,13 @@ import { describe, expect, it } from 'vitest';
  * translations and never against the code that calls it. The reverse is dead
  * weight, or the old wording of a string that was edited and so went
  * untranslated.
+ *
+ * This file sits beside `src/`'s other suites rather than in `src/i18n/`,
+ * because `copy:i18n` copies that whole folder to the package root at
+ * prepublish and `clean:i18n` takes back only the catalogues.
  */
 
-const root = join(__dirname, '..', '..');
+const root = join(__dirname, '..');
 
 /** Every first argument to `l10n.t(`, with the files it appears in. */
 function stringsPassedToL10n(): Map<string, string[]> {
