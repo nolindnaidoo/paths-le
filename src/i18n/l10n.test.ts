@@ -82,6 +82,23 @@ describe('runtime strings and the bundle agree', () => {
 		expect(offenders).toEqual([]);
 	});
 
+	it('never calls l10n.t() at module scope', () => {
+		// At module scope the call runs when the module is required, before the
+		// host has loaded the bundle, and the string stays English for the life
+		// of the process. Every call site is inside a function body, which this
+		// reads as the call being indented; a call at column zero is the defect.
+		const offenders = sourceFiles(join(root, 'src')).flatMap((file) =>
+			readFileSync(file, 'utf8')
+				.split('\n')
+				.flatMap((line, index) =>
+					/^(?:export\s+)?(?:const|let|var)\b.*\bl10n\.t\(/.test(line)
+						? [`${file}:${index + 1}`]
+						: [],
+				),
+		);
+		expect(offenders).toEqual([]);
+	});
+
 	it('every locale carries exactly the English keys', () => {
 		const locales = readdirSync(join(root, 'l10n')).filter(
 			(file) => file !== 'bundle.l10n.json',
