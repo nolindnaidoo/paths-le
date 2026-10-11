@@ -102,6 +102,48 @@ describe('resolvePathCanonical', () => {
 		expect(result).toContain('hosts');
 	});
 
+	it('leaves a URL as written, whatever the resolution settings', async () => {
+		// A URL is not a filesystem path. Normalising collapsed its `//` and
+		// workspace-relative resolution then nested it under the folder, so
+		// `https://x/y` came out as `/workspace/https:/x/y`.
+		const workspaceFolder = {
+			uri: Uri.file('/workspace'),
+			name: 'w',
+			index: 0,
+		} as never;
+		for (const url of ['https://example.com/a/b', 'file:///opt/data.bin']) {
+			expect(
+				await resolvePathCanonical(url, {
+					resolveSymlinks: false,
+					resolveWorkspaceRelative: true,
+					workspaceFolder,
+				}),
+			).toBe(url);
+			expect(
+				await resolvePathCanonical(url, {
+					resolveSymlinks: true,
+					resolveWorkspaceRelative: true,
+					workspaceFolder,
+				}),
+			).toBe(url);
+		}
+	});
+
+	it('does not nest a drive-letter path under the workspace', async () => {
+		// `path.isAbsolute` is the host's: on POSIX `C:/Temp/x.txt` is relative,
+		// so it was resolved to `/workspace/C:/Temp/x.txt`.
+		const result = await resolvePathCanonical('C:\\Temp\\x.txt', {
+			resolveSymlinks: false,
+			resolveWorkspaceRelative: true,
+			workspaceFolder: {
+				uri: Uri.file('/workspace'),
+				name: 'w',
+				index: 0,
+			} as never,
+		});
+		expect(result).toBe('C:/Temp/x.txt');
+	});
+
 	it('serves a repeated resolution from cache', async () => {
 		// The cache is keyed on the path plus both flags; the second call must
 		// return the same answer without re-hitting the filesystem.

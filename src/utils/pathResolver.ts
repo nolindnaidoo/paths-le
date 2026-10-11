@@ -57,6 +57,13 @@ export async function safeResolvePath(
 		return normalizePath(inputPath);
 	}
 
+	// A URL is not a filesystem path. Normalising it collapses the `//` after
+	// the scheme, and resolving it against a folder nests it under the folder:
+	// `https://x/y` came out as `/workspace/https:/x/y`. Reported as written.
+	if (hasScheme(inputPath)) {
+		return inputPath;
+	}
+
 	try {
 		return await resolvePath(inputPath, options);
 	} catch (_error) {
@@ -112,10 +119,18 @@ function resolveWorkspaceRelativePath(
 	inputPath: string,
 	workspaceFolder: vscode.WorkspaceFolder,
 ): string {
-	if (path.isAbsolute(inputPath)) {
+	// `path.isAbsolute` is the host's, so on POSIX a drive-letter path reads
+	// as relative and was resolved to `/workspace/C:/Temp/x`. The separators
+	// are already forward slashes here, normalised above.
+	if (path.isAbsolute(inputPath) || /^[A-Za-z]:\//.test(inputPath)) {
 		return inputPath;
 	}
 	return path.resolve(workspaceFolder.uri.fsPath, inputPath);
+}
+
+/** `https://`, `file://` and any other `scheme://` prefix. */
+function hasScheme(value: string): boolean {
+	return /^[A-Za-z][A-Za-z0-9+.-]*:\/\//.test(value);
 }
 
 async function resolveSymlinks(inputPath: string): Promise<string> {
