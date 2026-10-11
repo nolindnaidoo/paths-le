@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "无法排序：编辑被拒绝。",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "已提取路径，但无法复制到剪贴板：{0}",
 	"{0} file(s) could not be read.": "{0} 个文件无法读取。",
-	"Paths-LE could not finish: {0}": "Paths-LE 无法完成：{0}"
+	"Paths-LE could not finish: {0}": "Paths-LE 无法完成：{0}",
+	"Removed {0} duplicate paths ({1} remaining)": "已移除 {0} 个重复路径（剩余 {1} 个）",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "已移除 {0} 个重复路径（剩余 {1} 个）。每个路径仅显示其首次出现的位置。",
+	"Extracting paths...": "正在提取路径...",
+	"✅ Resolved {0} canonical paths": "✅ 已解析 {0} 个规范路径",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "文件大小（{0} 字节）超过安全阈值（{1} 字节）。请考虑拆分文件或在设置中提高阈值。",
+	"Large file detected: {0} lines (threshold: {1})": "检测到大文件：{0} 行（阈值：{1}）",
+	"Large number of paths detected: estimated {0} paths": "检测到大量路径：约 {0} 个",
+	"Paths-LE Help": "Paths-LE 帮助"
 }

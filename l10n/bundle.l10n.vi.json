@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Không thể sắp xếp: chỉnh sửa đã bị từ chối.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Đã trích xuất các đường dẫn nhưng không thể sao chép vào bảng nhớ tạm: {0}",
 	"{0} file(s) could not be read.": "Không thể đọc {0} tệp.",
-	"Paths-LE could not finish: {0}": "Paths-LE không thể hoàn tất: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE không thể hoàn tất: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "Đã xóa {0} đường dẫn trùng lặp (còn lại {1})",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "Đã xóa {0} đường dẫn trùng lặp (còn lại {1}). Mỗi đường dẫn chỉ hiển thị vị trí đầu tiên.",
+	"Extracting paths...": "Đang trích xuất đường dẫn...",
+	"✅ Resolved {0} canonical paths": "✅ Đã xác định {0} đường dẫn chuẩn",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Kích thước tệp ({0} byte) vượt quá ngưỡng an toàn ({1} byte). Hãy chia nhỏ tệp hoặc tăng ngưỡng trong cài đặt.",
+	"Large file detected: {0} lines (threshold: {1})": "Phát hiện tệp lớn: {0} dòng (ngưỡng: {1})",
+	"Large number of paths detected: estimated {0} paths": "Phát hiện số lượng đường dẫn lớn: ước tính {0} đường dẫn",
+	"Paths-LE Help": "Trợ giúp Paths-LE"
 }

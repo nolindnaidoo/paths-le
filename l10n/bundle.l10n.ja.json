@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "並べ替えできませんでした: 編集が拒否されました。",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "パスを抽出しましたが、クリップボードにコピーできませんでした: {0}",
 	"{0} file(s) could not be read.": "{0} 個のファイルを読み取れませんでした。",
-	"Paths-LE could not finish: {0}": "Paths-LE は完了できませんでした: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE は完了できませんでした: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "重複するパスを {0} 件削除しました（残り {1} 件）",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "重複するパスを {0} 件削除しました（残り {1} 件）。各パスは最初の位置のみを表示します。",
+	"Extracting paths...": "パスを抽出しています...",
+	"✅ Resolved {0} canonical paths": "✅ {0} 件の正規パスを解決しました",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "ファイルサイズ（{0} バイト）が安全上限（{1} バイト）を超えています。ファイルを分割するか、設定で上限を引き上げてください。",
+	"Large file detected: {0} lines (threshold: {1})": "大きなファイルを検出しました: {0} 行（閾値: {1}）",
+	"Large number of paths detected: estimated {0} paths": "多数のパスを検出しました: 推定 {0} 件",
+	"Paths-LE Help": "Paths-LE ヘルプ"
 }

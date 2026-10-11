@@ -86,7 +86,7 @@ export function registerExtractCommand(
 					}
 				}
 
-				deps.statusBar.showProgress('Extracting paths...');
+				deps.statusBar.showProgress(vscode.l10n.t('Extracting paths...'));
 
 				const formattedPaths = await resolvePathsIfNeeded(
 					result.paths,
@@ -272,7 +272,9 @@ async function resolvePathsIfNeeded(
 	// nothing had: the resolver never throws, so there is no failure to
 	// report, and the bar now says only what was done.
 	if (resolvedCount > 0) {
-		deps.statusBar.showProgress(`✅ Resolved ${resolvedCount} canonical paths`);
+		deps.statusBar.showProgress(
+			vscode.l10n.t('✅ Resolved {0} canonical paths', resolvedCount),
+		);
 	}
 
 	return formattedPaths;

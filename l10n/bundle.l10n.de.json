@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Sortierung nicht möglich: Die Änderung wurde abgelehnt.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Die Pfade wurden extrahiert, konnten aber nicht in die Zwischenablage kopiert werden: {0}",
 	"{0} file(s) could not be read.": "{0} Datei(en) konnten nicht gelesen werden.",
-	"Paths-LE could not finish: {0}": "Paths-LE konnte nicht abschließen: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE konnte nicht abschließen: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "{0} doppelte Pfade entfernt ({1} verbleibend)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "{0} doppelte Pfade entfernt ({1} verbleibend). Jeder Pfad zeigt nur seine erste Position.",
+	"Extracting paths...": "Pfade werden extrahiert...",
+	"✅ Resolved {0} canonical paths": "✅ {0} kanonische Pfade aufgelöst",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Die Dateigröße ({0} Bytes) überschreitet den Sicherheitsschwellenwert ({1} Bytes). Teilen Sie die Datei auf oder erhöhen Sie den Schwellenwert in den Einstellungen.",
+	"Large file detected: {0} lines (threshold: {1})": "Große Datei erkannt: {0} Zeilen (Schwellenwert: {1})",
+	"Large number of paths detected: estimated {0} paths": "Große Anzahl an Pfaden erkannt: geschätzt {0} Pfade",
+	"Paths-LE Help": "Paths-LE-Hilfe"
 }

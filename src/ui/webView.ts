@@ -29,7 +29,7 @@ export function createHelpWebView(
 
 			panel = vscode.window.createWebviewPanel(
 				'paths-le-help',
-				'Paths-LE Help',
+				vscode.l10n.t('Paths-LE Help'),
 				vscode.ViewColumn.Beside,
 				{
 					enableScripts: false,

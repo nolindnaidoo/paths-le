@@ -45,11 +45,20 @@ export function registerDedupeCommand(
 			}
 
 			const removedCount = lines.length - deduped.length;
-			const firstOnly = lines.some(hasPosition)
-				? '. Each path shows its first position only.'
-				: '';
+			// Two whole sentences rather than one with a suffix: a translation
+			// cannot be assembled from parts that each read right on their own.
 			notifier.showInfo(
-				`Removed ${removedCount} duplicate paths (${deduped.length} remaining)${firstOnly}`,
+				lines.some(hasPosition)
+					? vscode.l10n.t(
+							'Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.',
+							removedCount,
+							deduped.length,
+						)
+					: vscode.l10n.t(
+							'Removed {0} duplicate paths ({1} remaining)',
+							removedCount,
+							deduped.length,
+						),
 			);
 		}),
 	);

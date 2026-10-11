@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Impossible de trier : la modification a été refusée.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Les chemins ont été extraits, mais n'ont pas pu être copiés dans le presse-papiers : {0}",
 	"{0} file(s) could not be read.": "{0} fichier(s) n'ont pas pu être lus.",
-	"Paths-LE could not finish: {0}": "Paths-LE n'a pas pu terminer : {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE n'a pas pu terminer : {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "{0} chemins en double supprimés ({1} restants)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "{0} chemins en double supprimés ({1} restants). Chaque chemin n'indique que sa première position.",
+	"Extracting paths...": "Extraction des chemins...",
+	"✅ Resolved {0} canonical paths": "✅ {0} chemins canoniques résolus",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "La taille du fichier ({0} octets) dépasse le seuil de sécurité ({1} octets). Divisez le fichier ou augmentez le seuil dans les paramètres.",
+	"Large file detected: {0} lines (threshold: {1})": "Fichier volumineux détecté : {0} lignes (seuil : {1})",
+	"Large number of paths detected: estimated {0} paths": "Grand nombre de chemins détecté : environ {0} chemins",
+	"Paths-LE Help": "Aide de Paths-LE"
 }

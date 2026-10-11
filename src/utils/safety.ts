@@ -1,4 +1,4 @@
-import type * as vscode from 'vscode';
+import * as vscode from 'vscode';
 import type { Configuration } from '../types';
 
 export interface SafetyResult {
@@ -25,7 +25,11 @@ export function handleSafetyChecks(
 	if (content.length > config.safetyFileSizeWarnBytes) {
 		return Object.freeze({
 			proceed: false,
-			message: `File size (${content.length} bytes) exceeds safety threshold (${config.safetyFileSizeWarnBytes} bytes). Consider splitting the file or increasing the threshold in settings.`,
+			message: vscode.l10n.t(
+				'File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.',
+				content.length,
+				config.safetyFileSizeWarnBytes,
+			),
 			warnings: [],
 		});
 	}
@@ -51,14 +55,21 @@ function collectSafetyWarnings(
 
 	if (lineCount > config.safetyLargeOutputLinesThreshold) {
 		warnings.push(
-			`Large file detected: ${lineCount} lines (threshold: ${config.safetyLargeOutputLinesThreshold})`,
+			vscode.l10n.t(
+				'Large file detected: {0} lines (threshold: {1})',
+				lineCount,
+				config.safetyLargeOutputLinesThreshold,
+			),
 		);
 	}
 
 	const estimatedPaths = estimatePathCount(content);
 	if (estimatedPaths > 1000) {
 		warnings.push(
-			`Large number of paths detected: estimated ${estimatedPaths} paths`,
+			vscode.l10n.t(
+				'Large number of paths detected: estimated {0} paths',
+				estimatedPaths,
+			),
 		);
 	}
 

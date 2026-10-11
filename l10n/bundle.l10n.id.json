@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Tidak dapat mengurutkan: pengeditan ditolak.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Jalur berhasil diekstrak, tetapi tidak dapat disalin ke papan klip: {0}",
 	"{0} file(s) could not be read.": "{0} file tidak dapat dibaca.",
-	"Paths-LE could not finish: {0}": "Paths-LE tidak dapat menyelesaikan: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE tidak dapat menyelesaikan: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "{0} jalur duplikat dihapus ({1} tersisa)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "{0} jalur duplikat dihapus ({1} tersisa). Setiap jalur hanya menampilkan posisi pertamanya.",
+	"Extracting paths...": "Mengekstrak jalur...",
+	"✅ Resolved {0} canonical paths": "✅ {0} jalur kanonik berhasil ditentukan",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Ukuran file ({0} byte) melebihi ambang batas keamanan ({1} byte). Pertimbangkan untuk membagi file atau menaikkan ambang batas di pengaturan.",
+	"Large file detected: {0} lines (threshold: {1})": "File besar terdeteksi: {0} baris (ambang batas: {1})",
+	"Large number of paths detected: estimated {0} paths": "Jumlah jalur yang besar terdeteksi: diperkirakan {0} jalur",
+	"Paths-LE Help": "Bantuan Paths-LE"
 }

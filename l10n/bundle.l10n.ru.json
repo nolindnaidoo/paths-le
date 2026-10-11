@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Не удалось отсортировать: правка была отклонена.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Пути извлечены, но не удалось скопировать их в буфер обмена: {0}",
 	"{0} file(s) could not be read.": "Не удалось прочитать файлов: {0}.",
-	"Paths-LE could not finish: {0}": "Paths-LE не удалось завершить: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE не удалось завершить: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "Удалено дубликатов путей: {0} (осталось: {1})",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "Удалено дубликатов путей: {0} (осталось: {1}). Для каждого пути показана только первая позиция.",
+	"Extracting paths...": "Извлечение путей...",
+	"✅ Resolved {0} canonical paths": "✅ Определено канонических путей: {0}",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Размер файла ({0} байт) превышает безопасный порог ({1} байт). Разделите файл или увеличьте порог в настройках.",
+	"Large file detected: {0} lines (threshold: {1})": "Обнаружен большой файл: {0} строк (порог: {1})",
+	"Large number of paths detected: estimated {0} paths": "Обнаружено большое число путей: приблизительно {0}",
+	"Paths-LE Help": "Справка Paths-LE"
 }

@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Impossibile ordinare: la modifica è stata rifiutata.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "I percorsi sono stati estratti, ma non è stato possibile copiarli negli appunti: {0}",
 	"{0} file(s) could not be read.": "Impossibile leggere {0} file.",
-	"Paths-LE could not finish: {0}": "Paths-LE non ha potuto completare: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE non ha potuto completare: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "Rimossi {0} percorsi duplicati ({1} rimanenti)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "Rimossi {0} percorsi duplicati ({1} rimanenti). Ogni percorso mostra solo la sua prima posizione.",
+	"Extracting paths...": "Estrazione dei percorsi...",
+	"✅ Resolved {0} canonical paths": "✅ Risolti {0} percorsi canonici",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "La dimensione del file ({0} byte) supera la soglia di sicurezza ({1} byte). Dividi il file o aumenta la soglia nelle impostazioni.",
+	"Large file detected: {0} lines (threshold: {1})": "Rilevato file di grandi dimensioni: {0} righe (soglia: {1})",
+	"Large number of paths detected: estimated {0} paths": "Rilevato un gran numero di percorsi: circa {0} percorsi",
+	"Paths-LE Help": "Guida di Paths-LE"
 }

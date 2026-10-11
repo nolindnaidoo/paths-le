@@ -46,5 +46,13 @@
   "Could not sort: the edit was rejected.": "Could not sort: the edit was rejected.",
   "Extracted the paths, but could not copy them to the clipboard: {0}": "Extracted the paths, but could not copy them to the clipboard: {0}",
   "{0} file(s) could not be read.": "{0} file(s) could not be read.",
-  "Paths-LE could not finish: {0}": "Paths-LE could not finish: {0}"
+  "Paths-LE could not finish: {0}": "Paths-LE could not finish: {0}",
+  "Removed {0} duplicate paths ({1} remaining)": "Removed {0} duplicate paths ({1} remaining)",
+  "Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.",
+  "Extracting paths...": "Extracting paths...",
+  "✅ Resolved {0} canonical paths": "✅ Resolved {0} canonical paths",
+  "File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.",
+  "Large file detected: {0} lines (threshold: {1})": "Large file detected: {0} lines (threshold: {1})",
+  "Large number of paths detected: estimated {0} paths": "Large number of paths detected: estimated {0} paths",
+  "Paths-LE Help": "Paths-LE Help"
 }

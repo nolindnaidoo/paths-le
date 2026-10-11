@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Não foi possível classificar: a edição foi rejeitada.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Os caminhos foram extraídos, mas não foi possível copiá-los para a área de transferência: {0}",
 	"{0} file(s) could not be read.": "{0} arquivo(s) não puderam ser lidos.",
-	"Paths-LE could not finish: {0}": "O Paths-LE não conseguiu concluir: {0}"
+	"Paths-LE could not finish: {0}": "O Paths-LE não conseguiu concluir: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "{0} caminhos duplicados removidos ({1} restantes)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "{0} caminhos duplicados removidos ({1} restantes). Cada caminho mostra apenas sua primeira posição.",
+	"Extracting paths...": "Extraindo caminhos...",
+	"✅ Resolved {0} canonical paths": "✅ {0} caminhos canônicos resolvidos",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "O tamanho do arquivo ({0} bytes) excede o limite de segurança ({1} bytes). Considere dividir o arquivo ou aumentar o limite nas configurações.",
+	"Large file detected: {0} lines (threshold: {1})": "Arquivo grande detectado: {0} linhas (limite: {1})",
+	"Large number of paths detected: estimated {0} paths": "Grande número de caminhos detectado: aproximadamente {0} caminhos",
+	"Paths-LE Help": "Ajuda do Paths-LE"
 }

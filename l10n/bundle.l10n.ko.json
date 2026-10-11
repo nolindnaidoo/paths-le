@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "정렬할 수 없습니다: 편집이 거부되었습니다.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "경로를 추출했지만 클립보드에 복사할 수 없습니다: {0}",
 	"{0} file(s) could not be read.": "파일 {0}개를 읽을 수 없습니다.",
-	"Paths-LE could not finish: {0}": "Paths-LE가 완료할 수 없습니다: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE가 완료할 수 없습니다: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "중복 경로 {0}개를 제거했습니다 ({1}개 남음)",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "중복 경로 {0}개를 제거했습니다 ({1}개 남음). 각 경로는 첫 번째 위치만 표시합니다.",
+	"Extracting paths...": "경로를 추출하는 중...",
+	"✅ Resolved {0} canonical paths": "✅ 표준 경로 {0}개를 확인했습니다",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "파일 크기({0}바이트)가 안전 임계값({1}바이트)을 초과합니다. 파일을 분할하거나 설정에서 임계값을 높이세요.",
+	"Large file detected: {0} lines (threshold: {1})": "대용량 파일 감지: {0}줄 (임계값: {1})",
+	"Large number of paths detected: estimated {0} paths": "많은 경로 감지: 약 {0}개",
+	"Paths-LE Help": "Paths-LE 도움말"
 }

@@ -46,5 +46,13 @@
 	"Could not sort: the edit was rejected.": "Не вдалося відсортувати: правку було відхилено.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Шляхи витягнуто, але не вдалося скопіювати їх до буфера обміну: {0}",
 	"{0} file(s) could not be read.": "Не вдалося прочитати файлів: {0}.",
-	"Paths-LE could not finish: {0}": "Paths-LE не вдалося завершити: {0}"
+	"Paths-LE could not finish: {0}": "Paths-LE не вдалося завершити: {0}",
+	"Removed {0} duplicate paths ({1} remaining)": "Видалено дублікатів шляхів: {0} (залишилося: {1})",
+	"Removed {0} duplicate paths ({1} remaining). Each path shows its first position only.": "Видалено дублікатів шляхів: {0} (залишилося: {1}). Для кожного шляху показано лише першу позицію.",
+	"Extracting paths...": "Витягування шляхів...",
+	"✅ Resolved {0} canonical paths": "✅ Визначено канонічних шляхів: {0}",
+	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Розмір файлу ({0} байт) перевищує безпечний поріг ({1} байт). Розділіть файл або збільште поріг у налаштуваннях.",
+	"Large file detected: {0} lines (threshold: {1})": "Виявлено великий файл: {0} рядків (поріг: {1})",
+	"Large number of paths detected: estimated {0} paths": "Виявлено велику кількість шляхів: приблизно {0}",
+	"Paths-LE Help": "Довідка Paths-LE"
 }
