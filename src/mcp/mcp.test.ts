@@ -4,7 +4,7 @@ import type { ExtractionResult } from '../types';
 import { capped, isOk, readMaxResults, toDiagnostics } from './envelope';
 import { FALLBACK_FORMAT, resolveFormat, SUPPORTED_FORMATS } from './fileType';
 import { TOOLS } from './tools';
-import { createResponder, serve } from './transport';
+import { createResponder, MAX_FRAME_BYTES, serve } from './transport';
 
 /**
  * The MCP layer: the normalisation boundary, the tool table and the protocol.
@@ -396,6 +396,19 @@ describe('serve: the stdio loop', () => {
 		input.emit('data', '\n\n{"jsonrpc":"2.0","id":6,"method":"ping"}\n');
 		await settle();
 		expect(replies()).toHaveLength(1);
+	});
+
+	it('refuses a line over the frame limit and keeps serving', async () => {
+		// The buffer grew with every chunk until a newline arrived, with no
+		// ceiling: 64 MiB of newline-free input held the real server at 737 MB
+		// resident, and an oversized message produced no error of any kind.
+		const { input, replies } = harness();
+		input.emit('data', 'x'.repeat(MAX_FRAME_BYTES + 1));
+		input.emit('data', '\n{"jsonrpc":"2.0","id":7,"method":"ping"}\n');
+		await settle();
+		expect(replies()[0]?.error?.code).toBe(-32700);
+		expect(replies()[0]?.error?.message).toMatch(/exceeds/);
+		expect(replies()[1]?.id).toBe(7);
 	});
 
 	it('writes nothing for a notification', async () => {
