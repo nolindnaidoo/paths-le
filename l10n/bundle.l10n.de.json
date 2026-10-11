@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{0} verschiedene Pfade, {1} Vorkommen in {2} Datei(en)",
 	"No paths found.": "Keine Pfade gefunden.",
 	"Path": "Pfad",
-	"Could not be read ({0})": "Nicht lesbar ({0})"
+	"Could not be read ({0})": "Nicht lesbar ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Der Dokumentinhalt konnte nicht ersetzt werden: Die Änderung wurde abgelehnt.",
+	"Could not deduplicate: the edit was rejected.": "Deduplizierung nicht möglich: Die Änderung wurde abgelehnt.",
+	"Could not sort: the edit was rejected.": "Sortierung nicht möglich: Die Änderung wurde abgelehnt.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Die Pfade wurden extrahiert, konnten aber nicht in die Zwischenablage kopiert werden: {0}"
 }

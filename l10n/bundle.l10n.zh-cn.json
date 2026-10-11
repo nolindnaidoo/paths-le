@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{2} 个文件中有 {0} 个不同的路径，共出现 {1} 次",
 	"No paths found.": "未找到路径。",
 	"Path": "路径",
-	"Could not be read ({0})": "无法读取 ({0})"
+	"Could not be read ({0})": "无法读取 ({0})",
+	"Could not replace the document contents: the edit was rejected.": "无法替换文档内容：编辑被拒绝。",
+	"Could not deduplicate: the edit was rejected.": "无法去重：编辑被拒绝。",
+	"Could not sort: the edit was rejected.": "无法排序：编辑被拒绝。",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "已提取路径，但无法复制到剪贴板：{0}"
 }

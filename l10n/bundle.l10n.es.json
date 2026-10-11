@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{0} ruta(s) distinta(s), {1} aparición(es) en {2} archivo(s)",
 	"No paths found.": "No se encontraron rutas.",
 	"Path": "Ruta",
-	"Could not be read ({0})": "No se pudo leer ({0})"
+	"Could not be read ({0})": "No se pudo leer ({0})",
+	"Could not replace the document contents: the edit was rejected.": "No se pudo reemplazar el contenido del documento: la edición fue rechazada.",
+	"Could not deduplicate: the edit was rejected.": "No se pudo deduplicar: la edición fue rechazada.",
+	"Could not sort: the edit was rejected.": "No se pudo ordenar: la edición fue rechazada.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Se extrajeron las rutas, pero no se pudieron copiar al portapapeles: {0}"
 }

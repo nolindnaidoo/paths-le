@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{0} đường dẫn khác nhau, {1} lần xuất hiện trong {2} tệp",
 	"No paths found.": "Không tìm thấy đường dẫn nào.",
 	"Path": "Đường dẫn",
-	"Could not be read ({0})": "Không thể đọc ({0})"
+	"Could not be read ({0})": "Không thể đọc ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Không thể thay thế nội dung tài liệu: chỉnh sửa đã bị từ chối.",
+	"Could not deduplicate: the edit was rejected.": "Không thể loại bỏ trùng lặp: chỉnh sửa đã bị từ chối.",
+	"Could not sort: the edit was rejected.": "Không thể sắp xếp: chỉnh sửa đã bị từ chối.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Đã trích xuất các đường dẫn nhưng không thể sao chép vào bảng nhớ tạm: {0}"
 }

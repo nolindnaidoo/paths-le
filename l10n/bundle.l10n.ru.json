@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "Различных путей: {0}, вхождений: {1}, файлов: {2}",
 	"No paths found.": "Пути не найдены.",
 	"Path": "Путь",
-	"Could not be read ({0})": "Не удалось прочитать ({0})"
+	"Could not be read ({0})": "Не удалось прочитать ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Не удалось заменить содержимое документа: правка была отклонена.",
+	"Could not deduplicate: the edit was rejected.": "Не удалось удалить дубликаты: правка была отклонена.",
+	"Could not sort: the edit was rejected.": "Не удалось отсортировать: правка была отклонена.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Пути извлечены, но не удалось скопировать их в буфер обмена: {0}"
 }

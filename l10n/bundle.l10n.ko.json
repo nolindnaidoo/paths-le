@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "파일 {2}개에 서로 다른 경로 {0}개, {1}회 등장",
 	"No paths found.": "경로를 찾을 수 없습니다.",
 	"Path": "경로",
-	"Could not be read ({0})": "읽을 수 없음 ({0})"
+	"Could not be read ({0})": "읽을 수 없음 ({0})",
+	"Could not replace the document contents: the edit was rejected.": "문서 내용을 바꿀 수 없습니다: 편집이 거부되었습니다.",
+	"Could not deduplicate: the edit was rejected.": "중복을 제거할 수 없습니다: 편집이 거부되었습니다.",
+	"Could not sort: the edit was rejected.": "정렬할 수 없습니다: 편집이 거부되었습니다.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "경로를 추출했지만 클립보드에 복사할 수 없습니다: {0}"
 }

@@ -1,0 +1,94 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+/**
+ * The runtime strings and the bundle, held equal.
+ *
+ * `l10n.t()` looks a string up by its exact text, and a string that is not in
+ * the bundle is shown in English in every locale with nothing thrown. Four
+ * strings shipped that way, because the bundle was checked against its
+ * translations and never against the code that calls it. The reverse is dead
+ * weight, or the old wording of a string that was edited and so went
+ * untranslated.
+ */
+
+const root = join(__dirname, '..', '..');
+
+/** Every first argument to `l10n.t(`, with the files it appears in. */
+function stringsPassedToL10n(): Map<string, string[]> {
+	const found = new Map<string, string[]>();
+	for (const file of sourceFiles(join(root, 'src'))) {
+		const text = readFileSync(file, 'utf8');
+		for (const match of text.matchAll(LITERAL_CALL)) {
+			const key = (match[2] ?? '').replace(/\\(["'])/g, '$1');
+			found.set(key, [...(found.get(key) ?? []), file]);
+		}
+	}
+	return found;
+}
+
+/** `l10n.t(` followed by a string literal, across line breaks. */
+const LITERAL_CALL = /l10n\.t\(\s*(["'])((?:(?!\1)[^\\]|\\.)*)\1/g;
+
+/** `l10n.t(` followed by anything that is not a string literal. */
+const OTHER_CALL = /l10n\.t\(\s*[^"'\s)]/g;
+
+function sourceFiles(dir: string): string[] {
+	return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+		const path = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			return entry.name === '__mocks__' ? [] : sourceFiles(path);
+		}
+		return path.endsWith('.ts') && !path.endsWith('.test.ts') ? [path] : [];
+	});
+}
+
+function bundleKeys(file: string): string[] {
+	return Object.keys(
+		JSON.parse(readFileSync(join(root, 'l10n', file), 'utf8')) as Record<
+			string,
+			string
+		>,
+	).sort();
+}
+
+describe('runtime strings and the bundle agree', () => {
+	const inSource = stringsPassedToL10n();
+	const inBundle = bundleKeys('bundle.l10n.json');
+
+	it('reads a real number of calls, so the comparison is not vacuous', () => {
+		expect(inSource.size).toBeGreaterThan(20);
+	});
+
+	it('every string passed to l10n.t() is in the bundle', () => {
+		const missing = [...inSource.keys()].filter(
+			(key) => !inBundle.includes(key),
+		);
+		expect(missing).toEqual([]);
+	});
+
+	it('every key in the bundle is passed to l10n.t() somewhere', () => {
+		const dead = inBundle.filter((key) => !inSource.has(key));
+		expect(dead).toEqual([]);
+	});
+
+	it('every call hands l10n.t() a string literal, so the key is the text', () => {
+		// A template literal or a variable is looked up as its evaluated value,
+		// which is never in the bundle. Values go in as `{0}` arguments.
+		const offenders = sourceFiles(join(root, 'src')).filter((file) =>
+			OTHER_CALL.test(readFileSync(file, 'utf8')),
+		);
+		expect(offenders).toEqual([]);
+	});
+
+	it('every locale carries exactly the English keys', () => {
+		const locales = readdirSync(join(root, 'l10n')).filter(
+			(file) => file !== 'bundle.l10n.json',
+		);
+		expect(locales).toHaveLength(12);
+		for (const file of locales) {
+			expect(bundleKeys(file), file).toEqual(inBundle);
+		}
+	});
+});

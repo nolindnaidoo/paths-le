@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{0} caminho(s) distinto(s), {1} ocorrência(s) em {2} arquivo(s)",
 	"No paths found.": "Nenhum caminho encontrado.",
 	"Path": "Caminho",
-	"Could not be read ({0})": "Não foi possível ler ({0})"
+	"Could not be read ({0})": "Não foi possível ler ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Não foi possível substituir o conteúdo do documento: a edição foi rejeitada.",
+	"Could not deduplicate: the edit was rejected.": "Não foi possível desduplicar: a edição foi rejeitada.",
+	"Could not sort: the edit was rejected.": "Não foi possível classificar: a edição foi rejeitada.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Os caminhos foram extraídos, mas não foi possível copiá-los para a área de transferência: {0}"
 }

@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "Різних шляхів: {0}, входжень: {1}, файлів: {2}",
 	"No paths found.": "Шляхів не знайдено.",
 	"Path": "Шлях",
-	"Could not be read ({0})": "Не вдалося прочитати ({0})"
+	"Could not be read ({0})": "Не вдалося прочитати ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Не вдалося замінити вміст документа: правку було відхилено.",
+	"Could not deduplicate: the edit was rejected.": "Не вдалося видалити дублікати: правку було відхилено.",
+	"Could not sort: the edit was rejected.": "Не вдалося відсортувати: правку було відхилено.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Шляхи витягнуто, але не вдалося скопіювати їх до буфера обміну: {0}"
 }

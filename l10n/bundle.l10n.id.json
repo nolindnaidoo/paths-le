@@ -40,5 +40,9 @@
 	"{0} distinct path(s), {1} occurrence(s) in {2} file(s)": "{0} jalur berbeda, {1} kemunculan dalam {2} file",
 	"No paths found.": "Tidak ada jalur yang ditemukan.",
 	"Path": "Jalur",
-	"Could not be read ({0})": "Tidak dapat dibaca ({0})"
+	"Could not be read ({0})": "Tidak dapat dibaca ({0})",
+	"Could not replace the document contents: the edit was rejected.": "Tidak dapat mengganti isi dokumen: pengeditan ditolak.",
+	"Could not deduplicate: the edit was rejected.": "Tidak dapat menghapus duplikat: pengeditan ditolak.",
+	"Could not sort: the edit was rejected.": "Tidak dapat mengurutkan: pengeditan ditolak.",
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Jalur berhasil diekstrak, tetapi tidak dapat disalin ke papan klip: {0}"
 }
