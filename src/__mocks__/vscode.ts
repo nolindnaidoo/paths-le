@@ -133,6 +133,7 @@ export interface MockDocumentInit {
 	readonly content: string;
 	readonly languageId?: string;
 	readonly fileName?: string;
+	readonly version?: number;
 }
 
 export function _createDocument(init: MockDocumentInit) {
@@ -140,6 +141,8 @@ export function _createDocument(init: MockDocumentInit) {
 	const lines = content.split('\n');
 	return {
 		getText: () => content,
+		// Writable, so a test can change the document underneath a command.
+		version: init.version ?? 1,
 		languageId: init.languageId ?? 'plaintext',
 		fileName: init.fileName ?? '/mock/document.txt',
 		uri: Uri.file(init.fileName ?? '/mock/document.txt'),

@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Kích thước tệp ({0} byte) vượt quá ngưỡng an toàn ({1} byte). Hãy chia nhỏ tệp hoặc tăng ngưỡng trong cài đặt.",
 	"Large file detected: {0} lines (threshold: {1})": "Phát hiện tệp lớn: {0} dòng (ngưỡng: {1})",
 	"Large number of paths detected: estimated {0} paths": "Phát hiện số lượng đường dẫn lớn: ước tính {0} đường dẫn",
-	"Paths-LE Help": "Trợ giúp Paths-LE"
+	"Paths-LE Help": "Trợ giúp Paths-LE",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "Tài liệu đã thay đổi trong khi trích xuất đường dẫn. Không có gì được thay thế."
 }

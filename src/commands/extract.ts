@@ -36,6 +36,9 @@ export function registerExtractCommand(
 			}
 
 			const document = editor.document;
+			// The text is read now and may be written back after two awaits; the
+			// version says whether it is still the text that was read.
+			const versionRead = document.version;
 			const config = getConfiguration();
 
 			const safetyResult = handleSafetyChecks(document, config);
@@ -106,6 +109,7 @@ export function registerExtractCommand(
 					lines,
 					result.paths.length,
 					document,
+					versionRead,
 					config,
 					deps,
 				);

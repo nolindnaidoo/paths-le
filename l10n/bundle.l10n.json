@@ -54,5 +54,6 @@
   "File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.",
   "Large file detected: {0} lines (threshold: {1})": "Large file detected: {0} lines (threshold: {1})",
   "Large number of paths detected: estimated {0} paths": "Large number of paths detected: estimated {0} paths",
-  "Paths-LE Help": "Paths-LE Help"
+  "Paths-LE Help": "Paths-LE Help",
+  "The document changed while its paths were being extracted. Nothing was replaced.": "The document changed while its paths were being extracted. Nothing was replaced."
 }

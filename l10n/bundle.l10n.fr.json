@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "La taille du fichier ({0} octets) dépasse le seuil de sécurité ({1} octets). Divisez le fichier ou augmentez le seuil dans les paramètres.",
 	"Large file detected: {0} lines (threshold: {1})": "Fichier volumineux détecté : {0} lignes (seuil : {1})",
 	"Large number of paths detected: estimated {0} paths": "Grand nombre de chemins détecté : environ {0} chemins",
-	"Paths-LE Help": "Aide de Paths-LE"
+	"Paths-LE Help": "Aide de Paths-LE",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "Le document a changé pendant l'extraction de ses chemins. Rien n'a été remplacé."
 }

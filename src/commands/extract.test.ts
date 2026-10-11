@@ -13,6 +13,7 @@ import {
 	_setOpenTextDocumentError,
 	_shownMessages,
 	_statusBarItems,
+	appliedEdits,
 	Uri,
 	workspace,
 } from '../__mocks__/vscode';
@@ -261,6 +262,42 @@ describe('extract: the status bar is reset however the command ends', () => {
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
 		expect(_statusBarItems()[0]?.text).toBe(IDLE);
+	});
+});
+
+describe('extract: the document changes while the command waits', () => {
+	it('does not replace text it did not read', async () => {
+		// The paths were computed from the text read before the security dialog,
+		// and the replace route wrote them over whatever the document held once
+		// the dialog closed. Typing while the dialog was up was lost.
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setConfig('paths-le.resolution.resolveSymlinks', true);
+		const document = _createDocument({ content: PATHS, languageId: LANG });
+		_respondToWarning((items) => {
+			document.version += 1;
+			return items.find((i) => String(i).includes('Continue'));
+		});
+		const events: string[] = [];
+		registerExtractCommand(makeContext(), makeDeps(events));
+		_setActiveEditor(document);
+		await runCommand('paths-le.extractPaths');
+		expect(appliedEdits).toHaveLength(0);
+		expect(_shownMessages().some((m) => m.kind === 'error')).toBe(true);
+		expect(events).not.toContain('extract-success');
+	});
+
+	it('replaces when nothing changed', async () => {
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setConfig('paths-le.resolution.resolveSymlinks', true);
+		_respondToWarning((items) =>
+			items.find((i) => String(i).includes('Continue')),
+		);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(appliedEdits).toHaveLength(1);
 	});
 });
 

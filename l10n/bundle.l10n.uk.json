@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "Розмір файлу ({0} байт) перевищує безпечний поріг ({1} байт). Розділіть файл або збільште поріг у налаштуваннях.",
 	"Large file detected: {0} lines (threshold: {1})": "Виявлено великий файл: {0} рядків (поріг: {1})",
 	"Large number of paths detected: estimated {0} paths": "Виявлено велику кількість шляхів: приблизно {0}",
-	"Paths-LE Help": "Довідка Paths-LE"
+	"Paths-LE Help": "Довідка Paths-LE",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "Документ змінився під час витягування шляхів. Нічого не замінено."
 }

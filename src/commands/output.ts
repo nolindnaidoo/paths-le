@@ -16,6 +16,7 @@ export async function displayResults(
 	formattedPaths: string[],
 	pathCount: number,
 	document: vscode.TextDocument,
+	versionRead: number,
 	config: {
 		clipboardIncludesPositions: boolean;
 		copyToClipboardEnabled: boolean;
@@ -45,6 +46,18 @@ export async function displayResults(
 	if (config.postProcessOpenInNewFile) {
 		await openInNewFile(pathsContent, forClipboard, deps.notifier);
 		showSuccessMessage(pathCount, document.languageId, deps);
+		return;
+	}
+
+	// The paths were computed from the text as it was before the command
+	// waited on the security dialog and the resolver. Writing them over a
+	// document the user has typed into since would discard that typing.
+	if (document.version !== versionRead) {
+		deps.notifier.showError(
+			vscode.l10n.t(
+				'The document changed while its paths were being extracted. Nothing was replaced.',
+			),
+		);
 		return;
 	}
 

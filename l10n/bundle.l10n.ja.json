@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "ファイルサイズ（{0} バイト）が安全上限（{1} バイト）を超えています。ファイルを分割するか、設定で上限を引き上げてください。",
 	"Large file detected: {0} lines (threshold: {1})": "大きなファイルを検出しました: {0} 行（閾値: {1}）",
 	"Large number of paths detected: estimated {0} paths": "多数のパスを検出しました: 推定 {0} 件",
-	"Paths-LE Help": "Paths-LE ヘルプ"
+	"Paths-LE Help": "Paths-LE ヘルプ",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "パスの抽出中にドキュメントが変更されました。何も置き換えていません。"
 }

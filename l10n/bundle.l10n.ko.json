@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "파일 크기({0}바이트)가 안전 임계값({1}바이트)을 초과합니다. 파일을 분할하거나 설정에서 임계값을 높이세요.",
 	"Large file detected: {0} lines (threshold: {1})": "대용량 파일 감지: {0}줄 (임계값: {1})",
 	"Large number of paths detected: estimated {0} paths": "많은 경로 감지: 약 {0}개",
-	"Paths-LE Help": "Paths-LE 도움말"
+	"Paths-LE Help": "Paths-LE 도움말",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "경로를 추출하는 동안 문서가 변경되었습니다. 아무것도 바꾸지 않았습니다."
 }

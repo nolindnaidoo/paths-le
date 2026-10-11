@@ -54,5 +54,6 @@
 	"File size ({0} bytes) exceeds safety threshold ({1} bytes). Consider splitting the file or increasing the threshold in settings.": "文件大小（{0} 字节）超过安全阈值（{1} 字节）。请考虑拆分文件或在设置中提高阈值。",
 	"Large file detected: {0} lines (threshold: {1})": "检测到大文件：{0} 行（阈值：{1}）",
 	"Large number of paths detected: estimated {0} paths": "检测到大量路径：约 {0} 个",
-	"Paths-LE Help": "Paths-LE 帮助"
+	"Paths-LE Help": "Paths-LE 帮助",
+	"The document changed while its paths were being extracted. Nothing was replaced.": "提取路径期间文档已更改。未替换任何内容。"
 }
