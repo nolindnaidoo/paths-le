@@ -16,6 +16,7 @@ use jsonc_parser::ast::{Object, Value};
 use jsonc_parser::{CollectOptions, ParseOptions, parse_to_ast};
 
 use super::js;
+use super::nesting;
 use super::position::PositionIndex;
 use super::{Path, heuristics};
 
@@ -24,6 +25,9 @@ const REFUSED: &str = "Invalid JSON: the document does not parse";
 pub(crate) fn extract(content: &str) -> super::Extracted {
     if js::is_blank(content) {
         return Ok(Vec::new());
+    }
+    if nesting::depth(content) > nesting::MAX_NESTING_JSON {
+        return Err(nesting::too_deep("JSON", nesting::MAX_NESTING_JSON));
     }
 
     let options = ParseOptions {
@@ -129,6 +133,20 @@ mod tests {
             Err(REFUSED.to_string()),
             "cut off mid-value"
         );
+    }
+
+    /// A document nested deeper than the call stack ended the extension
+    /// with "Maximum call stack size exceeded" and this crate with an
+    /// empty answer. The bound is counted on the text, so both refuse
+    /// before either parses, and a document at the bound still reads.
+    #[test]
+    fn a_document_nested_deeper_than_the_bound_is_refused() {
+        let nested = |depth: usize| format!("{}\"./x.ts\"{}", "[".repeat(depth), "]".repeat(depth));
+        assert_eq!(
+            extract(&nested(513)),
+            Err("Invalid JSON: nested deeper than 512 levels".to_string())
+        );
+        assert_eq!(read(&nested(512))[0].value, "./x.ts");
     }
 
     /// Comments and nothing else is a document with no value, not a broken

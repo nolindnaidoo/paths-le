@@ -25,6 +25,15 @@ describe('extractFromYaml', () => {
 		});
 	});
 
+	it('refuses a document nested deeper than the bound', () => {
+		const nested = (depth: number) =>
+			`${'['.repeat(depth)}./x.ts${']'.repeat(depth)}`;
+		expect(extractFromYaml(nested(97))).toEqual({
+			refusal: 'Invalid YAML: nested deeper than 96 levels',
+		});
+		expect(read(nested(96)).map((p) => p.value)).toEqual(['./x.ts']);
+	});
+
 	it('extracts a scalar value with its position and kind', () => {
 		const result = read('log: /var/log/app.log\n');
 		expect(result).toHaveLength(1);

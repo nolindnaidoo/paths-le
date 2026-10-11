@@ -67,6 +67,17 @@ file = "file:///usr/local/bin/app"`;
 		});
 	});
 
+	it('refuses a document nested deeper than the bound', () => {
+		// 20,000 nested inline tables ended this frontend with "Maximum call
+		// stack size exceeded"; the crate answered empty. Both refuse now.
+		const nested = (depth: number) =>
+			`a = ${'{ b = '.repeat(depth)}"./x.ts"${' }'.repeat(depth)}`;
+		expect(extractFromToml(nested(81))).toEqual({
+			refusal: 'Invalid TOML: nested deeper than 80 levels',
+		});
+		expect(read(nested(80)).map((p) => p.value)).toEqual(['./x.ts']);
+	});
+
 	it('should include position information', () => {
 		const content = `config = "/etc/app/config.toml"
 log = "./logs/app.log"`;

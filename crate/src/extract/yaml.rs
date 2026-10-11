@@ -18,12 +18,16 @@
 
 use saphyr::{LoadableYamlNode, Scalar, Yaml};
 
+use super::nesting;
 use super::position::PositionIndex;
 use super::{Path, Position, heuristics};
 
 const REFUSED: &str = "Invalid YAML: the document does not parse";
 
 pub(crate) fn extract(content: &str) -> super::Extracted {
+    if nesting::depth(content) > nesting::MAX_NESTING_YAML {
+        return Err(nesting::too_deep("YAML", nesting::MAX_NESTING_YAML));
+    }
     // A document that does not parse is refused and named, as TOML and
     // JSON are, so a broken document reads the same way whatever it is.
     // It used to yield nothing, which is also what a clean document
@@ -140,6 +144,16 @@ mod tests {
             extract("secret: /etc/passwd\nbad: [unclosed\n"),
             Err(REFUSED.to_string())
         );
+    }
+
+    #[test]
+    fn a_document_nested_deeper_than_the_bound_is_refused() {
+        let nested = |depth: usize| format!("{}./x.ts{}", "[".repeat(depth), "]".repeat(depth));
+        assert_eq!(
+            extract(&nested(97)),
+            Err("Invalid YAML: nested deeper than 96 levels".to_string())
+        );
+        assert_eq!(read(&nested(96))[0].value, "./x.ts");
     }
 
     #[test]

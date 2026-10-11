@@ -2,6 +2,7 @@ import * as yaml from 'js-yaml';
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
+import { nestsTooDeep, tooDeep } from './nesting';
 
 /**
  * Extract paths from YAML scalars (and keys that look like paths).
@@ -26,6 +27,8 @@ import { createPositionIndex, type PositionIndex } from '../position';
  * the same words.
  */
 export function extractFromYaml(content: string): Extracted {
+	if (nestsTooDeep(content, 'YAML')) return { refusal: tooDeep('YAML') };
+
 	let documents: readonly unknown[];
 	try {
 		// loadAll handles both a single document and a `---`-separated stream;

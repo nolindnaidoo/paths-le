@@ -13,6 +13,7 @@
 //! `preserve_order` note in Cargo.toml.
 
 use super::js;
+use super::nesting;
 use super::position::PositionIndex;
 use super::{Path, Position, heuristics};
 
@@ -21,6 +22,9 @@ const REFUSED: &str = "Invalid TOML: the document does not parse";
 pub(crate) fn extract(content: &str) -> super::Extracted {
     if js::is_blank(content) {
         return Ok(Vec::new());
+    }
+    if nesting::depth(content) > nesting::MAX_NESTING_TOML {
+        return Err(nesting::too_deep("TOML", nesting::MAX_NESTING_TOML));
     }
 
     // `Table`, not `Value`: `Value`'s parser reads a single TOML value
@@ -139,6 +143,24 @@ mod tests {
             extract("secret = \"/etc/passwd\"\nbroken = [\n"),
             Err(REFUSED.to_string())
         );
+    }
+
+    /// 20,000 nested inline tables ended the extension with "Maximum call
+    /// stack size exceeded"; this crate answered empty. Both refuse now.
+    #[test]
+    fn a_document_nested_deeper_than_the_bound_is_refused() {
+        let nested = |depth: usize| {
+            format!(
+                "a = {}\"./x.ts\"{}",
+                "{ b = ".repeat(depth),
+                " }".repeat(depth)
+            )
+        };
+        assert_eq!(
+            extract(&nested(81)),
+            Err("Invalid TOML: nested deeper than 80 levels".to_string())
+        );
+        assert_eq!(read(&nested(80))[0].value, "./x.ts");
     }
 
     #[test]

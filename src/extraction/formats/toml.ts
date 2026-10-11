@@ -2,6 +2,7 @@ import { parse } from '@iarna/toml';
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
+import { nestsTooDeep, tooDeep } from './nesting';
 
 /**
  * Extract paths from TOML values (and keys that look like paths).
@@ -18,6 +19,7 @@ import { createPositionIndex, type PositionIndex } from '../position';
  */
 export function extractFromToml(content: string): Extracted {
 	if (content.trim().length === 0) return { paths: [] };
+	if (nestsTooDeep(content, 'TOML')) return { refusal: tooDeep('TOML') };
 
 	let parsed: unknown;
 	try {

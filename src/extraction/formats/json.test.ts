@@ -168,6 +168,20 @@ describe('extractFromJson', () => {
 		});
 	});
 
+	/**
+	 * A document nested deeper than the call stack ended this frontend with
+	 * "Maximum call stack size exceeded" and the crate with an empty answer.
+	 * The bound is counted on the text, so both refuse before either parses.
+	 */
+	it('refuses a document nested deeper than the bound, and reads one at it', () => {
+		const nested = (depth: number) =>
+			`${'['.repeat(depth)}"./x.ts"${']'.repeat(depth)}`;
+		expect(extractFromJson(nested(513))).toEqual({
+			refusal: 'Invalid JSON: nested deeper than 512 levels',
+		});
+		expect(read(nested(512)).map((p) => p.value)).toEqual(['./x.ts']);
+	});
+
 	it('reads a document that is only comments as empty, not as broken', () => {
 		expect(read('// nothing here')).toEqual([]);
 		expect(read('/* nothing */')).toEqual([]);

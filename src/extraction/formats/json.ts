@@ -8,6 +8,7 @@ import {
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
+import { nestsTooDeep, tooDeep } from './nesting';
 
 /**
  * Extract paths from JSON/JSONC string values.
@@ -25,6 +26,7 @@ import { createPositionIndex, type PositionIndex } from '../position';
  */
 export function extractFromJson(content: string): Extracted {
 	if (content.trim().length === 0) return { paths: [] };
+	if (nestsTooDeep(content, 'JSON')) return { refusal: tooDeep('JSON') };
 
 	const errors: ParseError[] = [];
 	const root = parseTree(content, errors, {
