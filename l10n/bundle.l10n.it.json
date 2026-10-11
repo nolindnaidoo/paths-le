@@ -44,5 +44,6 @@
 	"Could not replace the document contents: the edit was rejected.": "Impossibile sostituire il contenuto del documento: la modifica è stata rifiutata.",
 	"Could not deduplicate: the edit was rejected.": "Impossibile deduplicare: la modifica è stata rifiutata.",
 	"Could not sort: the edit was rejected.": "Impossibile ordinare: la modifica è stata rifiutata.",
-	"Extracted the paths, but could not copy them to the clipboard: {0}": "I percorsi sono stati estratti, ma non è stato possibile copiarli negli appunti: {0}"
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "I percorsi sono stati estratti, ma non è stato possibile copiarli negli appunti: {0}",
+	"{0} file(s) could not be read.": "Impossibile leggere {0} file."
 }

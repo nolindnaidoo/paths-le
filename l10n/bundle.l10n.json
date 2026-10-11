@@ -44,5 +44,6 @@
   "Could not replace the document contents: the edit was rejected.": "Could not replace the document contents: the edit was rejected.",
   "Could not deduplicate: the edit was rejected.": "Could not deduplicate: the edit was rejected.",
   "Could not sort: the edit was rejected.": "Could not sort: the edit was rejected.",
-  "Extracted the paths, but could not copy them to the clipboard: {0}": "Extracted the paths, but could not copy them to the clipboard: {0}"
+  "Extracted the paths, but could not copy them to the clipboard: {0}": "Extracted the paths, but could not copy them to the clipboard: {0}",
+  "{0} file(s) could not be read.": "{0} file(s) could not be read."
 }

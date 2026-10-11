@@ -44,5 +44,6 @@
 	"Could not replace the document contents: the edit was rejected.": "No se pudo reemplazar el contenido del documento: la edición fue rechazada.",
 	"Could not deduplicate: the edit was rejected.": "No se pudo deduplicar: la edición fue rechazada.",
 	"Could not sort: the edit was rejected.": "No se pudo ordenar: la edición fue rechazada.",
-	"Extracted the paths, but could not copy them to the clipboard: {0}": "Se extrajeron las rutas, pero no se pudieron copiar al portapapeles: {0}"
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Se extrajeron las rutas, pero no se pudieron copiar al portapapeles: {0}",
+	"{0} file(s) could not be read.": "{0} archivo(s) no se pudieron leer."
 }

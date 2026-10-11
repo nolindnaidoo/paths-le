@@ -44,5 +44,6 @@
 	"Could not replace the document contents: the edit was rejected.": "无法替换文档内容：编辑被拒绝。",
 	"Could not deduplicate: the edit was rejected.": "无法去重：编辑被拒绝。",
 	"Could not sort: the edit was rejected.": "无法排序：编辑被拒绝。",
-	"Extracted the paths, but could not copy them to the clipboard: {0}": "已提取路径，但无法复制到剪贴板：{0}"
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "已提取路径，但无法复制到剪贴板：{0}",
+	"{0} file(s) could not be read.": "{0} 个文件无法读取。"
 }

@@ -44,5 +44,6 @@
 	"Could not replace the document contents: the edit was rejected.": "ドキュメントの内容を置き換えられませんでした: 編集が拒否されました。",
 	"Could not deduplicate: the edit was rejected.": "重複を除去できませんでした: 編集が拒否されました。",
 	"Could not sort: the edit was rejected.": "並べ替えできませんでした: 編集が拒否されました。",
-	"Extracted the paths, but could not copy them to the clipboard: {0}": "パスを抽出しましたが、クリップボードにコピーできませんでした: {0}"
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "パスを抽出しましたが、クリップボードにコピーできませんでした: {0}",
+	"{0} file(s) could not be read.": "{0} 個のファイルを読み取れませんでした。"
 }

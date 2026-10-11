@@ -44,5 +44,6 @@
 	"Could not replace the document contents: the edit was rejected.": "Không thể thay thế nội dung tài liệu: chỉnh sửa đã bị từ chối.",
 	"Could not deduplicate: the edit was rejected.": "Không thể loại bỏ trùng lặp: chỉnh sửa đã bị từ chối.",
 	"Could not sort: the edit was rejected.": "Không thể sắp xếp: chỉnh sửa đã bị từ chối.",
-	"Extracted the paths, but could not copy them to the clipboard: {0}": "Đã trích xuất các đường dẫn nhưng không thể sao chép vào bảng nhớ tạm: {0}"
+	"Extracted the paths, but could not copy them to the clipboard: {0}": "Đã trích xuất các đường dẫn nhưng không thể sao chép vào bảng nhớ tạm: {0}",
+	"{0} file(s) could not be read.": "Không thể đọc {0} tệp."
 }

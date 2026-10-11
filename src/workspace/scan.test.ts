@@ -296,6 +296,34 @@ describe('scanFiles', () => {
 			read: 1,
 			tooLarge: 1,
 			notText: 1,
+			unreadable: 0,
+			stoppedEarly: false,
+			cancelled: false,
+		});
+	});
+
+	it('counts a file that could not be read apart from one that is not text', async () => {
+		// A file listed and then gone, or unreadable, threw out of the read and
+		// was counted as `notText`, so the report said it "is not UTF-8 text".
+		// A deleted file is not a binary file, and the note was false.
+		openWorkspace({ '/w/a.txt': 'small', '/w/bin': new Uint8Array([0, 1]) });
+		const summary = await scanFiles(
+			undefined,
+			[
+				Uri.file('/w/a.txt'),
+				Uri.file('/w/bin'),
+				Uri.file('/w/gone.txt'),
+			] as never[],
+			LIMITS,
+			TOKEN as never,
+			() => {},
+			() => undefined,
+		);
+		expect(summary).toEqual({
+			read: 1,
+			tooLarge: 0,
+			notText: 1,
+			unreadable: 1,
 			stoppedEarly: false,
 			cancelled: false,
 		});
@@ -355,6 +383,7 @@ describe('the note on what was never looked at', () => {
 		read: 3,
 		tooLarge: 0,
 		notText: 0,
+		unreadable: 0,
 		fileLimitReached: false,
 		ignored: 4,
 		stoppedEarly: false,
@@ -385,6 +414,7 @@ describe('unreadNotes', () => {
 		read: 3,
 		tooLarge: 0,
 		notText: 0,
+		unreadable: 0,
 		fileLimitReached: false,
 		ignored: 0,
 		stoppedEarly: false,
@@ -413,6 +443,7 @@ describe('unreadNotes', () => {
 					...read,
 					tooLarge: 2,
 					notText: 1,
+					unreadable: 3,
 					fileLimitReached: true,
 					stoppedEarly: true,
 				},
@@ -429,6 +460,7 @@ describe('unreadNotes', () => {
 			'The results limit was reached. The rest of the files were not read.',
 			'2 file(s) larger than the safety limit were not read.',
 			'1 file(s) that are not UTF-8 text were not read.',
+			'3 file(s) could not be read.',
 		]);
 	});
 });
