@@ -36,7 +36,7 @@ function stringsPassedToL10n(): Map<string, string[]> {
 const LITERAL_CALL = /l10n\.t\(\s*(["'])((?:(?!\1)[^\\]|\\.)*)\1/g;
 
 /** `l10n.t(` followed by anything that is not a string literal. */
-const OTHER_CALL = /l10n\.t\(\s*[^"'\s)]/g;
+const OTHER_CALL = /l10n\.t\(\s*[^"'\s)]/;
 
 function sourceFiles(dir: string): string[] {
 	return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
