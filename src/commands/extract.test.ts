@@ -100,6 +100,39 @@ describe('extract: guards', () => {
 	});
 });
 
+describe('extract: safety warnings', () => {
+	it('shows the large-output warning the setting promises', async () => {
+		// `safety.largeOutputLinesThreshold` is described as a warning threshold
+		// and the README says "Warn above this line count". The warning was
+		// computed and put in a list that nothing read, so the setting changed
+		// nothing a user could see.
+		_setConfig('paths-le.safety.largeOutputLinesThreshold', 100);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(
+			_createDocument({
+				content: `{"a": "./x.ts"${',\n"k": 1'.repeat(150)}}`,
+				languageId: LANG,
+			}),
+		);
+		await runCommand('paths-le.extractPaths');
+		expect(
+			_shownMessages().filter(
+				(m) => m.kind === 'warning' && m.message.includes('Large file'),
+			),
+		).toHaveLength(1);
+		// The warning is advice, not a refusal: the extraction still runs.
+		expect(_openedDocuments().at(-1)?.getText()).toBe('./x.ts');
+	});
+
+	it('shows nothing when the document is under the threshold', async () => {
+		_setConfig('paths-le.safety.largeOutputLinesThreshold', 100);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownMessages().filter((m) => m.kind === 'warning')).toEqual([]);
+	});
+});
+
 describe('extract: canonical resolution warning', () => {
 	// The dialog governs whether absolute filesystem paths reach the output, so
 	// each answer is checked rather than just the happy path.

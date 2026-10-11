@@ -42,6 +42,11 @@ export function registerExtractCommand(
 				deps.notifier.showWarning(safetyResult.message);
 				return;
 			}
+			// Advice, not a refusal: the thresholds behind these are described
+			// as warnings, and they were computed into a list nothing read.
+			for (const warning of safetyResult.warnings) {
+				deps.notifier.showWarning(warning);
+			}
 
 			const result = await extractPaths(
 				document.getText(),
