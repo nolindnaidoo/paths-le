@@ -435,19 +435,24 @@ export const window = {
 			_lines: linesOut,
 		};
 	},
-	createStatusBarItem: (_alignment?: unknown, _priority?: number) => ({
-		text: '',
-		tooltip: '',
-		command: undefined as unknown,
-		visible: false,
-		show(): void {
-			(this as { visible: boolean }).visible = true;
-		},
-		hide(): void {
-			(this as { visible: boolean }).visible = false;
-		},
-		dispose: () => {},
-	}),
+	createStatusBarItem: (_alignment?: unknown, _priority?: number) => {
+		const item = {
+			text: '',
+			tooltip: '',
+			command: undefined as unknown,
+			visible: false,
+			show(): void {
+				(this as { visible: boolean }).visible = true;
+			},
+			hide(): void {
+				(this as { visible: boolean }).visible = false;
+			},
+			dispose: () => {},
+		};
+		// Kept so a test can read what the bar says after a command returns.
+		statusBarItems.push(item);
+		return item;
+	},
 	createWebviewPanel: (
 		_viewType: string,
 		_title: string,
@@ -460,6 +465,13 @@ export const window = {
 		dispose: () => {},
 	}),
 };
+
+const statusBarItems: Array<{ text: string; visible: boolean }> = [];
+
+/** Every status bar item created since the last reset, in order. */
+export function _statusBarItems(): readonly { text: string; visible: boolean }[] {
+	return statusBarItems;
+}
 
 // ---------------------------------------------------------- commands
 
@@ -571,6 +583,7 @@ export function _shownDocumentOptions(): readonly { viewColumn?: number }[] {
 
 export function _resetMockState(): void {
 	openedDocuments.length = 0;
+	statusBarItems.length = 0;
 	clipboardError = undefined;
 	applyEditResult = true;
 	shownDocumentOptions.length = 0;

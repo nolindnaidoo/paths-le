@@ -11,6 +11,7 @@ import {
 	_setClipboardError,
 	_setConfig,
 	_shownMessages,
+	_statusBarItems,
 	Uri,
 	workspace,
 } from '../__mocks__/vscode';
@@ -18,7 +19,7 @@ import { activate, deactivate } from '../extension';
 import type { Telemetry } from '../telemetry/telemetry';
 import { createNotifier } from '../ui/notifier';
 import type { RatingPrompt } from '../ui/ratingPrompt';
-import type { StatusBar } from '../ui/statusBar';
+import { createStatusBar, type StatusBar } from '../ui/statusBar';
 import { registerExtractCommand } from './extract';
 
 /**
@@ -182,6 +183,50 @@ describe('extract: canonical resolution warning', () => {
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
 		expect(asked).toBe(false);
+	});
+});
+
+describe('extract: the status bar is reset however the command ends', () => {
+	// The spinner went up before the security dialog, and every answer but
+	// Continue returned without taking it down, so the bar read "Resolving
+	// canonical paths..." until the next successful extraction.
+	const IDLE = '$(file-directory) Paths-LE';
+
+	function withRealStatusBar(context: ReturnType<typeof makeContext>) {
+		return { ...makeDeps(), statusBar: createStatusBar(context) };
+	}
+
+	it('after the security dialog is dismissed', async () => {
+		_setConfig('paths-le.resolution.resolveSymlinks', true);
+		_respondToWarning(() => undefined);
+		const context = makeContext();
+		registerExtractCommand(context, withRealStatusBar(context));
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_statusBarItems()[0]?.text).toBe(IDLE);
+	});
+
+	it('after Disable and Continue', async () => {
+		_setConfig('paths-le.resolution.resolveSymlinks', true);
+		_respondToWarning((items) =>
+			items.find((i) => String(i).includes('Disable')),
+		);
+		const context = makeContext();
+		registerExtractCommand(context, withRealStatusBar(context));
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_statusBarItems()[0]?.text).toBe(IDLE);
+	});
+
+	it('after a rejected in-place edit', async () => {
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		_setApplyEditResult(false);
+		const context = makeContext();
+		registerExtractCommand(context, withRealStatusBar(context));
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_statusBarItems()[0]?.text).toBe(IDLE);
 	});
 });
 

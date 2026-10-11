@@ -65,35 +65,47 @@ export function registerExtractCommand(
 					config.resolution?.resolveWorkspaceRelative,
 			);
 
-			if (canonicalEnabled) {
-				const shouldContinue = await handleCanonicalResolutionWarning(
-					context,
+			// The spinner goes up before the security dialog and comes down on
+			// every way out of here, a declined dialog and a thrown error included.
+			// Taken down only on the one successful path, it stayed up until the
+			// next extraction that happened to succeed.
+			try {
+				if (canonicalEnabled) {
+					const shouldContinue = await handleCanonicalResolutionWarning(
+						context,
+						deps,
+					);
+					if (!shouldContinue) {
+						return;
+					}
+				}
+
+				deps.statusBar.showProgress('Extracting paths...');
+
+				const formattedPaths = await resolvePathsIfNeeded(
+					result.paths,
+					document,
+					config,
+					canonicalEnabled,
 					deps,
 				);
-				if (!shouldContinue) {
-					return;
-				}
+
+				// Each path with where it was found. Whether that is shown, or
+				// copied, is decided where the text is delivered.
+				const lines = formattedPaths.map((path, index) =>
+					withPosition(path, result.paths[index]?.position),
+				);
+
+				await displayResults(
+					lines,
+					result.paths.length,
+					document,
+					config,
+					deps,
+				);
+			} finally {
+				deps.statusBar.hideProgress();
 			}
-
-			deps.statusBar.showProgress('Extracting paths...');
-
-			const formattedPaths = await resolvePathsIfNeeded(
-				result.paths,
-				document,
-				config,
-				canonicalEnabled,
-				deps,
-			);
-
-			// Each path with where it was found. Whether that is shown, or copied,
-			// is decided where the text is delivered.
-			const lines = formattedPaths.map((path, index) =>
-				withPosition(path, result.paths[index]?.position),
-			);
-
-			await displayResults(lines, result.paths.length, document, config, deps);
-
-			deps.statusBar.hideProgress();
 		},
 	);
 
