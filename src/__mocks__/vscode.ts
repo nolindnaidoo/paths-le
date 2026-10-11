@@ -229,7 +229,13 @@ export function _setWorkspaceFiles(
 
 export const workspace = {
 	workspaceFolders: undefined as WorkspaceFolder[] | undefined,
-	getWorkspaceFolder: (_uri: Uri) => undefined as WorkspaceFolder | undefined,
+	// As the editor answers: the folder whose path is a prefix of the file's.
+	getWorkspaceFolder: (uri: Uri): WorkspaceFolder | undefined =>
+		(workspace.workspaceFolders ?? []).find(
+			(folder) =>
+				uri.path === folder.uri.path ||
+				uri.path.startsWith(`${folder.uri.path}/`),
+		),
 	asRelativePath: (target: Uri | string, _includeFolder?: boolean) =>
 		typeof target === 'string' ? target : target.path,
 	fs: {

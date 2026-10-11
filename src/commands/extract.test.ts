@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
 	_createDocument,
 	_createExtensionContext,
+	_openedDocuments,
 	_registeredCommands,
 	_resetMockState,
 	_respondToWarning,
@@ -10,6 +11,8 @@ import {
 	_setClipboardError,
 	_setConfig,
 	_shownMessages,
+	Uri,
+	workspace,
 } from '../__mocks__/vscode';
 import { activate, deactivate } from '../extension';
 import type { Telemetry } from '../telemetry/telemetry';
@@ -179,6 +182,33 @@ describe('extract: canonical resolution warning', () => {
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
 		expect(asked).toBe(false);
+	});
+});
+
+describe('extract: workspace-relative resolution', () => {
+	it('resolves against the folder the document is in', async () => {
+		// The folder was looked up from the extension host's working directory,
+		// which is nowhere near the document in a multi-root workspace, so the
+		// lookup found nothing and workspace-relative resolution silently did
+		// nothing. The document's own folder is known and is the only right one.
+		workspace.workspaceFolders = [
+			{ uri: Uri.file('/first'), name: 'first', index: 0 },
+			{ uri: Uri.file('/second'), name: 'second', index: 1 },
+		];
+		_setConfig('paths-le.resolution.resolveWorkspaceRelative', true);
+		_respondToWarning((items) =>
+			items.find((i) => String(i).includes('Continue')),
+		);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(
+			_createDocument({
+				content: '{"main": "./src/index.ts"}',
+				languageId: LANG,
+				fileName: '/second/app.json',
+			}),
+		);
+		await runCommand('paths-le.extractPaths');
+		expect(_openedDocuments().at(-1)?.getText()).toBe('/second/src/index.ts');
 	});
 });
 

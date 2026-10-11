@@ -79,6 +79,7 @@ export function registerExtractCommand(
 
 			const formattedPaths = await resolvePathsIfNeeded(
 				result.paths,
+				document,
 				config,
 				canonicalEnabled,
 				deps,
@@ -206,6 +207,7 @@ async function disableCanonicalResolution(
 
 async function resolvePathsIfNeeded(
 	paths: readonly { value: string }[],
+	document: vscode.TextDocument,
 	config: {
 		resolution?: {
 			resolveSymlinks?: boolean;
@@ -222,9 +224,16 @@ async function resolvePathsIfNeeded(
 	let resolvedCount = 0;
 	let fallbackCount = 0;
 
+	// A relative path means something relative to the file it is written in,
+	// so the folder is the document's. Looking it up from the path alone
+	// resolved against the extension host's working directory, which in a
+	// multi-root workspace found nothing and resolved nothing.
+	const documentFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+
 	const formattedPaths = await Promise.all(
 		paths.map(async (path) => {
-			const workspaceFolder = getWorkspaceFolderForPath(path.value);
+			const workspaceFolder =
+				documentFolder ?? getWorkspaceFolderForPath(path.value);
 			const resolveOptions = {
 				resolveSymlinks: config.resolution?.resolveSymlinks ?? false,
 				resolveWorkspaceRelative:
