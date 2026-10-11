@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { _resetMockState, _setConfig } from '../__mocks__/vscode';
 import {
 	DEFAULT_EXCLUDED_FILES,
 	DEFAULT_EXCLUDED_FOLDERS,
 	DEFAULT_EXCLUDED_PATHS,
 } from '../workspace/defaults';
-import { CONFIG_DEFAULTS } from './config';
+import { CONFIG_DEFAULTS, getConfiguration } from './config';
 
 /**
  * CONFIG_DEFAULTS must stay identical to the defaults declared in
@@ -58,6 +59,28 @@ describe('config defaults parity with package.json', () => {
 			expect(CONFIG_DEFAULTS[defaultsKey]).toEqual(props[manifestKey]?.default);
 		});
 	}
+});
+
+describe('a number setting is read as a number', () => {
+	beforeEach(() => _resetMockState());
+
+	it('falls back to the default when the stored value is not a number', () => {
+		// `Number('')` and `Number(null)` are both 0, so a setting cleared to an
+		// empty string or null read as 0 and was clamped to the floor: a 1,000
+		// byte size guard in place of the 1,000,000 byte default.
+		for (const stored of ['', null, true, 'abc']) {
+			_resetMockState();
+			_setConfig('paths-le.safety.fileSizeWarnBytes', stored);
+			expect(getConfiguration().safetyFileSizeWarnBytes, String(stored)).toBe(
+				CONFIG_DEFAULTS.safetyFileSizeWarnBytes,
+			);
+		}
+	});
+
+	it('clamps a number below the floor to the floor', () => {
+		_setConfig('paths-le.safety.fileSizeWarnBytes', 5);
+		expect(getConfiguration().safetyFileSizeWarnBytes).toBe(1000);
+	});
 });
 
 describe('the README states the scan limits the code uses', () => {
