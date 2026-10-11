@@ -125,6 +125,28 @@ describe('paths-le.postProcess.sort', () => {
 		expect(appliedEdits[0]?.replacements[0]?.newText).toBe('/abcd\n/ab\n/a');
 	});
 
+	it('orders alphabetically by code unit, the same on every machine', async () => {
+		// `localeCompare` with no locale orders by whatever the host happens to
+		// be set to, so two users sorted the same list two ways. The repo's rule,
+		// stated in the scan and the workspace report, is the plain comparison.
+		registerSortCommand(makeContext(), createNotifier());
+		_setActiveEditor(_createDocument({ content: 'b\nA\na\nB' }));
+		_respondToQuickPick((items) =>
+			(items as Array<{ value: string }>).find((item) => item.value === 'asc'),
+		);
+		await runCommand('paths-le.postProcess.sort');
+		expect(appliedEdits[0]?.replacements[0]?.newText).toBe('A\nB\na\nb');
+
+		_resetMockState();
+		registerSortCommand(makeContext(), createNotifier());
+		_setActiveEditor(_createDocument({ content: 'b\nA\na\nB' }));
+		_respondToQuickPick((items) =>
+			(items as Array<{ value: string }>).find((item) => item.value === 'desc'),
+		);
+		await runCommand('paths-le.postProcess.sort');
+		expect(appliedEdits[0]?.replacements[0]?.newText).toBe('b\na\nB\nA');
+	});
+
 	it('does nothing when the quick pick is dismissed', async () => {
 		registerSortCommand(makeContext(), createNotifier());
 		_setActiveEditor(_createDocument({ content: '/b\n/a' }));

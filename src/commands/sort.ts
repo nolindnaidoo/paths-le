@@ -86,10 +86,19 @@ function sortLines(lines: string[], order: SortOrder): string[] {
 	}
 
 	if (order === 'asc') {
-		return [...lines].sort((a, b) => a.localeCompare(b));
+		return [...lines].sort(byCodeUnit);
 	}
 
-	return [...lines].sort((a, b) => b.localeCompare(a));
+	return [...lines].sort((a, b) => byCodeUnit(b, a));
+}
+
+/**
+ * A plain comparison rather than `localeCompare`: the order must not change
+ * with the machine's locale. The scan and the workspace report follow the
+ * same rule, so one list sorts the same way everywhere it is shown.
+ */
+function byCodeUnit(a: string, b: string): number {
+	return a < b ? -1 : Number(a > b);
 }
 
 /** Returns false when the workspace rejected the edit. */
