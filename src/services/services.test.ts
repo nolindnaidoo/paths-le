@@ -2,12 +2,16 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
 	_createExtensionContext,
 	_fireConfigChange,
+	_mcpProviders,
 	_outputChannels,
 	_registeredCommands,
 	_resetMockState,
 	_setConfig,
+	_setLmApi,
 	_shownMessages,
+	_statusBarItems,
 	executedBuiltins,
+	type McpStdioServerDefinition,
 } from '../__mocks__/vscode';
 import { registerOpenSettingsCommand } from '../config/settings';
 import { activate } from '../extension';
@@ -84,19 +88,31 @@ describe('telemetry', () => {
 });
 
 describe('statusBar', () => {
+	// Both of these tests called the code and asserted nothing, so the bar
+	// could have shown anything, or stayed hidden, and they would have passed.
 	it('shows progress and restores idle text', () => {
 		const context = _createExtensionContext();
 		const statusBar = createStatusBar(context as never);
+		const item = _statusBarItems()[0];
+		expect(item?.text).toBe('$(file-directory) Paths-LE');
 		statusBar.showProgress('Working...');
+		expect(item?.text).toBe('$(loading~spin) Working...');
 		statusBar.hideProgress();
+		expect(item?.text).toBe('$(file-directory) Paths-LE');
 		statusBar.dispose();
 	});
 
 	it('reacts to statusBar.enabled config changes', () => {
 		const context = _createExtensionContext();
 		createStatusBar(context as never);
+		const item = _statusBarItems()[0];
+		expect(item?.visible).toBe(true);
 		_setConfig('paths-le.statusBar.enabled', false);
 		_fireConfigChange('paths-le.statusBar.enabled');
+		expect(item?.visible).toBe(false);
+		_setConfig('paths-le.statusBar.enabled', true);
+		_fireConfigChange('paths-le.statusBar.enabled');
+		expect(item?.visible).toBe(true);
 	});
 });
 
@@ -129,6 +145,34 @@ describe('notifier respects notificationsLevel', () => {
 			'warning',
 			'error',
 		]);
+	});
+});
+
+describe('mcp provider', () => {
+	it('says nothing on a host without the API', () => {
+		activate(_createExtensionContext() as never);
+		expect(_mcpProviders()).toEqual([]);
+	});
+
+	it('registers the bundled server on a host with the API, launched as the README promises', () => {
+		// The registration branch ran only in a real host, where nothing read
+		// the definition back. The extension host is Electron, so the launch
+		// has to say ELECTRON_RUN_AS_NODE or the editor starts a second editor.
+		_setLmApi(true);
+		const context = _createExtensionContext();
+		activate(context as never);
+		expect(_mcpProviders().map((entry) => entry.id)).toEqual(['paths-le']);
+		const definitions =
+			_mcpProviders()[0]?.provider.provideMcpServerDefinitions() as McpStdioServerDefinition[];
+		expect(definitions).toHaveLength(1);
+		const definition = definitions[0] as McpStdioServerDefinition;
+		expect(definition.label).toBe('Paths-LE');
+		expect(definition.command).toBe(process.execPath);
+		expect(definition.args).toEqual(['/ext/dist/mcp-server.js']);
+		expect(definition.env).toEqual({ ELECTRON_RUN_AS_NODE: '1' });
+		expect(definition.version).toBe('2.4.0');
+		for (const disposable of context.subscriptions) disposable.dispose();
+		expect(_mcpProviders()).toEqual([]);
 	});
 });
 

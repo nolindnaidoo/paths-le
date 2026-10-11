@@ -176,6 +176,19 @@ describe('paths-le.extractWorkspace and paths-le.extractFolder', () => {
 		).toEqual(['Paths-LE could not finish: no editor group']);
 	});
 
+	it('reports each path as written, whatever the resolution settings say', async () => {
+		// The README says a scan never resolves; the code never called the
+		// resolver; nothing held the two together.
+		open();
+		_setConfig('paths-le.resolution.resolveWorkspaceRelative', true);
+		_setConfig('paths-le.resolution.resolveSymlinks', true);
+		await runCommand('paths-le.extractWorkspace');
+		expect(report()).toContain('| `./lib/util` | 3 | 2 |');
+		expect(report()).not.toContain('/w/lib/util');
+		// And no security dialog, which only canonical resolution shows.
+		expect(_shownMessages().filter((m) => m.kind === 'warning')).toEqual([]);
+	});
+
 	it('says when a folder holds no paths', async () => {
 		open({ '/w/a.txt': 'nothing here\n' });
 		await runCommand('paths-le.extractWorkspace');

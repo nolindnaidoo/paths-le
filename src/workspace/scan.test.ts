@@ -160,6 +160,18 @@ describe('listFiles', () => {
 		expect(labels).toEqual(['a.txt', 'skip.txt']);
 	});
 
+	it('reads only the files the patterns name', async () => {
+		openWorkspace({ '/w/a.ts': 'a', '/w/b.md': 'b', '/w/sub/c.ts': 'c' });
+		const listed = await listFiles(undefined, {
+			...LIMITS,
+			patterns: ['**/*.ts'],
+		});
+		expect(listed.files.map((uri) => uri.path)).toEqual([
+			'/w/a.ts',
+			'/w/sub/c.ts',
+		]);
+	});
+
 	it('says when more files matched than the limit', async () => {
 		openWorkspace({ '/w/a': 'a', '/w/b': 'b', '/w/c': 'c' });
 		const two = await listFiles(undefined, { ...LIMITS, maxFiles: 2 });

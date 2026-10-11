@@ -11,10 +11,12 @@ import {
 	_setClipboardError,
 	_setConfig,
 	_setOpenTextDocumentError,
+	_shownDocumentOptions,
 	_shownMessages,
 	_statusBarItems,
 	appliedEdits,
 	Uri,
+	ViewColumn,
 	workspace,
 } from '../__mocks__/vscode';
 import { activate, deactivate } from '../extension';
@@ -262,6 +264,42 @@ describe('extract: the status bar is reset however the command ends', () => {
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
 		expect(_statusBarItems()[0]?.text).toBe(IDLE);
+	});
+});
+
+describe('extract: where the results go', () => {
+	// Three routes, two settings. Only the replace route had tests of its own.
+	it('opens beside the editor by default', async () => {
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownDocumentOptions().at(-1)?.viewColumn).toBe(ViewColumn.Beside);
+		expect(_openedDocuments()).toHaveLength(1);
+		expect(appliedEdits).toHaveLength(0);
+	});
+
+	it('opens a new file in the active column when side by side is off', async () => {
+		_setConfig('paths-le.openResultsSideBySide', false);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_shownDocumentOptions().at(-1)).toEqual({});
+		expect(_openedDocuments().at(-1)?.getText()).toBe(
+			'./src/index.ts\n../lib/util.ts',
+		);
+		expect(appliedEdits).toHaveLength(0);
+	});
+
+	it('replaces the document when both are off', async () => {
+		_setConfig('paths-le.openResultsSideBySide', false);
+		_setConfig('paths-le.postProcess.openInNewFile', false);
+		registerExtractCommand(makeContext(), makeDeps());
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		expect(_openedDocuments()).toHaveLength(0);
+		expect(appliedEdits[0]?.replacements[0]?.newText).toBe(
+			'./src/index.ts\n../lib/util.ts',
+		);
 	});
 });
 

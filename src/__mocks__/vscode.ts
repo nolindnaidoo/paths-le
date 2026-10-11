@@ -440,9 +440,12 @@ export const window = {
 		quickPickResponder ? quickPickResponder(items) : undefined,
 	showTextDocument: async (_document: unknown, options?: unknown) => {
 		// Recorded so tests can assert placement — openResultsSideBySide sets
-		// viewColumn, which is otherwise unobservable.
+		// viewColumn, which is otherwise unobservable. The editor takes either
+		// a column or an options object; both are kept as the object.
 		shownDocumentOptions.push(
-			(options as { viewColumn?: number } | undefined) ?? {},
+			typeof options === 'number'
+				? { viewColumn: options }
+				: ((options as { viewColumn?: number } | undefined) ?? {}),
 		);
 		return undefined;
 	},
@@ -516,6 +519,58 @@ export function _outputChannels(): readonly { name: string; _lines: string[] }[]
 /** Every status bar item created since the last reset, in order. */
 export function _statusBarItems(): readonly { text: string; visible: boolean }[] {
 	return statusBarItems;
+}
+
+// ------------------------------------------------------ lm (agent mode)
+
+/** The definition the provider builds, kept as it was constructed. */
+export class McpStdioServerDefinition {
+	constructor(
+		public readonly label: string,
+		public readonly command: string,
+		public readonly args: readonly string[],
+		public readonly env: Readonly<Record<string, string>>,
+		public readonly version: string,
+	) {}
+}
+
+interface McpProvider {
+	readonly provideMcpServerDefinitions: () => unknown;
+}
+
+const mcpProviders: Array<{ id: string; provider: McpProvider }> = [];
+
+/** Every MCP server definition provider registered and not yet disposed. */
+export function _mcpProviders(): readonly { id: string; provider: McpProvider }[] {
+	return mcpProviders;
+}
+
+/**
+ * Agent mode's API. Absent by default, as in a fork that reports a recent
+ * version and lacks it; `_setLmApi(true)` gives the host VS Code 1.101's.
+ */
+export const lm: {
+	registerMcpServerDefinitionProvider?: (
+		id: string,
+		provider: McpProvider,
+	) => { dispose(): void };
+} = {};
+
+export function _setLmApi(present: boolean): void {
+	if (!present) {
+		delete lm.registerMcpServerDefinitionProvider;
+		return;
+	}
+	lm.registerMcpServerDefinitionProvider = (id, provider) => {
+		const entry = { id, provider };
+		mcpProviders.push(entry);
+		return {
+			dispose: () => {
+				const index = mcpProviders.indexOf(entry);
+				if (index >= 0) mcpProviders.splice(index, 1);
+			},
+		};
+	};
 }
 
 // ---------------------------------------------------------- commands
@@ -594,8 +649,9 @@ export function _createExtensionContext() {
 		},
 		extension: {
 			id: 'nolindnaidoo.paths-le',
-			packageJSON: { displayName: 'Paths-LE' },
+			packageJSON: { displayName: 'Paths-LE', version: '2.4.0' },
 		},
+		asAbsolutePath: (relative: string) => `/ext/${relative}`,
 	};
 }
 
@@ -650,6 +706,8 @@ export function _resetMockState(): void {
 	workspace.workspaceFolders = undefined;
 	workspaceFiles.clear();
 	openDialogResponder = undefined;
+	mcpProviders.length = 0;
+	_setLmApi(false);
 }
 
 export const l10n = {
