@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { version as manifestVersion } from '../../package.json';
 import {
 	_createExtensionContext,
 	_fireConfigChange,
@@ -170,7 +171,7 @@ describe('mcp provider', () => {
 		expect(definition.command).toBe(process.execPath);
 		expect(definition.args).toEqual(['/ext/dist/mcp-server.js']);
 		expect(definition.env).toEqual({ ELECTRON_RUN_AS_NODE: '1' });
-		expect(definition.version).toBe('2.4.0');
+		expect(definition.version).toBe(manifestVersion);
 		for (const disposable of context.subscriptions) disposable.dispose();
 		expect(_mcpProviders()).toEqual([]);
 	});

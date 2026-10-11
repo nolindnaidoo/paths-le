@@ -3,6 +3,7 @@
  * Stateful pieces (config store, message log, command registry) expose
  * `_reset()`/`_set()` helpers prefixed with underscore — test-only API.
  */
+import { version as manifestVersion } from '../../package.json';
 
 export interface WorkspaceFolder {
 	readonly uri: Uri;
@@ -707,7 +708,9 @@ export function _createExtensionContext() {
 		},
 		extension: {
 			id: 'nolindnaidoo.paths-le',
-			packageJSON: { displayName: 'Paths-LE', version: '2.4.0' },
+			// The manifest's own version, so a release never leaves a stale
+			// literal here for the definition test to agree with.
+			packageJSON: { displayName: 'Paths-LE', version: manifestVersion },
 		},
 		asAbsolutePath: (relative: string) => `/ext/${relative}`,
 	};
