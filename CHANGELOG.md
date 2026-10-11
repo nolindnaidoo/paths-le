@@ -9,6 +9,66 @@ This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
 separate product on its own cadence and keeps its own
 [CHANGELOG](crate/CHANGELOG.md).
 
+## [Unreleased]
+
+### Fixed
+
+- The MCP server answered a `filename` or `format` that is an
+  `Object.prototype` name, such as `constructor` or `__proto__`, with a
+  function or an object for its file type, or dropped the field. It answers
+  `unknown`, as the crate's server always did.
+- A number setting cleared to an empty string or null read as 0 and was
+  clamped to its floor, so the size guard became 1,000 bytes. It falls back
+  to the default.
+- `Sort Paths` ordered by the machine's locale, so one list sorted two ways
+  on two machines. It orders by code unit, as the workspace report does;
+  uppercase sorts before lowercase.
+- With `resolution.resolveWorkspaceRelative` on, a URL was rewritten under
+  the workspace folder, `https://example.com/a` becoming
+  `/workspace/https:/example.com/a`, and so was a drive-letter path on macOS
+  and Linux. Both are left as written.
+- Workspace-relative resolution looked the folder up from the extension
+  host's working directory, so in a multi-root workspace it silently did
+  nothing. It resolves against the folder the document is in.
+- The status bar spinner stayed up after the security dialog was dismissed
+  or declined, and after any failure in the output step.
+- "Canonical resolution failed, using original paths" was shown whenever no
+  path changed, which is also what happens when every path was already
+  canonical. Nothing had failed, and the message is gone.
+- A folder or workspace scan counted a file deleted or made unreadable after
+  it was listed as "not UTF-8 text". It has its own line in the report:
+  "N file(s) could not be read."
+- `paths-le.safety.largeOutputLinesThreshold` changed nothing a user could
+  see: the warning it governs was computed and never shown. It is shown,
+  with the path-density warning, before the extraction proceeds.
+- `paths-le.telemetryEnabled` was read once at activation, so changing it
+  took effect only after a reload. It is read per event.
+- The help page listed seven file types and told a user with no results to
+  check whether the file type was supported. It names every format,
+  including YAML and TSV, and the text scan over everything else.
+- Four runtime strings were missing from every locale and showed in
+  English: the three "the edit was rejected" errors and the clipboard
+  warning. Eight more never went through the localization layer: the
+  dedupe toast, the two status bar messages, the three safety messages and
+  the help panel's title. All twelve are translated into all twelve locales,
+  and a unit test now holds the bundle and the source equal.
+- A failure inside a command, such as the editor refusing to open a document
+  or an edit throwing, escaped as an unhandled rejection the editor reported
+  in its own words. Every command reports it as one redacted, localized
+  error notification.
+- The MCP server's stdio buffer had no ceiling: input with no newline grew
+  the process without bound, and 64 MiB of it held the server at 737 MB. A
+  frame over 16 MiB is refused with a JSON-RPC parse error and the server
+  keeps serving.
+- In replace mode, the paths computed from the text read at the start of the
+  command were written over the whole document after the security dialog
+  closed, so anything typed while the dialog was up was lost. The replace
+  route now refuses, with an error, when the document changed in between.
+- Eleven locales rendered the count in "Extracted {0} paths from document" as
+  a name ("{0}-Pfade", "las rutas de «{0}»"); Japanese, Korean and Chinese
+  rendered the sort order in "Sorted {0} paths ({1})" as a second count; the
+  Japanese Continue button read as "read more". Each value is corrected.
+
 ## [2.4.0] - 2026-10-07
 
 ### Added
