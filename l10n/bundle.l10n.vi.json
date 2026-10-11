@@ -13,7 +13,7 @@
 	"No paths found in the current document": "Không tìm thấy đường dẫn nào trong tài liệu hiện tại",
 	"Failed to extract paths: Unknown error": "Không thể trích xuất đường dẫn: Lỗi không xác định",
 	"Canonical path resolution disabled for security": "Chức năng giải quyết đường dẫn chuẩn đã bị vô hiệu hóa vì lý do bảo mật",
-	"Extracted {0} paths from document": "Đã trích xuất các đường dẫn {0} từ tài liệu",
+	"Extracted {0} paths from document": "Đã trích xuất {0} đường dẫn từ tài liệu",
 	"Paths-LE: File Path Extraction": "Paths-LE: Trích xuất đường dẫn tệp",
 	"Continue": "Tiếp tục",
 	"Disable and Continue": "Tắt và Tiếp tục",

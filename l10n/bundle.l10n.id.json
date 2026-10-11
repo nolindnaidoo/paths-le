@@ -13,7 +13,7 @@
 	"No paths found in the current document": "Tidak ditemukan jalur apa pun dalam dokumen ini",
 	"Failed to extract paths: Unknown error": "Gagal mengekstrak jalur: Kesalahan tidak diketahui",
 	"Canonical path resolution disabled for security": "Resolusi jalur kanonik dinonaktifkan demi keamanan",
-	"Extracted {0} paths from document": "Mengekstrak jalur {0} dari dokumen",
+	"Extracted {0} paths from document": "{0} jalur diekstrak dari dokumen",
 	"Paths-LE: File Path Extraction": "Paths-LE: Ekstraksi Jalur File",
 	"Continue": "Lanjutkan",
 	"Disable and Continue": "Nonaktifkan dan Lanjutkan",

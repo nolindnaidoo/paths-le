@@ -13,7 +13,7 @@
 	"No paths found in the current document": "Nessun percorso trovato nel documento corrente",
 	"Failed to extract paths: Unknown error": "Impossibile estrarre i percorsi: errore sconosciuto",
 	"Canonical path resolution disabled for security": "Risoluzione del percorso canonico disabilitata per motivi di sicurezza",
-	"Extracted {0} paths from document": "Ha estratto i percorsi \"{0}\" dal documento",
+	"Extracted {0} paths from document": "Estratti {0} percorsi dal documento",
 	"Paths-LE: File Path Extraction": "Paths-LE: Estrazione del percorso dei file",
 	"Continue": "Continua",
 	"Disable and Continue": "Disattiva e continua",

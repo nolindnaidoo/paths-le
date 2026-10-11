@@ -13,7 +13,7 @@
 	"No paths found in the current document": "У поточному документі не знайдено шляхів",
 	"Failed to extract paths: Unknown error": "Не вдалося витягти шляхи: невідома помилка",
 	"Canonical path resolution disabled for security": "Визначення канонічного шляху вимкнено з міркувань безпеки",
-	"Extracted {0} paths from document": "Витягнуто шляхи до файлів {0} з документа",
+	"Extracted {0} paths from document": "Витягнуто шляхів із документа: {0}",
 	"Paths-LE: File Path Extraction": "Paths-LE: Витяг шляху до файлу",
 	"Continue": "Продовжити",
 	"Disable and Continue": "Вимкнути та продовжити",

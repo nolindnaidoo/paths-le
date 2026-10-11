@@ -13,7 +13,7 @@
 	"No paths found in the current document": "Aucun chemin d'accès n'a été trouvé dans le document actuel",
 	"Failed to extract paths: Unknown error": "Échec de l'extraction des chemins d'accès : erreur inconnue",
 	"Canonical path resolution disabled for security": "La résolution de chemin canonique est désactivée pour des raisons de sécurité",
-	"Extracted {0} paths from document": "Extraction des chemins d'accès « {0} » à partir du document",
+	"Extracted {0} paths from document": "{0} chemins extraits du document",
 	"Paths-LE: File Path Extraction": "Paths-LE : Extraction des chemins d'accès aux fichiers",
 	"Continue": "Continuer",
 	"Disable and Continue": "Désactiver et continuer",

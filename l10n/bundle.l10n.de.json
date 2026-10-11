@@ -13,7 +13,7 @@
 	"No paths found in the current document": "Im aktuellen Dokument wurden keine Pfade gefunden",
 	"Failed to extract paths: Unknown error": "Pfade konnten nicht extrahiert werden: Unbekannter Fehler",
 	"Canonical path resolution disabled for security": "Die Auflösung des kanonischen Pfads wurde aus Sicherheitsgründen deaktiviert",
-	"Extracted {0} paths from document": "{0}-Pfade aus dem Dokument extrahiert",
+	"Extracted {0} paths from document": "{0} Pfade aus dem Dokument extrahiert",
 	"Paths-LE: File Path Extraction": "Paths-LE: Extraktion von Dateipfaden",
 	"Continue": "Weiter",
 	"Disable and Continue": "Deaktivieren und fortfahren",
