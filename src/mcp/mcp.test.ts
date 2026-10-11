@@ -364,6 +364,40 @@ describe('serve: the stdio loop', () => {
 		expect(replies()[0]?.id).toBe(2);
 	});
 
+	it('reassembles a request split at every character boundary', async () => {
+		// One split was tested; a client's chunks fall anywhere.
+		const message = '{"jsonrpc":"2.0","id":8,"method":"ping"}\n';
+		for (let at = 1; at < message.length; at++) {
+			const { input, replies } = harness();
+			input.emit('data', message.slice(0, at));
+			input.emit('data', message.slice(at));
+			await settle();
+			expect(
+				replies().map((r) => r.id),
+				`split at ${at}`,
+			).toEqual([8]);
+		}
+	});
+
+	it('reassembles a request split inside a multi-byte character', async () => {
+		// The real server reads stdin as UTF-8 text, so a chunk boundary inside
+		// `é` is healed by the decoder before this code sees it; the harness
+		// hands over strings, so the split here lands between the characters
+		// around it. Driven against the built server at every byte offset in
+		// the pass record.
+		const message =
+			'{"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"extract_paths","arguments":{"content":"{\\"café\\":\\"./naïve.ts\\"}","format":"json"}}}\n';
+		const at = message.indexOf('é') + 1;
+		const { input, replies } = harness();
+		input.emit('data', message.slice(0, at));
+		input.emit('data', message.slice(at));
+		await settle();
+		expect(replies()[0]?.id).toBe(9);
+		expect(
+			replies()[0]?.result?.structuredContent?.data?.paths?.[0]?.value,
+		).toBe('./naïve.ts');
+	});
+
 	it('handles several requests in one chunk', async () => {
 		const { input, replies } = harness();
 		input.emit(
