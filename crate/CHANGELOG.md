@@ -7,6 +7,16 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.5] - 2026-10-11
+
+### Fixed
+
+- **The README's Open VSX link led nowhere.** It pointed at a namespace the
+  extension's listing has left, and points at `nolindnaidoo` now. The Zed
+  row is gone with the Zed extension, which was never listed.
+- The family list's String-LE line no longer promises a position for every
+  string.
+
 ## [0.3.4] - 2026-09-30
 
 ### Fixed
@@ -359,6 +369,7 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.3.5]: https://crates.io/crates/paths-le/0.3.5
 [0.3.4]: https://crates.io/crates/paths-le/0.3.4
 [0.3.3]: https://crates.io/crates/paths-le/0.3.3
 [0.3.1]: https://crates.io/crates/paths-le/0.3.1
