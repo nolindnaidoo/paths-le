@@ -21,12 +21,15 @@ use saphyr::{LoadableYamlNode, Scalar, Yaml};
 use super::position::PositionIndex;
 use super::{Path, Position, heuristics};
 
-pub(crate) fn extract(content: &str) -> Vec<Path> {
-    // A document that does not parse yields nothing, matching the
-    // extension's `catch { return [] }` — the same answer TOML and JSON
-    // give, so a broken document reads the same way whatever it is.
+const REFUSED: &str = "Invalid YAML: the document does not parse";
+
+pub(crate) fn extract(content: &str) -> super::Extracted {
+    // A document that does not parse is refused and named, as TOML and
+    // JSON are, so a broken document reads the same way whatever it is.
+    // It used to yield nothing, which is also what a clean document
+    // yields. The extension refuses with the same words.
     let Ok(documents) = Yaml::load_from_str(content) else {
-        return Vec::new();
+        return Err(REFUSED.to_string());
     };
 
     let index = PositionIndex::new(content);
@@ -35,7 +38,7 @@ pub(crate) fn extract(content: &str) -> Vec<Path> {
     for document in &documents {
         walk(document, &mut paths, &mut locator);
     }
-    paths
+    Ok(paths)
 }
 
 fn walk(node: &Yaml<'_>, paths: &mut Vec<Path>, locator: &mut Locator) {
@@ -113,27 +116,35 @@ mod tests {
     use super::*;
     use crate::extract::PathType;
 
+    /// The paths of a document that reads; a refusal fails the test by name.
+    fn read(content: &str) -> Vec<Path> {
+        extract(content).expect("the document reads")
+    }
+
     fn values(content: &str) -> Vec<String> {
-        extract(content)
-            .into_iter()
-            .map(|path| path.value)
-            .collect()
+        read(content).into_iter().map(|path| path.value).collect()
     }
 
     #[test]
     fn a_blank_document_yields_nothing() {
-        assert!(extract("").is_empty());
-        assert!(extract("  \n ").is_empty());
+        assert!(read("").is_empty());
+        assert!(read("  \n ").is_empty());
     }
 
+    /// Named, never silent: an empty result is what a clean document
+    /// answers, and a document holding a path behind a broken line used
+    /// to answer exactly that.
     #[test]
-    fn a_document_that_does_not_parse_yields_nothing() {
-        assert!(extract("a: [unterminated").is_empty());
+    fn a_document_that_does_not_parse_is_refused_and_named() {
+        assert_eq!(
+            extract("secret: /etc/passwd\nbad: [unclosed\n"),
+            Err(REFUSED.to_string())
+        );
     }
 
     #[test]
     fn a_scalar_value_is_a_path() {
-        let paths = extract("log: /var/log/app.log\n");
+        let paths = read("log: /var/log/app.log\n");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "/var/log/app.log");
         assert_eq!(paths[0].kind, PathType::Absolute);
@@ -144,7 +155,7 @@ mod tests {
 
     #[test]
     fn a_key_that_looks_like_a_path_counts_too() {
-        let paths = extract("config/app.yaml: contents\n");
+        let paths = read("config/app.yaml: contents\n");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "config/app.yaml");
         assert_eq!(paths[0].context, "YAML key");
@@ -175,7 +186,7 @@ mod tests {
 
     #[test]
     fn mapping_order_follows_the_document() {
-        let paths = extract("z: ./first.ts\na: ./second.ts\n");
+        let paths = read("z: ./first.ts\na: ./second.ts\n");
         assert_eq!(paths[0].value, "./first.ts");
         assert_eq!(paths[0].position.line, 1);
         assert_eq!(paths[1].value, "./second.ts");
@@ -184,7 +195,7 @@ mod tests {
 
     #[test]
     fn repeated_values_land_on_successive_occurrences() {
-        let paths = extract("a: ./x.ts\nb: ./x.ts\n");
+        let paths = read("a: ./x.ts\nb: ./x.ts\n");
         assert_eq!(paths[0].position.line, 1);
         assert_eq!(paths[1].position.line, 2);
     }
@@ -194,7 +205,7 @@ mod tests {
     /// answering 1:1, and both are honest about where the text is.
     #[test]
     fn an_aliased_value_resolves_to_its_anchor() {
-        let paths = extract("base: &dir ./shared/lib.ts\nuse: *dir\n");
+        let paths = read("base: &dir ./shared/lib.ts\nuse: *dir\n");
         assert_eq!(paths.len(), 2);
         assert_eq!(paths[1].value, "./shared/lib.ts");
         assert_eq!(paths[1].position.line, 1);
@@ -204,7 +215,7 @@ mod tests {
     /// appears nowhere in the source as written.
     #[test]
     fn an_unlocatable_value_falls_back_to_the_first_position() {
-        let paths = extract("p: >-\n  ./spread\n  /out.ts\n");
+        let paths = read("p: >-\n  ./spread\n  /out.ts\n");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "./spread /out.ts");
         assert_eq!(paths[0].position, Position { line: 1, column: 1 });
@@ -212,7 +223,7 @@ mod tests {
 
     #[test]
     fn a_quoted_scalar_is_located_past_its_quote() {
-        let paths = extract("p: \"./quoted.ts\"\n");
+        let paths = read("p: \"./quoted.ts\"\n");
         assert_eq!(paths[0].position.column, 5);
     }
 

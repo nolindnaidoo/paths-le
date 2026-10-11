@@ -518,6 +518,29 @@ fn a_document_the_reader_refused_exits_two_and_names_why() {
     assert!(run.stderr.contains("never closed"), "{}", run.stderr);
 }
 
+/// The parser-backed formats refuse the same way. A malformed YAML or TOML
+/// document holding `/etc/passwd` used to exit 1 with no paths and no
+/// diagnostics, which is exactly what a clean file does.
+#[test]
+fn a_malformed_yaml_or_toml_exits_two_and_names_why() {
+    let tree = Tree::new("malformed-parsed");
+    let yaml = tree.write("deploy.yaml", "secret: /etc/passwd\nbad: [unclosed\n");
+    let run_yaml = run(&["--no-resolve", &yaml.to_string_lossy()]);
+    assert_eq!(run_yaml.code, 2, "{}{}", run_yaml.stdout, run_yaml.stderr);
+    assert_eq!(
+        reports(&run_yaml)[0]["diagnostics"][0]["message"],
+        "Invalid YAML: the document does not parse"
+    );
+
+    let toml = tree.write("app.toml", "secret = \"/etc/passwd\"\nbroken = [\n");
+    let run_toml = run(&["--no-resolve", &toml.to_string_lossy()]);
+    assert_eq!(run_toml.code, 2, "{}{}", run_toml.stdout, run_toml.stderr);
+    assert_eq!(
+        reports(&run_toml)[0]["diagnostics"][0]["message"],
+        "Invalid TOML: the document does not parse"
+    );
+}
+
 /// A no-break space after a closing quote is an ordinary thing to find
 /// in a spreadsheet export. `csv-parse` walked that whitespace run one
 /// byte at a time and refused the document over it, and the reader

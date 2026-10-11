@@ -1,5 +1,5 @@
 import * as yaml from 'js-yaml';
-import type { Path } from '../../types';
+import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
 
@@ -19,17 +19,20 @@ import { createPositionIndex, type PositionIndex } from '../position';
  * Keys count as well as values, because a YAML mapping keyed by path is
  * ordinary — a Kubernetes config map's `data:`, a compose file's volumes. TOML
  * does the same for the same reason.
+ *
+ * A document that does not parse is refused and named, never read as empty:
+ * an empty list is what a clean document answers, and a document holding
+ * `/etc/passwd` behind a broken line read as clean. The crate refuses with
+ * the same words.
  */
-export function extractFromYaml(content: string): readonly Path[] {
+export function extractFromYaml(content: string): Extracted {
 	let documents: readonly unknown[];
 	try {
 		// loadAll handles both a single document and a `---`-separated stream;
 		// load() rejects the latter outright.
 		documents = yaml.loadAll(content);
 	} catch (_error) {
-		// A document that does not parse yields nothing, matching TOML and
-		// JSON here — a broken document reads the same way whatever it is.
-		return [];
+		return { refusal: 'Invalid YAML: the document does not parse' };
 	}
 
 	const locate = createLocator(content);
@@ -37,7 +40,7 @@ export function extractFromYaml(content: string): readonly Path[] {
 	for (const document of documents) {
 		walk(document, paths, locate);
 	}
-	return paths;
+	return { paths };
 }
 
 function walk(

@@ -778,5 +778,83 @@
 			"maxResults": 0
 		},
 		"expectedError": "maxResults must be a positive integer"
+	},
+	{
+		"name": "a toml document that does not parse refuses and names why",
+		"content": "secret = \"/etc/passwd\"\nbroken = [\n",
+		"arguments": {
+			"format": "toml"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "toml"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid TOML: the document does not parse"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a yaml document that does not parse refuses and names why",
+		"content": "secret: /etc/passwd\nbad: [unclosed\n",
+		"arguments": {
+			"format": "yaml"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "yaml"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid YAML: the document does not parse"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
+	},
+	{
+		"name": "a json document cut off mid-value refuses rather than reading what parsed",
+		"content": "{\"a\": \"./x.ts\", \"b\": ",
+		"arguments": {
+			"format": "json"
+		},
+		"expected": {
+			"ok": false,
+			"data": {
+				"paths": [],
+				"fileType": "json"
+			},
+			"diagnostics": [
+				{
+					"severity": "error",
+					"code": "parsing",
+					"message": "Invalid JSON: the document does not parse"
+				}
+			],
+			"meta": {
+				"tool": "extract_paths",
+				"count": 0,
+				"truncated": false
+			}
+		}
 	}
 ]

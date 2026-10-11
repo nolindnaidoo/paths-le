@@ -117,13 +117,14 @@ impl Extraction {
     }
 }
 
-/// A format extractor's result. Two things fail, and neither is a wrong
+/// A format extractor's result. Three things fail, and none is a wrong
 /// answer: the CSV reader refuses a document whose quoting is malformed,
-/// and the four regex-driven extractors refuse one that exhausts the
-/// backtracking budget. The first is reported by both frontends, from
-/// the same reader in two languages; the second is this crate's alone,
-/// because the extension's engine has no equivalent failure, and it is a
-/// documented divergence in SPEC.md.
+/// the JSON, TOML and YAML readers refuse a document that does not
+/// parse, and the four regex-driven extractors refuse one that exhausts
+/// the backtracking budget. The first two are reported by both frontends
+/// in the same words; the third is this crate's alone, because the
+/// extension's engine has no equivalent failure, and it is a documented
+/// divergence in SPEC.md.
 pub(crate) type Extracted = Result<Vec<Path>, String>;
 
 /// Extract every path from a document.
@@ -149,13 +150,13 @@ fn extract_by_file_type(content: &str, file_type: FileType) -> Extracted {
     match file_type {
         FileType::Csv => csv::extract(content, csv::COMMA),
         FileType::Tsv => csv::extract(content, csv::TAB),
-        FileType::Toml => Ok(toml::extract(content)),
+        FileType::Toml => toml::extract(content),
         FileType::Dotenv => dotenv::extract(content),
         FileType::Javascript | FileType::Typescript => javascript::extract(content),
-        FileType::Json => Ok(json::extract(content)),
+        FileType::Json => json::extract(content),
         FileType::Css => css::extract(content),
         FileType::Html => html::extract(content),
-        FileType::Yaml => Ok(yaml::extract(content)),
+        FileType::Yaml => yaml::extract(content),
         FileType::Unknown => Ok(fallback::extract(content)),
     }
 }

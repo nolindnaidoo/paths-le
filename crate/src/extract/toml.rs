@@ -16,9 +16,11 @@ use super::js;
 use super::position::PositionIndex;
 use super::{Path, Position, heuristics};
 
-pub(crate) fn extract(content: &str) -> Vec<Path> {
+const REFUSED: &str = "Invalid TOML: the document does not parse";
+
+pub(crate) fn extract(content: &str) -> super::Extracted {
     if js::is_blank(content) {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
     // `Table`, not `Value`: `Value`'s parser reads a single TOML value
@@ -26,17 +28,18 @@ pub(crate) fn extract(content: &str) -> Vec<Path> {
     // an array and then reports the rest as trailing junk. A TOML
     // document is always a table.
     //
-    // A document that does not parse yields nothing, matching the
-    // extension's `catch { return [] }`.
+    // A document that does not parse is refused and named. It used to
+    // yield nothing, which is also what a clean document yields. The
+    // extension refuses with the same words.
     let Ok(parsed) = content.parse::<::toml::Table>() else {
-        return Vec::new();
+        return Err(REFUSED.to_string());
     };
 
     let index = PositionIndex::new(content);
     let mut locator = Locator::new(content, &index);
     let mut paths = Vec::new();
     walk(&::toml::Value::Table(parsed), &mut paths, &mut locator);
-    paths
+    Ok(paths)
 }
 
 fn walk(value: &::toml::Value, paths: &mut Vec<Path>, locator: &mut Locator) {
@@ -116,20 +119,31 @@ mod tests {
     use super::*;
     use crate::extract::PathType;
 
-    #[test]
-    fn a_blank_document_yields_nothing() {
-        assert!(extract("").is_empty());
-        assert!(extract("  \n ").is_empty());
+    /// The paths of a document that reads; a refusal fails the test by name.
+    fn read(content: &str) -> Vec<Path> {
+        extract(content).expect("the document reads")
     }
 
     #[test]
-    fn a_document_that_does_not_parse_yields_nothing() {
-        assert!(extract("this is [not toml").is_empty());
+    fn a_blank_document_yields_nothing() {
+        assert!(read("").is_empty());
+        assert!(read("  \n ").is_empty());
+    }
+
+    /// Named, never silent: an empty result is what a clean document
+    /// answers, and a document holding a path behind a broken line used
+    /// to answer exactly that.
+    #[test]
+    fn a_document_that_does_not_parse_is_refused_and_named() {
+        assert_eq!(
+            extract("secret = \"/etc/passwd\"\nbroken = [\n"),
+            Err(REFUSED.to_string())
+        );
     }
 
     #[test]
     fn values_and_keys_both_count() {
-        let paths = extract("[\"./key.sh\"]\nvalue = \"./value.sh\"\n");
+        let paths = read("[\"./key.sh\"]\nvalue = \"./value.sh\"\n");
         assert_eq!(paths.len(), 2);
         assert_eq!(paths[0].value, "./key.sh");
         assert_eq!(paths[0].context, "TOML key");
@@ -139,7 +153,7 @@ mod tests {
 
     #[test]
     fn arrays_are_walked() {
-        let paths = extract("files = [\"./a.ts\", \"./b.ts\"]\n");
+        let paths = read("files = [\"./a.ts\", \"./b.ts\"]\n");
         assert_eq!(paths.len(), 2);
         assert_eq!(paths[1].value, "./b.ts");
     }
@@ -149,7 +163,7 @@ mod tests {
     /// it is wrong.
     #[test]
     fn tables_iterate_in_document_order() {
-        let paths = extract("[z]\na = \"./first.ts\"\n\n[a]\nb = \"./second.ts\"\n");
+        let paths = read("[z]\na = \"./first.ts\"\n\n[a]\nb = \"./second.ts\"\n");
         assert_eq!(paths[0].value, "./first.ts");
         assert_eq!(paths[0].position.line, 2);
         assert_eq!(paths[1].value, "./second.ts");
@@ -158,7 +172,7 @@ mod tests {
 
     #[test]
     fn repeated_values_land_on_successive_occurrences() {
-        let paths = extract("a = \"./x.ts\"\nb = \"./x.ts\"\n");
+        let paths = read("a = \"./x.ts\"\nb = \"./x.ts\"\n");
         assert_eq!(paths[0].position.line, 1);
         assert_eq!(paths[1].position.line, 2);
     }
@@ -168,7 +182,7 @@ mod tests {
     /// the escaped form is what gets located.
     #[test]
     fn a_windows_path_is_located_through_its_escaped_form() {
-        let paths = extract(r#"p = "C:\\Temp\\x.txt""#);
+        let paths = read(r#"p = "C:\\Temp\\x.txt""#);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, r"C:\Temp\x.txt");
         assert_eq!(paths[0].kind, PathType::Absolute);
@@ -179,7 +193,7 @@ mod tests {
     /// written and the escaped candidate never runs.
     #[test]
     fn a_literal_string_is_located_directly() {
-        let paths = extract(r"p = 'C:\Temp\x.txt'");
+        let paths = read(r"p = 'C:\Temp\x.txt'");
         assert_eq!(paths[0].value, r"C:\Temp\x.txt");
         assert_eq!(paths[0].position.column, 6);
     }
@@ -188,14 +202,14 @@ mod tests {
     /// value that appears nowhere in the source as written.
     #[test]
     fn an_unlocatable_value_falls_back_to_the_first_position() {
-        let paths = extract("p = \"\"\"\n./spread\\\n  /out.ts\"\"\"\n");
+        let paths = read("p = \"\"\"\n./spread\\\n  /out.ts\"\"\"\n");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position, Position { line: 1, column: 1 });
     }
 
     #[test]
     fn non_string_values_are_skipped() {
-        let paths = extract("a = 1\nb = true\nc = 1979-05-27\nd = \"./x.ts\"\n");
+        let paths = read("a = 1\nb = true\nc = 1979-05-27\nd = \"./x.ts\"\n");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "./x.ts");
     }

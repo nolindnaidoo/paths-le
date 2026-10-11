@@ -1,5 +1,11 @@
-import { type Node, parseTree } from 'jsonc-parser';
-import type { Path } from '../../types';
+import {
+	type Node,
+	type ParseError,
+	ParseErrorCode,
+	parseTree,
+	stripComments,
+} from 'jsonc-parser';
+import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
 
@@ -8,20 +14,44 @@ import { createPositionIndex, type PositionIndex } from '../position';
  * jsonc-parser provides real node offsets (v1.x reported every path at
  * 1:1) and tolerates comments and trailing commas, so .jsonc documents
  * extract instead of silently returning nothing.
+ *
+ * A document that does not parse is refused and named. It used to be read
+ * as empty, which is also what a clean document answers, so a file holding
+ * `/etc/passwd` behind a syntax error read as clean. And jsonc-parser
+ * recovers a partial tree from a document cut off mid-value, so reading
+ * paths out of whatever it built answered one path where the crate's parser
+ * answered none. The errors it collects are the signal, whatever tree it
+ * also built; the crate refuses the same documents with the same words.
  */
-export function extractFromJson(content: string): readonly Path[] {
-	if (content.trim().length === 0) return [];
+export function extractFromJson(content: string): Extracted {
+	if (content.trim().length === 0) return { paths: [] };
 
-	const root = parseTree(content, undefined, {
+	const errors: ParseError[] = [];
+	const root = parseTree(content, errors, {
 		allowTrailingComma: true,
 		disallowComments: false,
 	});
-	if (!root) return [];
+	// Comments and nothing else is a document with no value in it, not a
+	// broken one: the crate's parser answers "no value" and this one reports
+	// the value it expected. Both read it as empty. A stray `}` also reports
+	// a value expected, so the text has to be comments and whitespace as well;
+	// an unterminated comment reports more than that and stays refused.
+	if (
+		!root &&
+		stripComments(content).trim().length === 0 &&
+		errors.every((e) => e.error === ParseErrorCode.ValueExpected)
+	) {
+		return { paths: [] };
+	}
+	if (errors.length > 0) {
+		return { refusal: 'Invalid JSON: the document does not parse' };
+	}
+	if (!root) return { paths: [] };
 
 	const toPosition = createPositionIndex(content);
 	const paths: Path[] = [];
 	visitNode(root, [], paths, toPosition);
-	return paths;
+	return { paths };
 }
 
 function visitNode(

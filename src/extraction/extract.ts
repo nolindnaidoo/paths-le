@@ -81,20 +81,20 @@ function extractPathsByFileType(
 		case 'tsv':
 			return extractFromCsv(content, TAB);
 		case 'toml':
-			return { paths: extractFromToml(content) };
+			return extractFromToml(content);
 		case 'dotenv':
 			return { paths: extractFromDotenv(content) };
 		case 'javascript':
 		case 'typescript':
 			return { paths: extractFromJavaScript(content) };
 		case 'json':
-			return { paths: extractFromJson(content) };
+			return extractFromJson(content);
 		case 'css':
 			return { paths: extractFromCss(content) };
 		case 'html':
 			return { paths: extractFromHtml(content) };
 		case 'yaml':
-			return { paths: extractFromYaml(content) };
+			return extractFromYaml(content);
 		default:
 			return { paths: extractFromFallback(content) };
 	}

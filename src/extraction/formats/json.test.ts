@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import type { Path } from '../../types';
 import { extractFromJson } from './json';
+
+/** The paths of a document that reads; a refusal fails the test by name. */
+function read(content: string): readonly Path[] {
+	const result = extractFromJson(content);
+	if ('refusal' in result) throw new Error(result.refusal);
+	return result.paths;
+}
 
 describe('extractFromJson', () => {
 	it('should extract paths from simple JSON object', () => {
@@ -9,7 +17,7 @@ describe('extractFromJson', () => {
   "data": "C:\\\\data\\\\app.db"
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(3);
 		expect(result[0]?.value).toBe('/etc/app/config.json');
 		expect(result[1]?.value).toBe('./logs/app.log');
@@ -28,7 +36,7 @@ describe('extractFromJson', () => {
   }
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(4);
 		expect(result[0]?.value).toBe('/home/user/.config/app.json');
 		expect(result[1]?.value).toBe('./cache/temp');
@@ -45,7 +53,7 @@ describe('extractFromJson', () => {
   ]
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(3);
 		expect(result[0]?.value).toBe('/path/to/file1.txt');
 		expect(result[1]?.value).toBe('./relative/file2.txt');
@@ -59,7 +67,7 @@ describe('extractFromJson', () => {
   "local": "file:///home/user/file.txt"
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(3);
 		expect(result[0]?.value).toBe('https://example.com/page');
 		expect(result[1]?.value).toBe('http://api.example.com');
@@ -73,7 +81,7 @@ describe('extractFromJson', () => {
   "data": "config.json"
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(3);
 		expect(result[0]?.value).toBe('app.js');
 		expect(result[1]?.value).toBe('styles.css');
@@ -88,7 +96,7 @@ describe('extractFromJson', () => {
   "file": "./real/path.txt"
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(1);
 		expect(result[0]?.value).toBe('./real/path.txt');
 	});
@@ -104,7 +112,7 @@ describe('extractFromJson', () => {
   }
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(1);
 		expect(result[0]?.value).toBe('/deep/nested/path.txt');
 	});
@@ -121,25 +129,48 @@ describe('extractFromJson', () => {
   ]
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result).toHaveLength(2);
 		expect(result[0]?.value).toBe('./file1.txt');
 		expect(result[1]?.value).toBe('./file2.txt');
 	});
 
 	it('should handle empty JSON', () => {
-		expect(extractFromJson('{}')).toEqual([]);
-		expect(extractFromJson('[]')).toEqual([]);
+		expect(read('{}')).toEqual([]);
+		expect(read('[]')).toEqual([]);
 	});
 
 	it('should handle empty content', () => {
-		expect(extractFromJson('')).toEqual([]);
-		expect(extractFromJson('   ')).toEqual([]);
+		expect(read('')).toEqual([]);
+		expect(read('   ')).toEqual([]);
 	});
 
-	it('should handle invalid JSON gracefully', () => {
-		const content = '{ invalid json }';
-		expect(extractFromJson(content)).toEqual([]);
+	/**
+	 * A document that does not parse is refused and named, never read as
+	 * empty: an empty result with an empty `diagnostics` is what a clean file
+	 * answers, and a document holding `/etc/passwd` behind a syntax error used
+	 * to answer exactly that. The crate refuses with the same words.
+	 */
+	it('refuses a document that does not parse, and says why', () => {
+		expect(extractFromJson('{ invalid json }')).toEqual({
+			refusal: 'Invalid JSON: the document does not parse',
+		});
+	});
+
+	/**
+	 * jsonc-parser recovers a partial tree from a document cut off mid-value,
+	 * and reading paths out of it answered one path where the crate's parser
+	 * answered none. The errors it collects are the signal.
+	 */
+	it('refuses a document cut off mid-value', () => {
+		expect(extractFromJson('{"a": "./x.ts", "b": ')).toEqual({
+			refusal: 'Invalid JSON: the document does not parse',
+		});
+	});
+
+	it('reads a document that is only comments as empty, not as broken', () => {
+		expect(read('// nothing here')).toEqual([]);
+		expect(read('/* nothing */')).toEqual([]);
 	});
 
 	it('should include context information', () => {
@@ -149,7 +180,7 @@ describe('extractFromJson', () => {
   }
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result[0]?.context).toContain('JSON');
 		expect(result[0]?.context).toContain('config.path');
 	});
@@ -161,7 +192,7 @@ describe('extractFromJson', () => {
   "url": "https://example.com/file"
 }`;
 
-		const result = extractFromJson(content);
+		const result = read(content);
 		expect(result[0]?.type).toBe('relative');
 		expect(result[1]?.type).toBe('absolute');
 		expect(result[2]?.type).toBe('url');

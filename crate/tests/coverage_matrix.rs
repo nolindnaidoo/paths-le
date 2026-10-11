@@ -107,6 +107,17 @@ fn fallback_format() -> String {
         .expect("FALLBACK_FORMAT has no value")
 }
 
+/// A document valid in the format the alias lands on, holding the value.
+/// One JSON document served every row until the parser-backed readers
+/// began refusing what does not parse: `{"a":"./t.txt"}` is not TOML.
+fn document_for(language: &str) -> &'static str {
+    match language {
+        "toml" => "a = \"./t.txt\"\n",
+        "yaml" => "a: ./t.txt\n",
+        _ => "{\"a\":\"./t.txt\"}\n",
+    }
+}
+
 struct Tree {
     root: PathBuf,
 }
@@ -173,7 +184,7 @@ fn every_extension_the_alias_table_names_is_opened_and_named() {
     let mut expected: BTreeMap<String, String> = BTreeMap::new();
     for (from, to) in &aliases {
         let name = format!("case-{from}.{from}");
-        std::fs::write(tree.path().join(&name), "{\"a\":\"./t.txt\"}\n").expect("a document");
+        std::fs::write(tree.path().join(&name), document_for(to)).expect("a document");
         expected.insert(name, to.clone());
     }
 

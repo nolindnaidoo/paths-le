@@ -249,6 +249,39 @@ describe('extract_paths', () => {
 		]);
 	});
 
+	/**
+	 * The same for the parser-backed formats. A malformed TOML or YAML holding
+	 * `/etc/passwd` answered `ok: true`, no paths, no diagnostics, from both
+	 * servers, and a truncated JSON document answered one path here and none
+	 * from the crate. Each is a named refusal now, in the same words on both.
+	 */
+	it('names a parser-backed document its reader refused', async () => {
+		for (const [format, content, message] of [
+			[
+				'toml',
+				'secret = "/etc/passwd"\nbroken = [\n',
+				'Invalid TOML: the document does not parse',
+			],
+			[
+				'yaml',
+				'secret: /etc/passwd\nbad: [unclosed\n',
+				'Invalid YAML: the document does not parse',
+			],
+			[
+				'json',
+				'{"a": "./x.ts", "b": ',
+				'Invalid JSON: the document does not parse',
+			],
+		] as const) {
+			const result = await call({ content, format });
+			expect(result.ok, format).toBe(false);
+			expect(result.data.paths, format).toEqual([]);
+			expect(result.diagnostics, format).toEqual([
+				{ severity: 'error', code: 'parsing', message },
+			]);
+		}
+	});
+
 	it('says nothing extra about a document that reads', async () => {
 		const result = await call({
 			content: 'name,path\napp,/etc/passwd\n',

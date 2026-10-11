@@ -19,9 +19,11 @@ use super::js;
 use super::position::PositionIndex;
 use super::{Path, heuristics};
 
-pub(crate) fn extract(content: &str) -> Vec<Path> {
+const REFUSED: &str = "Invalid JSON: the document does not parse";
+
+pub(crate) fn extract(content: &str) -> super::Extracted {
     if js::is_blank(content) {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
     let options = ParseOptions {
@@ -33,22 +35,23 @@ pub(crate) fn extract(content: &str) -> Vec<Path> {
         allow_hexadecimal_numbers: false,
         allow_unary_plus_numbers: false,
     };
-    // A document that does not parse yields nothing, matching the
-    // extension: its parser returns no tree and the extractor returns
-    // an empty list. Reporting the parse failure would be more useful
-    // and is deliberately not done here — parity is the contract, and
-    // the divergence would be invisible to the corpus.
+    // A document that does not parse is refused and named. It used to
+    // yield nothing, which is also what a clean document yields, so a
+    // file holding `/etc/passwd` behind a syntax error read as clean.
+    // The extension refuses the same documents with the same words; the
+    // corpus and the differential hold the two equal. A document holding
+    // comments and nothing else has no value and is empty, not broken.
     let Ok(result) = parse_to_ast(content, &CollectOptions::default(), &options) else {
-        return Vec::new();
+        return Err(REFUSED.to_string());
     };
     let Some(root) = result.value else {
-        return Vec::new();
+        return Ok(Vec::new());
     };
 
     let index = PositionIndex::new(content);
     let mut paths = Vec::new();
     visit(&root, &mut Vec::new(), &mut paths, &index);
-    paths
+    Ok(paths)
 }
 
 fn visit(value: &Value, key_path: &mut Vec<String>, paths: &mut Vec<Path>, index: &PositionIndex) {
@@ -104,20 +107,42 @@ mod tests {
     use super::*;
     use crate::extract::PathType;
 
-    #[test]
-    fn a_blank_document_yields_nothing() {
-        assert!(extract("").is_empty());
-        assert!(extract("   \n\t ").is_empty());
+    /// The paths of a document that reads; a refusal fails the test by name.
+    fn read(content: &str) -> Vec<Path> {
+        extract(content).expect("the document reads")
     }
 
     #[test]
-    fn a_document_that_does_not_parse_yields_nothing() {
-        assert!(extract("{ this is not json").is_empty());
+    fn a_blank_document_yields_nothing() {
+        assert!(read("").is_empty());
+        assert!(read("   \n\t ").is_empty());
+    }
+
+    /// Named, never silent: an empty result is what a clean document
+    /// answers, and a document holding a path behind a syntax error used
+    /// to answer exactly that.
+    #[test]
+    fn a_document_that_does_not_parse_is_refused_and_named() {
+        assert_eq!(extract("{ this is not json"), Err(REFUSED.to_string()));
+        assert_eq!(
+            extract("{\"a\": \"./x.ts\", \"b\": "),
+            Err(REFUSED.to_string()),
+            "cut off mid-value"
+        );
+    }
+
+    /// Comments and nothing else is a document with no value, not a broken
+    /// one. The extension's parser reports the value it expected there;
+    /// this one answers no value; both read it as empty.
+    #[test]
+    fn a_document_that_is_only_comments_is_empty_not_broken() {
+        assert!(read("// nothing here").is_empty());
+        assert!(read("/* nothing */").is_empty());
     }
 
     #[test]
     fn the_position_points_past_the_opening_quote() {
-        let paths = extract("{\"a\": \"./x.ts\"}");
+        let paths = read("{\"a\": \"./x.ts\"}");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position.line, 1);
         assert_eq!(paths[0].position.column, 8);
@@ -125,13 +150,13 @@ mod tests {
 
     #[test]
     fn nested_keys_build_a_dotted_context() {
-        let paths = extract(r#"{"a":{"b":{"c":"./x.ts"}}}"#);
+        let paths = read(r#"{"a":{"b":{"c":"./x.ts"}}}"#);
         assert_eq!(paths[0].context, "JSON a.b.c");
     }
 
     #[test]
     fn array_elements_are_indexed_in_the_context() {
-        let paths = extract(r#"{"files":["./a.ts","./b.ts"]}"#);
+        let paths = read(r#"{"files":["./a.ts","./b.ts"]}"#);
         assert_eq!(paths[0].context, "JSON files.[0]");
         assert_eq!(paths[1].context, "JSON files.[1]");
     }
@@ -140,21 +165,21 @@ mod tests {
     /// what it is rather than leaving an empty suffix.
     #[test]
     fn a_root_string_is_named_value() {
-        let paths = extract("\"./root.ts\"");
+        let paths = read("\"./root.ts\"");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].context, "JSON value");
     }
 
     #[test]
     fn non_string_leaves_are_skipped() {
-        let paths = extract(r#"{"a":42,"b":null,"c":true,"d":"./x.ts"}"#);
+        let paths = read(r#"{"a":42,"b":null,"c":true,"d":"./x.ts"}"#);
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].value, "./x.ts");
     }
 
     #[test]
     fn comments_and_trailing_commas_parse() {
-        let paths = extract("{\n// a comment\n\"a\": \"./x.ts\",\n}");
+        let paths = read("{\n// a comment\n\"a\": \"./x.ts\",\n}");
         assert_eq!(paths.len(), 1);
         assert_eq!(paths[0].position.line, 3);
     }
@@ -165,17 +190,17 @@ mod tests {
     /// nobody would notice.
     #[test]
     fn leniency_beyond_the_extensions_parser_is_switched_off() {
-        assert!(extract("{'a': './x.ts'}").is_empty(), "single quotes");
-        assert!(extract("{a: \"./x.ts\"}").is_empty(), "unquoted key");
+        assert!(extract("{'a': './x.ts'}").is_err(), "single quotes");
+        assert!(extract("{a: \"./x.ts\"}").is_err(), "unquoted key");
         assert!(
-            extract("{\"a\": \"./x.ts\" \"b\": \"./y.ts\"}").is_empty(),
+            extract("{\"a\": \"./x.ts\" \"b\": \"./y.ts\"}").is_err(),
             "missing comma"
         );
     }
 
     #[test]
     fn escapes_are_decoded_in_the_value() {
-        let paths = extract(r#"{"a":"C:\\Temp\\x.txt"}"#);
+        let paths = read(r#"{"a":"C:\\Temp\\x.txt"}"#);
         assert_eq!(paths[0].value, r"C:\Temp\x.txt");
         assert_eq!(paths[0].kind, PathType::Absolute);
     }
