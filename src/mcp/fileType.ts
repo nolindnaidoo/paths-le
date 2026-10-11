@@ -18,40 +18,45 @@
  * earn a row because the row is what puts the real name in the answer — a `.md`
  * file reads as `markdown` rather than as `unknown`, which is the difference
  * between "scanned generically" and "not recognised at all".
+ *
+ * A `Map`, not a plain object: on an object, `constructor`, `__proto__` and
+ * every other `Object.prototype` name is a hit, and the npm server answered a
+ * `filename` of `constructor` with a function for its file type while the
+ * crate answered `unknown`. A map has no inherited keys.
  */
-const ALIASES: Readonly<Record<string, string>> = Object.freeze({
-	csv: 'csv',
-	tsv: 'tsv',
-	toml: 'toml',
-	dotenv: 'dotenv',
-	env: 'dotenv',
-	javascript: 'javascript',
-	js: 'javascript',
-	jsx: 'javascript',
-	mjs: 'javascript',
-	cjs: 'javascript',
-	javascriptreact: 'javascript',
-	typescript: 'typescript',
-	ts: 'typescript',
-	tsx: 'typescript',
-	mts: 'typescript',
-	cts: 'typescript',
-	typescriptreact: 'typescript',
-	json: 'json',
-	jsonc: 'json',
-	html: 'html',
-	htm: 'html',
-	xhtml: 'html',
-	css: 'css',
-	scss: 'scss',
-	sass: 'scss',
-	less: 'less',
-	yaml: 'yaml',
-	yml: 'yaml',
-	markdown: 'markdown',
-	md: 'markdown',
-	xml: 'xml',
-});
+const ALIASES: ReadonlyMap<string, string> = new Map([
+	['csv', 'csv'],
+	['tsv', 'tsv'],
+	['toml', 'toml'],
+	['dotenv', 'dotenv'],
+	['env', 'dotenv'],
+	['javascript', 'javascript'],
+	['js', 'javascript'],
+	['jsx', 'javascript'],
+	['mjs', 'javascript'],
+	['cjs', 'javascript'],
+	['javascriptreact', 'javascript'],
+	['typescript', 'typescript'],
+	['ts', 'typescript'],
+	['tsx', 'typescript'],
+	['mts', 'typescript'],
+	['cts', 'typescript'],
+	['typescriptreact', 'typescript'],
+	['json', 'json'],
+	['jsonc', 'json'],
+	['html', 'html'],
+	['htm', 'html'],
+	['xhtml', 'html'],
+	['css', 'css'],
+	['scss', 'scss'],
+	['sass', 'scss'],
+	['less', 'less'],
+	['yaml', 'yaml'],
+	['yml', 'yaml'],
+	['markdown', 'markdown'],
+	['md', 'markdown'],
+	['xml', 'xml'],
+]);
 
 /**
  * The formats a caller can name, for the tool schema's enum.
@@ -102,7 +107,7 @@ export function resolveFormat(
 	filename: string | undefined,
 ): string {
 	if (format) {
-		const direct = ALIASES[normalise(format)];
+		const direct = ALIASES.get(normalise(format));
 		if (direct) return direct;
 	}
 
@@ -110,13 +115,13 @@ export function resolveFormat(
 		// A dotfile like `.env` has no extension to split on; its whole name is
 		// the type, which is exactly the case an agent sends most often here.
 		const bare = normalise(filename);
-		const whole = ALIASES[bare.startsWith('.') ? bare.slice(1) : bare];
+		const whole = ALIASES.get(bare.startsWith('.') ? bare.slice(1) : bare);
 		if (whole) return whole;
 
 		const extension = filename.includes('.')
 			? filename.slice(filename.lastIndexOf('.') + 1)
 			: '';
-		const inferred = ALIASES[normalise(extension)];
+		const inferred = ALIASES.get(normalise(extension));
 		if (inferred) return inferred;
 	}
 

@@ -112,6 +112,18 @@ describe('fileType: tolerant resolution', () => {
 		expect(resolveFormat(undefined, 'deployment.yaml')).toBe('yaml');
 	});
 
+	it('does not read a prototype key as a format', () => {
+		// The table was a plain object, so `ALIASES['constructor']` was Object's
+		// constructor and `ALIASES['__proto__']` was Object.prototype: both
+		// truthy, both returned as the file type. The npm server then answered
+		// `fileType: {}` or dropped the field, while the crate answered `unknown`.
+		for (const name of ['constructor', '__proto__', 'toString', 'valueOf']) {
+			expect(resolveFormat(name, undefined)).toBe(FALLBACK_FORMAT);
+			expect(resolveFormat(undefined, name)).toBe(FALLBACK_FORMAT);
+			expect(resolveFormat(undefined, `notes.${name}`)).toBe(FALLBACK_FORMAT);
+		}
+	});
+
 	it('advertises only formats the engine supports', () => {
 		expect(SUPPORTED_FORMATS).toContain('json');
 		expect(SUPPORTED_FORMATS).toContain('yaml');
