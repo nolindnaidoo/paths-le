@@ -234,7 +234,6 @@ async function resolvePathsIfNeeded(
 	}
 
 	let resolvedCount = 0;
-	let fallbackCount = 0;
 
 	// A relative path means something relative to the file it is written in,
 	// so the folder is the document's. Looking it up from the path alone
@@ -257,22 +256,17 @@ async function resolvePathsIfNeeded(
 
 			if (resolved !== path.value) {
 				resolvedCount++;
-				return resolved;
 			}
-			fallbackCount++;
-
 			return resolved;
 		}),
 	);
 
+	// A path that came back as written was already canonical, or is a URL.
+	// That used to be announced as "Canonical resolution failed", which
+	// nothing had: the resolver never throws, so there is no failure to
+	// report, and the bar now says only what was done.
 	if (resolvedCount > 0) {
 		deps.statusBar.showProgress(`✅ Resolved ${resolvedCount} canonical paths`);
-		return formattedPaths;
-	}
-	if (fallbackCount > 0) {
-		deps.statusBar.showProgress(
-			'⚠️ Canonical resolution failed, using original paths',
-		);
 	}
 
 	return formattedPaths;

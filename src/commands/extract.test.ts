@@ -230,6 +230,41 @@ describe('extract: the status bar is reset however the command ends', () => {
 	});
 });
 
+describe('extract: what the status bar claims about resolution', () => {
+	it('does not report a failure when every path was already canonical', async () => {
+		// "Canonical resolution failed, using original paths" was shown whenever
+		// no path changed, which is also what happens when every path was
+		// already canonical, or is a URL. Nothing failed.
+		workspace.workspaceFolders = [{ uri: Uri.file('/w'), name: 'w', index: 0 }];
+		_setConfig('paths-le.resolution.resolveWorkspaceRelative', true);
+		_respondToWarning((items) =>
+			items.find((i) => String(i).includes('Continue')),
+		);
+		const status: string[] = [];
+		const deps = makeDeps();
+		registerExtractCommand(makeContext(), {
+			...deps,
+			statusBar: {
+				showProgress: (message: string) => status.push(message),
+				hideProgress: () => status.push('idle'),
+				dispose: () => {},
+			},
+		});
+		_setActiveEditor(
+			_createDocument({
+				content: '{"a": "/etc/hosts", "b": "https://example.com/x"}',
+				languageId: LANG,
+				fileName: '/w/app.json',
+			}),
+		);
+		await runCommand('paths-le.extractPaths');
+		expect(status.filter((s) => /fail/i.test(s))).toEqual([]);
+		expect(_openedDocuments().at(-1)?.getText()).toBe(
+			'/etc/hosts\nhttps://example.com/x',
+		);
+	});
+});
+
 describe('extract: workspace-relative resolution', () => {
 	it('resolves against the folder the document is in', async () => {
 		// The folder was looked up from the extension host's working directory,
