@@ -388,6 +388,27 @@ fn stdin_without_a_format_exits_two() {
     assert_eq!(output.status.code(), Some(2));
 }
 
+/// `--no-ignore` is the one walk flag no test produced. A file that
+/// `.gitignore` leaves out is skipped by default and read with the flag;
+/// without a test, the flag could stop reaching the walker and nothing
+/// would say so.
+#[test]
+fn no_ignore_reads_what_gitignore_leaves_out() {
+    let tree = Tree::new("no-ignore");
+    std::fs::create_dir_all(tree.path().join(".git")).expect("a git dir");
+    tree.write(".gitignore", "generated/\n");
+    tree.write("generated/out.json", "{\"a\":\"./gone.ts\"}");
+    tree.write("src/app.json", "{}");
+
+    let quiet = run(&[&tree.path().to_string_lossy()]);
+    assert_eq!(quiet.code, 0, "{}", quiet.stderr);
+    assert_eq!(reports(&quiet).len(), 1, "{}", quiet.stdout);
+
+    let read = run(&["--no-ignore", &tree.path().to_string_lossy()]);
+    assert_eq!(read.code, 1, "{}", read.stderr);
+    assert_eq!(reports(&read).len(), 2, "{}", read.stdout);
+}
+
 /// **The cross-surface contract.** Both surfaces call one entry point,
 /// so they must answer identically for the same tree. A surface that
 /// grows its own copy of a rule fails here.
