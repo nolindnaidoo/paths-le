@@ -45,5 +45,6 @@
 	"Could not deduplicate: the edit was rejected.": "Deduplizierung nicht möglich: Die Änderung wurde abgelehnt.",
 	"Could not sort: the edit was rejected.": "Sortierung nicht möglich: Die Änderung wurde abgelehnt.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Die Pfade wurden extrahiert, konnten aber nicht in die Zwischenablage kopiert werden: {0}",
-	"{0} file(s) could not be read.": "{0} Datei(en) konnten nicht gelesen werden."
+	"{0} file(s) could not be read.": "{0} Datei(en) konnten nicht gelesen werden.",
+	"Paths-LE could not finish: {0}": "Paths-LE konnte nicht abschließen: {0}"
 }

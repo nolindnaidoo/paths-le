@@ -45,5 +45,6 @@
 	"Could not deduplicate: the edit was rejected.": "Не удалось удалить дубликаты: правка была отклонена.",
 	"Could not sort: the edit was rejected.": "Не удалось отсортировать: правка была отклонена.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Пути извлечены, но не удалось скопировать их в буфер обмена: {0}",
-	"{0} file(s) could not be read.": "Не удалось прочитать файлов: {0}."
+	"{0} file(s) could not be read.": "Не удалось прочитать файлов: {0}.",
+	"Paths-LE could not finish: {0}": "Paths-LE не удалось завершить: {0}"
 }

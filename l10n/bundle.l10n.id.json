@@ -45,5 +45,6 @@
 	"Could not deduplicate: the edit was rejected.": "Tidak dapat menghapus duplikat: pengeditan ditolak.",
 	"Could not sort: the edit was rejected.": "Tidak dapat mengurutkan: pengeditan ditolak.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Jalur berhasil diekstrak, tetapi tidak dapat disalin ke papan klip: {0}",
-	"{0} file(s) could not be read.": "{0} file tidak dapat dibaca."
+	"{0} file(s) could not be read.": "{0} file tidak dapat dibaca.",
+	"Paths-LE could not finish: {0}": "Paths-LE tidak dapat menyelesaikan: {0}"
 }

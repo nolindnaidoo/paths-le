@@ -3,6 +3,7 @@ import type { Telemetry } from '../telemetry/telemetry';
 import type { Notifier } from '../ui/notifier';
 import type { StatusBar } from '../ui/statusBar';
 import { createHelpWebView } from '../ui/webView';
+import { guarded } from './guard';
 
 export function registerHelpCommand(
 	context: vscode.ExtensionContext,
@@ -14,11 +15,14 @@ export function registerHelpCommand(
 ): void {
 	const webView = createHelpWebView(context, deps.telemetry);
 
-	const command = vscode.commands.registerCommand('paths-le.help', async () => {
-		deps.telemetry.event('command-help');
-		webView.show();
-		deps.telemetry.event('help-displayed');
-	});
+	const command = vscode.commands.registerCommand(
+		'paths-le.help',
+		guarded(deps.notifier, async () => {
+			deps.telemetry.event('command-help');
+			webView.show();
+			deps.telemetry.event('help-displayed');
+		}),
+	);
 
 	context.subscriptions.push(command);
 	context.subscriptions.push(webView);

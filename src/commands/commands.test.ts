@@ -5,6 +5,7 @@ import {
 	_resetMockState,
 	_respondToQuickPick,
 	_setActiveEditor,
+	_setApplyEditError,
 	_setApplyEditResult,
 	_setConfig,
 	_shownMessages,
@@ -275,6 +276,30 @@ describe('paths-le.extractPaths', () => {
 
 		expect(events).toContain('info:Extracted 1 paths from document');
 		expect(events.some((e) => e.startsWith('error:'))).toBe(false);
+	});
+});
+
+describe('post-process: a failure inside the command', () => {
+	it('dedupe reports it instead of rejecting', async () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerDedupeCommand(makeContext(), createNotifier());
+		_setApplyEditError(new Error('the editor is read-only right now'));
+		_setActiveEditor(_createDocument({ content: '/a\n/a\n' }));
+		await runCommand('paths-le.postProcess.dedupe');
+		const errors = _shownMessages().filter((m) => m.kind === 'error');
+		expect(errors.map((m) => m.message)).toEqual([
+			'Paths-LE could not finish: the editor is read-only right now',
+		]);
+	});
+
+	it('sort reports it instead of rejecting', async () => {
+		_setConfig('paths-le.notificationsLevel', 'all');
+		registerSortCommand(makeContext(), createNotifier());
+		_setApplyEditError(new Error('the editor is read-only right now'));
+		_respondToQuickPick((items) => items[0]);
+		_setActiveEditor(_createDocument({ content: '/b\n/a\n' }));
+		await runCommand('paths-le.postProcess.sort');
+		expect(_shownMessages().filter((m) => m.kind === 'error')).toHaveLength(1);
 	});
 });
 

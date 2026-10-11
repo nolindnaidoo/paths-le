@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { Notifier } from '../ui/notifier';
 import { fullDocumentRange } from '../utils/document';
 import { onValues } from '../utils/positions';
+import { guarded } from './guard';
 
 type SortOrder = 'asc' | 'desc' | 'length-asc' | 'length-desc';
 
@@ -16,7 +17,7 @@ export function registerSortCommand(
 ): void {
 	const command = vscode.commands.registerCommand(
 		'paths-le.postProcess.sort',
-		async () => {
+		guarded(notifier, async () => {
 			const editor = vscode.window.activeTextEditor;
 			if (!editor) {
 				notifier.showWarning(vscode.l10n.t('No active editor found'));
@@ -50,7 +51,7 @@ export function registerSortCommand(
 					sortOption.label,
 				),
 			);
-		},
+		}),
 	);
 
 	context.subscriptions.push(command);

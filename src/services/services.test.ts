@@ -136,8 +136,8 @@ describe('openSettings command', () => {
 	it('opens the settings UI scoped to paths-le', async () => {
 		const context = _createExtensionContext();
 		registerOpenSettingsCommand(context as never, {
-			event: () => {},
-			dispose: () => {},
+			telemetry: { event: () => {}, dispose: () => {} },
+			notifier: createNotifier(),
 		});
 		await _registeredCommands().get('paths-le.openSettings')?.();
 		expect(executedBuiltins[0]).toEqual({

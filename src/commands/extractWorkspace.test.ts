@@ -8,6 +8,7 @@ import {
 	_resetMockState,
 	_respondToOpenDialog,
 	_setConfig,
+	_setOpenTextDocumentError,
 	_setWorkspaceFiles,
 	_shownMessages,
 	Uri,
@@ -158,6 +159,21 @@ describe('paths-le.extractWorkspace and paths-le.extractFolder', () => {
 		expect(report()).toContain(
 			'> The results limit was reached. The rest of the files were not read.',
 		);
+	});
+
+	it('reports a failure inside the command instead of rejecting', async () => {
+		// The report is delivered through `openTextDocument`, which the editor
+		// can refuse. Without an outer handler the command rejected and the
+		// editor reported it in its own words.
+		_setConfig('paths-le.notificationsLevel', 'all');
+		open();
+		_setOpenTextDocumentError(new Error('no editor group'));
+		await runCommand('paths-le.extractWorkspace');
+		expect(
+			_shownMessages()
+				.filter((m) => m.kind === 'error')
+				.map((m) => m.message),
+		).toEqual(['Paths-LE could not finish: no editor group']);
 	});
 
 	it('says when a folder holds no paths', async () => {

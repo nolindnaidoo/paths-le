@@ -12,6 +12,7 @@ import {
 } from '../utils/pathResolver';
 import { withPosition } from '../utils/positions';
 import { handleSafetyChecks } from '../utils/safety';
+import { guarded } from './guard';
 import { displayResults } from './output';
 
 export function registerExtractCommand(
@@ -25,7 +26,7 @@ export function registerExtractCommand(
 ): void {
 	const command = vscode.commands.registerCommand(
 		'paths-le.extractPaths',
-		async () => {
+		guarded(deps.notifier, async () => {
 			deps.telemetry.event('command-extract-paths');
 
 			const editor = vscode.window.activeTextEditor;
@@ -111,7 +112,7 @@ export function registerExtractCommand(
 			} finally {
 				deps.statusBar.hideProgress();
 			}
-		},
+		}),
 	);
 
 	context.subscriptions.push(command);

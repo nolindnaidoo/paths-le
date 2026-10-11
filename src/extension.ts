@@ -16,7 +16,7 @@ export function activate(context: vscode.ExtensionContext): void {
 	registerCommands(context, services);
 
 	// Register settings command
-	registerOpenSettingsCommand(context, services.telemetry);
+	registerOpenSettingsCommand(context, services);
 
 	// Log activation
 	// Offer the bundled MCP server to agent mode, where the host supports it

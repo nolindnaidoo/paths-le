@@ -10,6 +10,7 @@ import {
 	_setApplyEditResult,
 	_setClipboardError,
 	_setConfig,
+	_setOpenTextDocumentError,
 	_shownMessages,
 	_statusBarItems,
 	Uri,
@@ -260,6 +261,29 @@ describe('extract: the status bar is reset however the command ends', () => {
 		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
 		await runCommand('paths-le.extractPaths');
 		expect(_statusBarItems()[0]?.text).toBe(IDLE);
+	});
+});
+
+describe('extract: a failure inside the command', () => {
+	it("is reported in the extension's own words and resets the bar", async () => {
+		// No command body had an outer handler. A rejection from the editor,
+		// here `openTextDocument`, left the command as an unhandled rejection
+		// that the editor reported in its own words, raw message and home
+		// directory included, and the status bar kept spinning.
+		_setOpenTextDocumentError(new Error('disk full at /Users/someone/out'));
+		const context = makeContext();
+		registerExtractCommand(context, {
+			...makeDeps(),
+			statusBar: createStatusBar(context),
+		});
+		_setActiveEditor(_createDocument({ content: PATHS, languageId: LANG }));
+		await runCommand('paths-le.extractPaths');
+		const errors = _shownMessages().filter((m) => m.kind === 'error');
+		expect(errors).toHaveLength(1);
+		expect(errors[0]?.message).toContain('could not finish');
+		expect(errors[0]?.message).toContain('/Users/***/');
+		expect(errors[0]?.message).not.toContain('someone');
+		expect(_statusBarItems()[0]?.text).toBe('$(file-directory) Paths-LE');
 	});
 });
 

@@ -45,5 +45,6 @@
 	"Could not deduplicate: the edit was rejected.": "Не вдалося видалити дублікати: правку було відхилено.",
 	"Could not sort: the edit was rejected.": "Не вдалося відсортувати: правку було відхилено.",
 	"Extracted the paths, but could not copy them to the clipboard: {0}": "Шляхи витягнуто, але не вдалося скопіювати їх до буфера обміну: {0}",
-	"{0} file(s) could not be read.": "Не вдалося прочитати файлів: {0}."
+	"{0} file(s) could not be read.": "Не вдалося прочитати файлів: {0}.",
+	"Paths-LE could not finish: {0}": "Paths-LE не вдалося завершити: {0}"
 }

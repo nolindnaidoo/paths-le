@@ -322,6 +322,9 @@ export const workspace = {
 		content?: string;
 		language?: string;
 	}) => {
+		// The editor can refuse to open a document; without a way to make it
+		// fail here, no command's outer handler could be reached.
+		if (openTextDocumentError) throw openTextDocumentError;
 		const document = _createDocument({
 			content: options?.content ?? '',
 			languageId: options?.language ?? 'plaintext',
@@ -333,6 +336,7 @@ export const workspace = {
 		// A hardcoded true made every rejected-edit path untestable, and those
 		// are the paths where a command announces a result over a document it
 		// never touched.
+		if (applyEditError) throw applyEditError;
 		appliedEdits.push(edit);
 		return applyEditResult;
 	},
@@ -340,10 +344,22 @@ export const workspace = {
 
 export const appliedEdits: WorkspaceEdit[] = [];
 let applyEditResult = true;
+let applyEditError: Error | undefined;
+let openTextDocumentError: Error | undefined;
 
 /** Make applyEdit resolve false, as it does for a read-only document. */
 export function _setApplyEditResult(value: boolean): void {
 	applyEditResult = value;
+}
+
+/** Make applyEdit reject, as it does when the editor itself fails. */
+export function _setApplyEditError(error: Error | undefined): void {
+	applyEditError = error;
+}
+
+/** Make openTextDocument reject. */
+export function _setOpenTextDocumentError(error: Error | undefined): void {
+	openTextDocumentError = error;
 }
 
 // ------------------------------------------------------------ window
@@ -614,6 +630,8 @@ export function _resetMockState(): void {
 	webviewPanels.length = 0;
 	clipboardError = undefined;
 	applyEditResult = true;
+	applyEditError = undefined;
+	openTextDocumentError = undefined;
 	shownDocumentOptions.length = 0;
 	configStore.clear();
 	configUpdates.length = 0;
