@@ -460,19 +460,34 @@ export const window = {
 	},
 	createWebviewPanel: (
 		_viewType: string,
-		_title: string,
+		title: string,
 		_column: unknown,
 		_options?: unknown,
-	) => ({
-		webview: { html: '' },
-		reveal: () => {},
-		onDidDispose: (_listener: () => void) => ({ dispose: () => {} }),
-		dispose: () => {},
-	}),
+	) => {
+		const panel = {
+			title,
+			webview: { html: '' },
+			reveal: () => {},
+			onDidDispose: (_listener: () => void) => ({ dispose: () => {} }),
+			dispose: () => {},
+		};
+		// Kept so a test can read what a panel shows.
+		webviewPanels.push(panel);
+		return panel;
+	},
 };
 
 const statusBarItems: Array<{ text: string; visible: boolean }> = [];
 const outputChannels: Array<{ name: string; _lines: string[] }> = [];
+const webviewPanels: Array<{ title: string; webview: { html: string } }> = [];
+
+/** Every webview panel created since the last reset, in order. */
+export function _webviewPanels(): readonly {
+	title: string;
+	webview: { html: string };
+}[] {
+	return webviewPanels;
+}
 
 /** Every output channel created since the last reset, in order. */
 export function _outputChannels(): readonly { name: string; _lines: string[] }[] {
@@ -596,6 +611,7 @@ export function _resetMockState(): void {
 	openedDocuments.length = 0;
 	statusBarItems.length = 0;
 	outputChannels.length = 0;
+	webviewPanels.length = 0;
 	clipboardError = undefined;
 	applyEditResult = true;
 	shownDocumentOptions.length = 0;

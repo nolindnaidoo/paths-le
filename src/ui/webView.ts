@@ -174,15 +174,18 @@ function getHelpHtml(): string {
     <p><span class="command">paths-le.help</span></p>
     <p>Shows this help information.</p>
 
-    <h2>📁 Supported File Types</h2>
+    <h2>📁 What it reads</h2>
+    <p>Every file. Nine formats have a parser behind them, and everything else is read by a text scan.</p>
     <ul class="feature-list">
         <li><strong>JavaScript / TypeScript</strong> (.js, .jsx, .ts, .tsx) - import/require/export paths</li>
         <li><strong>JSON</strong> (.json, .jsonc) - path-like string values</li>
+        <li><strong>YAML</strong> (.yaml, .yml) - path-like values and keys, across every document in the file</li>
         <li><strong>HTML</strong> (.html) - src, href, srcset, and related attributes</li>
         <li><strong>CSS</strong> (.css, .scss, .less) - url() and @import</li>
-        <li><strong>TOML</strong> (.toml) - path-like values</li>
-        <li><strong>CSV</strong> (.csv) - path-like cells</li>
-        <li><strong>Environment</strong> (.env) - path-like variable values</li>
+        <li><strong>TOML</strong> (.toml) - path-like values and keys</li>
+        <li><strong>CSV / TSV</strong> (.csv, .tsv) - path-like cells</li>
+        <li><strong>Environment</strong> (.env) - path-like variable values and names</li>
+        <li><strong>Everything else</strong> (Markdown, Python, Go, XML, a Dockerfile) - a text scan: quoted tokens, and undelimited runs that carry a path separator</li>
     </ul>
 
     <h2>🔍 Path Types Detected</h2>
@@ -213,8 +216,8 @@ function getHelpHtml(): string {
         <strong>No paths found:</strong>
         <ul>
             <li>Ensure the document contains recognizable path patterns</li>
-            <li>Check if the file type is supported</li>
-            <li>Verify path format (quoted strings, variables, etc.)</li>
+            <li>In a file with no parser, a bare <code>name.ext</code> is claimed only inside quotes</li>
+            <li>Version strings, IP addresses and bare domains such as <code>example.com</code> are never paths</li>
         </ul>
     </div>
 
