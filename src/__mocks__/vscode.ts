@@ -453,8 +453,11 @@ export const window = {
 		const linesOut: string[] = [];
 		const channel = {
 			name,
+			disposed: false,
 			appendLine: (line: string) => linesOut.push(line),
-			dispose: () => {},
+			dispose(): void {
+				(this as { disposed: boolean }).disposed = true;
+			},
 			_lines: linesOut,
 		};
 		// Kept so a test can read what was logged, and whether a channel was
@@ -468,13 +471,16 @@ export const window = {
 			tooltip: '',
 			command: undefined as unknown,
 			visible: false,
+			disposed: false,
 			show(): void {
 				(this as { visible: boolean }).visible = true;
 			},
 			hide(): void {
 				(this as { visible: boolean }).visible = false;
 			},
-			dispose: () => {},
+			dispose(): void {
+				(this as { disposed: boolean }).disposed = true;
+			},
 		};
 		// Kept so a test can read what the bar says after a command returns.
 		statusBarItems.push(item);
@@ -486,12 +492,20 @@ export const window = {
 		_column: unknown,
 		_options?: unknown,
 	) => {
+		const listeners: Array<() => void> = [];
 		const panel = {
 			title,
+			disposed: false,
 			webview: { html: '' },
 			reveal: () => {},
-			onDidDispose: (_listener: () => void) => ({ dispose: () => {} }),
-			dispose: () => {},
+			onDidDispose: (listener: () => void) => {
+				listeners.push(listener);
+				return { dispose: () => {} };
+			},
+			dispose(): void {
+				(this as { disposed: boolean }).disposed = true;
+				for (const listener of listeners) listener();
+			},
 		};
 		// Kept so a test can read what a panel shows.
 		webviewPanels.push(panel);
@@ -499,25 +513,69 @@ export const window = {
 	},
 };
 
-const statusBarItems: Array<{ text: string; visible: boolean }> = [];
-const outputChannels: Array<{ name: string; _lines: string[] }> = [];
-const webviewPanels: Array<{ title: string; webview: { html: string } }> = [];
+const statusBarItems: Array<{
+	text: string;
+	visible: boolean;
+	disposed: boolean;
+}> = [];
+const outputChannels: Array<{
+	name: string;
+	disposed: boolean;
+	_lines: string[];
+}> = [];
+const webviewPanels: Array<{
+	title: string;
+	disposed: boolean;
+	webview: { html: string };
+}> = [];
+
+/**
+ * What is still alive: created and not disposed, registered and not removed.
+ * The count a leak test compares before and after.
+ */
+export function _live(): {
+	statusBarItems: number;
+	outputChannels: number;
+	webviewPanels: number;
+	configListeners: number;
+	commands: number;
+	mcpProviders: number;
+} {
+	return {
+		statusBarItems: statusBarItems.filter((item) => !item.disposed).length,
+		outputChannels: outputChannels.filter((channel) => !channel.disposed)
+			.length,
+		webviewPanels: webviewPanels.filter((panel) => !panel.disposed).length,
+		configListeners: configListeners.length,
+		commands: registeredCommands.size,
+		mcpProviders: mcpProviders.length,
+	};
+}
 
 /** Every webview panel created since the last reset, in order. */
 export function _webviewPanels(): readonly {
 	title: string;
+	disposed: boolean;
 	webview: { html: string };
 }[] {
 	return webviewPanels;
 }
 
 /** Every output channel created since the last reset, in order. */
-export function _outputChannels(): readonly { name: string; _lines: string[] }[] {
+export function _outputChannels(): readonly {
+	name: string;
+	disposed: boolean;
+	_lines: string[];
+}[] {
 	return outputChannels;
 }
 
 /** Every status bar item created since the last reset, in order. */
-export function _statusBarItems(): readonly { text: string; visible: boolean }[] {
+export function _statusBarItems(): readonly {
+	text: string;
+	visible: boolean;
+	disposed: boolean;
+}[] {
 	return statusBarItems;
 }
 
