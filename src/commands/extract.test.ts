@@ -1,3 +1,4 @@
+import * as path from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
 	_createDocument,
@@ -420,7 +421,11 @@ describe('extract: workspace-relative resolution', () => {
 			}),
 		);
 		await runCommand('paths-le.extractPaths');
-		expect(_openedDocuments().at(-1)?.getText()).toBe('/second/src/index.ts');
+		// Spelled as the host spells it: Windows resolves `/second` onto its
+		// drive with backslashes, and the point here is which folder was used.
+		expect(_openedDocuments().at(-1)?.getText()).toBe(
+			path.resolve('/second', './src/index.ts'),
+		);
 	});
 });
 
