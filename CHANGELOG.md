@@ -11,8 +11,22 @@ separate product on its own cadence and keeps its own
 
 ## [Unreleased]
 
+A bug fix and hardening pass over the extension, the bundled MCP server and
+the shared extraction engine, made by driving every feature, every failure
+path and every locale rather than by reading. One release carries all of it;
+nothing here adds a feature.
+
 ### Fixed
 
+- A JSON, TOML or YAML document that does not parse was read as empty, the
+  answer a clean file gives, so a file holding `/etc/passwd` behind a syntax
+  error read as clean, and on a JSON document cut off mid-value the bundled
+  server and the Rust CLI disagreed. All three readers refuse with a named
+  reason now, as CSV always has, in the same words on both.
+- A document nested deeper than its parser can follow ended the extension
+  with "Maximum call stack size exceeded" and the CLI with an empty answer.
+  Both refuse before parsing, at the depth the weakest parser behind each
+  format can follow: 512 levels for JSON, 80 for TOML, 96 for YAML.
 - The MCP server answered a `filename` or `format` that is an
   `Object.prototype` name, such as `constructor` or `__proto__`, with a
   function or an object for its file type, or dropped the field. It answers

@@ -245,6 +245,42 @@ These are the extension's current answers, pinned by
   `diagnostics` is indistinguishable from a clean file, which is the one
   outcome this tool may never produce.
 
+- **A JSON, TOML or YAML document that does not parse is refused the same
+  way.** The parsers behind the three readers differ on each side
+  (`jsonc_parser` and `jsonc-parser`, `toml` and `@iarna/toml`, `saphyr`
+  and `js-yaml`), so the message names no position, which the two would
+  not agree on, and only the fact:
+
+  ```
+  Invalid JSON: the document does not parse
+  Invalid TOML: the document does not parse
+  Invalid YAML: the document does not parse
+  ```
+
+  A JSON document holding comments and nothing else has no value and is
+  empty, not broken, on both sides. What the parsers *accept* differs in
+  two known places and is recorded rather than pinned: `@iarna/toml` reads
+  TOML 0.5 and refuses a mixed-type array that `toml` (1.0) reads, and
+  `js-yaml` refuses a duplicate key, a complex key and an invalid
+  `!!binary` payload that `saphyr` reads. A document in one of those
+  shapes is refused by the extension and read by this crate until the
+  parsers agree.
+
+- **A document nested deeper than its parser can follow is refused
+  before it is parsed.** Every parser here recurses; a document nested
+  200,000 deep ended the extension with "Maximum call stack size exceeded"
+  and this crate with an empty answer. Both frontends count the nesting
+  on the text, outside quoted strings, and refuse past a bound set at the
+  weakest parser behind each format on either side, measured by driving
+  both servers: 512 levels for JSON (`jsonc_parser` gives up past it), 80
+  for TOML (`toml` past it), 96 for YAML (`js-yaml` past 98 levels of flow
+  nesting). A document at the bound reads on both; one past it is refused
+  by both, in the same words:
+
+  ```
+  Invalid JSON: nested deeper than 512 levels
+  ```
+
 - **Neither frontend delegates the CSV reading.** `extract/csv.rs` and
   the extension's `src/extraction/formats/csv.ts` are the same reader
   spelled out in two languages, held equal by
@@ -290,7 +326,7 @@ What follows from that split, and why:
 | The walk, resolution, exit codes, `--strict`, JSON Lines on stdout | A terminal answers about a tree and a script branches on the answer. An editor has neither a tree nor an exit code. |
 | A file read by the generic scan is not resolved unless `--resolve` asks | A scan is generous by construction. In an editor a human glances at a generous list and moves on; a `missing` verdict is a claim, and a claim needs evidence. |
 | A relative path resolves against the directory of the file it was found in, not the workspace folder | See "Resolution — the enhancement". `./helper` in `src/app.ts` means a sibling of `app.ts`, and that is the dominant case on a command line. |
-| A spent backtracking budget is a parsing diagnostic here and nothing on the extension's side | The regex-driven extractors have a budget, and exhausting it is a refusal rather than a wrong answer. The extension's engine has no equivalent failure to report. Both return no paths; only this one says why. **A malformed CSV is not in this row** — that refusal is shared, and both frontends emit the same diagnostic for it. |
+| A spent backtracking budget is a parsing diagnostic here and nothing on the extension's side | The regex-driven extractors have a budget, and exhausting it is a refusal rather than a wrong answer. The extension's engine has no equivalent failure to report. Both return no paths; only this one says why. **A document the reader refused is not in this row**: a malformed CSV, or a JSON, TOML or YAML document that does not parse or nests past its bound. Those refusals are shared, and both frontends emit the same diagnostic for them. |
 
 Anything else is drift. A difference that does not follow from IDE-first
 versus terminal-first is a bug in one of the two, and it belongs in this

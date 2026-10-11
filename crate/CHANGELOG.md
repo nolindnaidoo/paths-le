@@ -7,6 +7,22 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+The crate's half of a bug fix and hardening pass over the whole repository.
+
+### Changed
+
+- **A JSON, TOML or YAML document that does not parse is refused and
+  named**, with a `parsing` diagnostic of severity `error`, as a malformed
+  CSV always was, and the run exits 2 over it rather than reporting the
+  file clean. The npm server refuses the same documents in the same words;
+  `fixtures/mcp-extract-paths.json` pins each one against both.
+- **A document nested deeper than its parser can follow is refused before
+  it is parsed**, at a bound measured per format at the weakest parser on
+  either side: 512 levels for JSON, 80 for TOML, 96 for YAML. It used to
+  answer empty here while the extension overflowed its stack.
+
 ## [0.3.5] - 2026-10-11
 
 ### Fixed
