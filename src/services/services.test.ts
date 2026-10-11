@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
 	_createExtensionContext,
 	_fireConfigChange,
+	_outputChannels,
 	_registeredCommands,
 	_resetMockState,
 	_setConfig,
@@ -56,6 +57,28 @@ describe('telemetry', () => {
 		_setConfig('paths-le.telemetryEnabled', true);
 		const telemetry = createTelemetry();
 		telemetry.event('activated', { count: 2 });
+		expect(_outputChannels()[0]?._lines).toEqual([
+			expect.stringMatching(/^\[.+\] activated \{"count":2\}$/),
+		]);
+		telemetry.dispose();
+	});
+
+	it('follows the setting while running, without a reload', () => {
+		// The setting was read once, when the service was created at activation.
+		// Turning it on afterwards logged nothing until the window was reloaded,
+		// and the setting's description does not say a reload is needed.
+		const telemetry = createTelemetry();
+		telemetry.event('before');
+		_setConfig('paths-le.telemetryEnabled', true);
+		telemetry.event('after');
+		expect(_outputChannels()).toHaveLength(1);
+		expect(_outputChannels()[0]?._lines.map((l) => l.split('] ')[1])).toEqual([
+			'after',
+		]);
+
+		_setConfig('paths-le.telemetryEnabled', false);
+		telemetry.event('off again');
+		expect(_outputChannels()[0]?._lines).toHaveLength(1);
 		telemetry.dispose();
 	});
 });

@@ -427,13 +427,18 @@ export const window = {
 		);
 		return undefined;
 	},
-	createOutputChannel: (_name: string) => {
+	createOutputChannel: (name: string) => {
 		const linesOut: string[] = [];
-		return {
+		const channel = {
+			name,
 			appendLine: (line: string) => linesOut.push(line),
 			dispose: () => {},
 			_lines: linesOut,
 		};
+		// Kept so a test can read what was logged, and whether a channel was
+		// created at all.
+		outputChannels.push(channel);
+		return channel;
 	},
 	createStatusBarItem: (_alignment?: unknown, _priority?: number) => {
 		const item = {
@@ -467,6 +472,12 @@ export const window = {
 };
 
 const statusBarItems: Array<{ text: string; visible: boolean }> = [];
+const outputChannels: Array<{ name: string; _lines: string[] }> = [];
+
+/** Every output channel created since the last reset, in order. */
+export function _outputChannels(): readonly { name: string; _lines: string[] }[] {
+	return outputChannels;
+}
 
 /** Every status bar item created since the last reset, in order. */
 export function _statusBarItems(): readonly { text: string; visible: boolean }[] {
@@ -584,6 +595,7 @@ export function _shownDocumentOptions(): readonly { viewColumn?: number }[] {
 export function _resetMockState(): void {
 	openedDocuments.length = 0;
 	statusBarItems.length = 0;
+	outputChannels.length = 0;
 	clipboardError = undefined;
 	applyEditResult = true;
 	shownDocumentOptions.length = 0;
