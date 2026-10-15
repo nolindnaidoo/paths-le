@@ -30,6 +30,12 @@ with its own `CLAUDE.md`.
 - Write regression tests for every bug you fix; keep unit tests free of
   clocks, randomness, and the filesystem outside `resolve`/`walk`/
   `audit`.
+- **The command line has a twin.** The npm package `paths-le`, built
+  from the extension's `src/cli/`, mirrors `cli.rs`, `audit.rs`,
+  `resolve.rs`, `walk.rs` and `mcp/mod.rs` byte for byte, and
+  `bun ../scripts/check-cli-parity.ts` fails on any difference. A change
+  to a flag, a message, the walk, the root, a verdict or an exit code
+  changes `src/cli/` in the same commit.
 - **Run the binary, not only the tests.** The first `escapes-root` bug
   fired on every relative path on macOS and every unit test passed,
   because every one of them built its own canonical root. Filesystem

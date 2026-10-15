@@ -119,6 +119,8 @@ benchmark-results.json
 crate/target/
 mcp/server.js
 mcp/LICENSE
+cli/cli.js
+cli/LICENSE
 
 # The shared corpus is the contract between the two frontends, so every
 # file in it must be tracked whatever its extension — a corpus document

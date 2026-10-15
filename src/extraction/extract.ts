@@ -100,7 +100,7 @@ function extractPathsByFileType(
 	}
 }
 
-function determineFileType(languageId: string): FileType {
+export function determineFileType(languageId: string): FileType {
 	switch (languageId) {
 		case 'csv':
 			return 'csv';
