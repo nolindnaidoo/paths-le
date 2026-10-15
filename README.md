@@ -28,7 +28,7 @@
 ---
 
 <p align="center">
-  <img src="src/assets/images/demo.gif" alt="Paths-LE Demo" style="max-width: 100%; height: auto;" />
+  <img src="assets/demos/editor.gif" alt="Paths-LE in VS Code" style="max-width: 100%; height: auto;" />
 </p>
 
 > **Useful?** A star or rating is how other developers find it —
@@ -63,6 +63,10 @@ The same engine runs as an [MCP](https://modelcontextprotocol.io) server, so an 
 | **VS Code** 1.101+ | Nothing to install — the extension registers `extract_paths` with agent mode |
 | **Claude Code** | `claude mcp add paths-le -- npx -y paths-le-mcp` |
 | **Cursor, Windsurf, anything else** | point it at `npx paths-le-mcp` |
+
+<p align="center">
+  <img src="assets/demos/mcp.gif" alt="An agent in Claude Code calling the paths-le MCP server" style="max-width: 100%; height: auto;" />
+</p>
 
 ```
 extract_paths(content, format?, filename?, dedupe?, maxResults?)
@@ -207,6 +211,10 @@ document differently.
 It also does the half an editor cannot: **resolve what it found against the
 filesystem it is standing in.** Every path gets a verdict — exists, missing,
 escapes the audited tree, non-canonical, or a symlink with its target named.
+
+<p align="center">
+  <img src="assets/demos/cli.gif" alt="paths-le in a terminal" style="max-width: 100%; height: auto;" />
+</p>
 
 ```bash
 paths-le .                    # audit a tree; JSON on stdout, summary on stderr

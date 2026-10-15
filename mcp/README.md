@@ -15,6 +15,8 @@
   </a>
 </p>
 
+![An agent in Claude Code calling the paths-le MCP server](https://raw.githubusercontent.com/nolindnaidoo/paths-le/main/assets/demos/mcp.gif)
+
 An [MCP](https://modelcontextprotocol.io) server that extracts file and directory paths
 from configuration, markup and code — the extraction engine behind the
 [Paths-LE](https://letools.dev/tools/paths-le)
