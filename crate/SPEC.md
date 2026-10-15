@@ -349,6 +349,7 @@ about it is indistinguishable from never having looked:
 ```json
 {
   "file": "src/app.ts",
+  "root": "/repo",
   "format": "typescript",
   "paths": [
     {
@@ -377,7 +378,9 @@ resolution did not run it carries `verdict: "unresolved"` and the reason.
 it lands outside, so the report carries nothing about the machine that
 took it and two runs over the same tree diff clean. A path the document
 wrote absolute is reported absolute, because the source already tied it
-to one machine. The stderr summary names the root once, at the end.
+to one machine. Every report carries `root`, so a consumer can place
+each location from the report alone, without knowing how the run was
+invoked. The stderr summary names the root once, at the end.
 
 `diagnostics` carries what happened to the file rather than to a path —
 an unsupported format, or a file that could not be read at all. A

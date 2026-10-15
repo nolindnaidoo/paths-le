@@ -18,7 +18,8 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   absolute, which put the auditing machine's home directory in every
   report and kept two machines' reports from ever diffing clean. A path
   the document wrote absolute is still reported absolute. A consumer
-  that read `canonical` as an absolute path has to join it to the root.
+  that read `canonical` as an absolute path joins it to the report's new
+  `root` field, which every report now carries.
 - **An `escapes-root` verdict carries no reason.** The reason repeated
   the root's absolute path on every line. The summary now names the root
   once: `23 paths in 3 files — 23 findings (root /repo)`.

@@ -345,6 +345,30 @@ fn stdout_carries_only_reports_and_stderr_only_the_summary() {
     assert!(run.stderr.contains("1 file"), "{}", run.stderr);
 }
 
+/// A machine reading one report must be able to place every location in
+/// it without knowing how the run was invoked.
+#[test]
+fn every_report_names_the_root_its_locations_are_relative_to() {
+    let tree = Tree::new("root-field");
+    tree.write("pkg/a.json", "{\"a\":\"./gone.ts\"}");
+    let run = run(&[&tree.path().to_string_lossy()]);
+    let reports = reports(&run);
+    let report = &reports[0];
+
+    let root = report["root"].as_str().expect("a root");
+    let canonical = report["paths"][0]["resolution"]["canonical"]
+        .as_str()
+        .expect("a location");
+    let expected = std::fs::canonicalize(tree.path()).expect("a canonical directory");
+    assert!(std::path::Path::new(root).is_absolute(), "{root}");
+    assert_eq!(
+        std::path::Path::new(root).file_name(),
+        expected.file_name(),
+        "{root}"
+    );
+    assert_eq!(canonical, "pkg/gone.ts");
+}
+
 #[test]
 fn a_document_on_stdin_is_audited_against_the_working_directory() {
     let mut child = Command::new(BINARY)
