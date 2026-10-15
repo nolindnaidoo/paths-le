@@ -60,8 +60,9 @@ pub(crate) struct Resolution {
     pub(crate) verdict: Verdict,
     /// Where the path points, resolved as far as it could be: the
     /// filesystem's own canonical form when the target exists, and the
-    /// lexically-resolved absolute path when it does not — so a
-    /// `missing` verdict still says *where* it looked.
+    /// lexically-resolved path when it does not — so a `missing`
+    /// verdict still says *where* it looked. Spelled relative to the
+    /// root (see [`locate`]).
     pub(crate) canonical: Option<String>,
     /// The link target, when the path itself is a symlink. Present
     /// whatever the verdict, so a broken link still names what it
@@ -126,9 +127,9 @@ pub(crate) fn resolve(
     if !absolute && !target.starts_with(root) {
         return Resolution {
             verdict: Verdict::EscapesRoot,
-            canonical: Some(display(&target)),
+            canonical: Some(locate(&target, root, absolute)),
             symlink: None,
-            reason: Some(format!("resolves outside {}", display(root))),
+            reason: None,
         };
     }
 
@@ -165,7 +166,7 @@ pub(crate) fn resolve(
         };
         return Resolution {
             verdict: Verdict::Missing,
-            canonical: Some(display(&target)),
+            canonical: Some(locate(&target, root, absolute)),
             symlink,
             reason: Some(reason),
         };
@@ -177,7 +178,7 @@ pub(crate) fn resolve(
         // that substitution has to be visible to be checkable.
         return Resolution {
             verdict: Verdict::Ok,
-            canonical: Some(display(&canonical)),
+            canonical: Some(locate(&canonical, root, absolute)),
             symlink,
             reason: Some(format!("written without an extension; resolved to {name}")),
         };
@@ -186,7 +187,7 @@ pub(crate) fn resolve(
     if let Some(reason) = non_canonical_reason(value) {
         return Resolution {
             verdict: Verdict::NonCanonical,
-            canonical: Some(display(&canonical)),
+            canonical: Some(locate(&canonical, root, absolute)),
             symlink,
             reason: Some(reason),
         };
@@ -195,7 +196,7 @@ pub(crate) fn resolve(
     if symlink.is_some() {
         return Resolution {
             verdict: Verdict::Symlinked,
-            canonical: Some(display(&canonical)),
+            canonical: Some(locate(&canonical, root, absolute)),
             symlink,
             reason: None,
         };
@@ -203,7 +204,7 @@ pub(crate) fn resolve(
 
     Resolution {
         verdict: Verdict::Ok,
-        canonical: Some(display(&canonical)),
+        canonical: Some(locate(&canonical, root, absolute)),
         symlink: None,
         reason: None,
     }
@@ -390,6 +391,44 @@ fn lexical_normalise(path: &StdPath) -> PathBuf {
     out
 }
 
+/// Where a resolved path points, as the report writes it: **relative to
+/// the root**, climbing with `..` when it lands outside.
+///
+/// An absolute spelling would put the auditing machine's home directory
+/// in every report, and the same tree audited on two machines could
+/// never be diffed. A path the document itself wrote absolute stays
+/// absolute: the source already tied it to one machine, and rewriting
+/// `/etc/hosts` as a climb out of the repository would hide that.
+fn locate(target: &StdPath, root: &StdPath, written_absolute: bool) -> String {
+    if written_absolute {
+        return display(target);
+    }
+    relative_to(target, root).map_or_else(|| display(target), |relative| display(&relative))
+}
+
+/// `None` when the two share no starting point — two Windows drives —
+/// since no relative spelling joins them.
+fn relative_to(target: &StdPath, root: &StdPath) -> Option<PathBuf> {
+    let target: Vec<Component> = target.components().collect();
+    let root: Vec<Component> = root.components().collect();
+    if target.first() != root.first() {
+        return None;
+    }
+    let shared = target
+        .iter()
+        .zip(&root)
+        .take_while(|(left, right)| left == right)
+        .count();
+
+    let mut relative: PathBuf = std::iter::repeat_n(Component::ParentDir, root.len() - shared)
+        .chain(target[shared..].iter().copied())
+        .collect();
+    if relative.as_os_str().is_empty() {
+        relative.push(".");
+    }
+    Some(relative)
+}
+
 /// A path as the report writes it: **separators forward, on every
 /// platform**.
 ///
@@ -534,7 +573,44 @@ mod tests {
         let base = tree.path().join("pkg");
         let resolution = resolve("../../outside.txt", PathType::Relative, &base, tree.path());
         assert_eq!(resolution.verdict, Verdict::EscapesRoot);
-        assert!(resolution.reason.expect("a reason").contains("outside"));
+        assert_eq!(resolution.reason, None, "the verdict already says it");
+        assert_eq!(resolution.canonical.as_deref(), Some("../outside.txt"));
+    }
+
+    /// The report must read the same on every machine that audits the
+    /// same tree, so the location carries nothing above the root.
+    #[test]
+    fn a_location_is_spelled_relative_to_the_root() {
+        let tree = TempTree::new("resolve-relative");
+        tree.write("pkg/x.txt", "x");
+        let base = tree.path().join("pkg");
+        let found = resolve("./x.txt", PathType::Relative, &base, tree.path());
+        let missing = resolve("./gone.txt", PathType::Relative, &base, tree.path());
+        assert_eq!(found.canonical.as_deref(), Some("pkg/x.txt"));
+        assert_eq!(missing.canonical.as_deref(), Some("pkg/gone.txt"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_path_written_absolute_is_reported_absolute() {
+        let tree = TempTree::new("resolve-absolute");
+        let resolution = resolve(
+            "/no/such/place.txt",
+            PathType::Absolute,
+            tree.path(),
+            tree.path(),
+        );
+        assert_eq!(resolution.canonical.as_deref(), Some("/no/such/place.txt"));
+    }
+
+    #[test]
+    fn the_root_itself_is_a_dot() {
+        let root = StdPath::new("/repo");
+        assert_eq!(relative_to(root, root), Some(PathBuf::from(".")));
+        assert_eq!(
+            relative_to(StdPath::new("/elsewhere/x"), root),
+            Some(PathBuf::from("../elsewhere/x"))
+        );
     }
 
     /// Climbing and coming back is not an escape — it never leaves.

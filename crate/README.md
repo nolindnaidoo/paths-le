@@ -84,11 +84,12 @@ cat pkg.json | paths-le --stdin --format json
 ```
 ./pkg.json:3:12  ./docs//guide.md  [non-canonical — contains a duplicate separator]
 ./src/app.ts:2:16  ./gone.ts  [missing — no such file or directory]
-./src/app.ts:3:16  ../../escape/out  [escapes root — resolves outside /repo]
-5 paths in 3 files — 3 findings
+./src/app.ts:3:16  ../../escape/out  [escapes root]
+5 paths in 3 files — 3 findings (root /repo)
 ```
 
-The report is JSON on stdout — one object per line, one line per file —
+The report is JSON on stdout — one object per line, one line per file,
+printed when stdout is piped or redirected and left out at a terminal —
 the summary above is stderr, and the exit code is the answer: **0 clear ·
 1 findings · 2 the question was malformed.**
 
