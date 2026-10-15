@@ -1,0 +1,48 @@
+{
+	"name": "paths-le",
+	"version": "2.4.1",
+	"description": "Find every path in a codebase and report whether it still points at anything.",
+	"keywords": [
+		"paths",
+		"broken-links",
+		"dead-links",
+		"imports",
+		"config",
+		"audit",
+		"cli",
+		"lint",
+		"paths-le",
+		"nolindnaidoo",
+		"letools"
+	],
+	"license": "MIT",
+	"author": {
+		"name": "Nolin Naidoo",
+		"url": "https://nolindnaidoo.com"
+	},
+	"homepage": "https://letools.dev/tools/paths-le",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/nolindnaidoo/paths-le.git",
+		"directory": "cli"
+	},
+	"bugs": {
+		"url": "https://github.com/nolindnaidoo/paths-le/issues"
+	},
+	"type": "commonjs",
+	"bin": {
+		"paths-le": "cli.js"
+	},
+	"files": [
+		"cli.js",
+		"README.md",
+		"LICENSE"
+	],
+	"engines": {
+		"node": ">=20"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	}
+}
