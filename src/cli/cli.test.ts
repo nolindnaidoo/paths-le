@@ -13,7 +13,6 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { parse } from './args';
 import { auditContent, exitCode, type FileReport } from './audit';
 import { AUDIT_TOOL } from './auditTool';
-import { formatForName } from './format';
 import { rustIoMessage } from './ioError';
 import { isFinding, resolvePath } from './resolve';
 import { chooseRoot } from './root';
@@ -87,15 +86,6 @@ describe('parse', () => {
 		const asked = parse(['--resolve', 'x']);
 		expect([asked.resolve, asked.resolveScanned]).toEqual([true, true]);
 		expect(parse(['--no-resolve', 'x']).resolve).toBe(false);
-	});
-});
-
-describe('formatForName', () => {
-	it('reads every dotenv spelling as dotenv, and nothing else', () => {
-		for (const name of ['.env', '.env.local', '.ENV.production', 'app.env'])
-			expect(formatForName(name), name).toBe('dotenv');
-		expect(formatForName('env.ts')).toBe('typescript');
-		expect(formatForName('.envrc')).toBe('unknown');
 	});
 });
 

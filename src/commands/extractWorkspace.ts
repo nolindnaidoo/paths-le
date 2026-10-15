@@ -1,3 +1,4 @@
+import { basename } from 'node:path';
 import * as vscode from 'vscode';
 import { getConfiguration } from '../config/config';
 import { extractPathsFromText } from '../extraction/extract';
@@ -107,7 +108,7 @@ async function extractWorkspace(
 					// recognises is scanned whole, as Extract scans it.
 					const extracted = extractPathsFromText(
 						text,
-						resolveFormat(undefined, file),
+						resolveFormat(undefined, basename(file)),
 					);
 					// A reader that refused a document found nothing in it, which is
 					// not the same as the document holding nothing.

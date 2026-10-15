@@ -10,7 +10,7 @@
  */
 import { type Dirent, readdirSync, type Stats, statSync } from 'node:fs';
 import { dirname, resolve, sep } from 'node:path';
-import { formatForName } from './format';
+import { resolveFormat } from '../mcp/fileType';
 import {
 	type DirectoryRules,
 	isIgnored,
@@ -73,7 +73,7 @@ export function collect(
 /** A name that resolves to nothing is the reason the generic scan exists. */
 function languageFor(path: string): string {
 	const name = path.split(sep === '\\' ? /[\\/]/ : '/').at(-1) ?? '';
-	return formatForName(name);
+	return resolveFormat(undefined, name);
 }
 
 function filesUnder(input: string, options: WalkOptions): readonly string[] {

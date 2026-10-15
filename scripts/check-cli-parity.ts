@@ -365,6 +365,8 @@ function mcpRequests(): readonly Record<string, unknown>[] {
 		call(8, 'paths_le_audit', { path: repo, root: join(repo, 'package.json') }),
 		call(9, 'paths_le_audit', { path: join(repo, 'packages', 'app') }),
 		call(10, 'extract_paths', { content: '{"a": "./b.json"}', format: 'json' }),
+		call(11, 'extract_paths', { content: 'LOG_DIR=./my logs/app.log\n', filename: '.env.local' }),
+		call(12, 'extract_paths', { content: 'const a = "./b.ts";\n', filename: 'env.ts' }),
 	];
 }
 
