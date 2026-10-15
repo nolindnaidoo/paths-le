@@ -7,6 +7,22 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **stdout is silent at a terminal.** The JSON reports printed on the
+  same screen as the stderr summary and said the same thing again. Piped
+  or redirected, stdout carries every report exactly as before.
+- **`resolution.canonical` is relative to the root.** It used to be
+  absolute, which put the auditing machine's home directory in every
+  report and kept two machines' reports from ever diffing clean. A path
+  the document wrote absolute is still reported absolute. A consumer
+  that read `canonical` as an absolute path has to join it to the root.
+- **An `escapes-root` verdict carries no reason.** The reason repeated
+  the root's absolute path on every line. The summary now names the root
+  once: `23 paths in 3 files — 23 findings (root /repo)`.
+
 ## [0.3.6] - 2026-10-11
 
 The crate's half of a bug fix and hardening pass over the whole repository.

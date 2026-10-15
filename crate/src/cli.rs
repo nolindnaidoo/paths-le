@@ -1,12 +1,13 @@
 //! The terminal surface.
 //!
-//! stdout is always protocol — one JSON report per line, one line per
-//! file. stderr is always for the human, and is a projection of the
-//! same reports rather than parallel prose. Exit codes are the API:
+//! stdout is protocol — one JSON report per line, one line per file —
+//! whenever something is reading it, and silent when it is a terminal.
+//! stderr is always for the human, and is a projection of the same
+//! reports rather than parallel prose. Exit codes are the API:
 //! 0 clear, 1 findings, 2 the question was malformed.
 
-use std::io::{Read, Write};
-use std::path::PathBuf;
+use std::io::{IsTerminal, Read, Write};
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use crate::audit::{self, AuditOptions, FileReport};
@@ -19,8 +20,8 @@ const USAGE: &str = "usage: paths-le [options] <file|dir>...
        paths-le --version | --help
 
 Finds every file and directory path in a document and reports whether it
-still points at anything. One JSON report per line on stdout, human
-summary on stderr.
+still points at anything. One JSON report per line on stdout when it
+is piped or redirected, human summary on stderr.
 
 Options:
   --resolve            check the paths a generic scan found against the
@@ -108,29 +109,47 @@ pub(crate) fn run() -> ExitCode {
 
 fn execute(args: &[String]) -> Result<u8, String> {
     let options = parse(args)?;
-    let (reports, binary) = if options.stdin {
-        (vec![audit_stdin(&options)?], 0)
+    let (reports, binary, root) = if options.stdin {
+        let (report, root) = audit_stdin(&options)?;
+        (vec![report], 0, root)
     } else {
         audit_inputs(&options)?
     };
 
-    let mut stdout = std::io::stdout().lock();
-    for report in &reports {
-        let line = serde_json::to_string(report).expect("a report serializes");
-        writeln!(stdout, "{line}")
-            .map_err(|error| format!("could not write the report: {error}"))?;
-    }
-    drop(stdout);
+    let stdout = std::io::stdout();
+    let terminal = stdout.is_terminal();
+    write_reports(&mut stdout.lock(), &reports, terminal)
+        .map_err(|error| format!("could not write the report: {error}"))?;
 
-    summarise(&reports, options.resolve, binary);
+    summarise(&reports, options.resolve.then_some(root.as_path()), binary);
     Ok(audit::exit_code(&reports, options.strict))
+}
+
+/// A terminal gets nothing here. The stderr summary already says
+/// everything a person reads, and the JSON beside it on the same screen
+/// is the same answer a second time in a form nobody reads by eye.
+/// Anything that can parse — a pipe, a file, a subprocess — still gets
+/// every report, so no script sees a difference.
+fn write_reports(
+    out: &mut impl Write,
+    reports: &[FileReport],
+    terminal: bool,
+) -> std::io::Result<()> {
+    if terminal {
+        return Ok(());
+    }
+    for report in reports {
+        let line = serde_json::to_string(report).expect("a report serializes");
+        writeln!(out, "{line}")?;
+    }
+    Ok(())
 }
 
 /// The reports, and how many files were binary and therefore never
 /// examined. The second number is not decoration: it is the difference
 /// between the tree and what the reports cover, and the summary says it
 /// out loud.
-fn audit_inputs(options: &Options) -> Result<(Vec<FileReport>, usize), String> {
+fn audit_inputs(options: &Options) -> Result<(Vec<FileReport>, usize, PathBuf), String> {
     let targets = walk::collect(&options.inputs, &options.walk)?;
     let audit_options = AuditOptions {
         resolve: options.resolve,
@@ -143,10 +162,10 @@ fn audit_inputs(options: &Options) -> Result<(Vec<FileReport>, usize), String> {
         .filter_map(|target| audit::audit_file(target, &audit_options))
         .collect();
     let binary = targets.len() - reports.len();
-    Ok((reports, binary))
+    Ok((reports, binary, audit_options.root))
 }
 
-fn audit_stdin(options: &Options) -> Result<FileReport, String> {
+fn audit_stdin(options: &Options) -> Result<(FileReport, PathBuf), String> {
     let format = options.format.ok_or_else(|| {
         "reading from stdin needs --format: the name that would carry the format is not there"
             .to_string()
@@ -175,7 +194,7 @@ fn audit_stdin(options: &Options) -> Result<FileReport, String> {
     };
     let mut report = audit::audit_content(&content, &target, &audit_options);
     report.file = "<stdin>".to_string();
-    Ok(report)
+    Ok((report, audit_options.root))
 }
 
 /// The boundary a relative path may not escape.
@@ -295,8 +314,9 @@ fn parse(args: &[String]) -> Result<Options, String> {
 
 /// The human half. Every line here restates something already in the
 /// JSON — a summary that says more than the report would be a second
-/// source of truth.
-fn summarise(reports: &[FileReport], resolved: bool, binary: usize) {
+/// source of truth. The one addition is the root, named once, because
+/// every location in the report is spelled relative to it.
+fn summarise(reports: &[FileReport], root: Option<&Path>, binary: usize) {
     let mut stderr = std::io::stderr().lock();
     let mut findings = 0;
     let mut paths = 0;
@@ -320,11 +340,13 @@ fn summarise(reports: &[FileReport], resolved: bool, binary: usize) {
         .iter()
         .map(|report| report.summary.findings)
         .sum::<usize>();
-    let tail = if resolved {
-        plural(counted, "finding", "findings")
-    } else {
-        "not resolved".to_string()
-    };
+    let tail = root.map_or_else(
+        || "not resolved".to_string(),
+        |_| plural(counted, "finding", "findings"),
+    );
+    let scope = root
+        .map(|root| format!(" (root {})", crate::resolve::display(root)))
+        .unwrap_or_default();
     // `findings` counts every verdict that could be one; `counted`
     // counts the ones this run is set to act on. Saying both keeps the
     // tally honest when symlinks were listed above but do not move the
@@ -346,7 +368,7 @@ fn summarise(reports: &[FileReport], resolved: bool, binary: usize) {
     };
     let _ = writeln!(
         stderr,
-        "{} in {} — {tail}{noted}{unexamined}",
+        "{} in {} — {tail}{noted}{unexamined}{scope}",
         plural(paths, "path", "paths"),
         plural(files, "file", "files")
     );
@@ -360,6 +382,34 @@ fn plural(count: usize, one: &str, many: &str) -> String {
 mod tests {
     use super::*;
     use crate::testing::TempTree;
+
+    fn sample_reports(tree: &TempTree) -> Vec<FileReport> {
+        tree.write("a.ts", "import './gone.ts';\n");
+        let options = parse(&[tree.path().join("a.ts").to_string_lossy().into_owned()])
+            .expect("a valid command line");
+        audit_inputs(&options).expect("an audit").0
+    }
+
+    #[test]
+    fn a_pipe_gets_one_report_per_line() {
+        let tree = TempTree::new("cli-pipe");
+        let reports = sample_reports(&tree);
+        let mut out = Vec::new();
+        write_reports(&mut out, &reports, false).expect("a write");
+        let text = String::from_utf8(out).expect("utf-8");
+        assert_eq!(text.lines().count(), reports.len());
+        assert!(text.starts_with('{'), "{text}");
+    }
+
+    /// The summary on stderr already covers a person at a terminal.
+    #[test]
+    fn a_terminal_gets_no_json() {
+        let tree = TempTree::new("cli-terminal");
+        let reports = sample_reports(&tree);
+        let mut out = Vec::new();
+        write_reports(&mut out, &reports, true).expect("a write");
+        assert!(out.is_empty());
+    }
 
     /// A flag documented and not implemented, or implemented and not
     /// documented, is the failure nobody notices until a user hits it.

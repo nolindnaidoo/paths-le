@@ -94,8 +94,13 @@ crate/src/
 - **A leading `./` or `../` is not `non-canonical`.** A check that fires
   on every relative import in every codebase is a check nobody reads.
 - **stdout is protocol, stderr is human. There is no `--json` flag.**
-  One mode, nothing to misremember, and the human summary is a
-  projection of the same reports so the two cannot drift.
+  stdout stays silent when it is a terminal, because the stderr summary
+  already covers a person reading it. Anything that can parse gets every
+  report, and the human summary is a projection of the same reports so
+  the two cannot drift.
+- **Locations are relative to the root.** `resolution.canonical` never
+  carries the auditing machine's absolute path unless the document wrote
+  one, so the same tree reports identically on any machine.
 - **Parity scope is extraction only** — the extension's
   `src/extraction/**`. Commands, UI, i18n, the config reader and the
   status bar are extension concerns with no CLI equivalent. The resolver

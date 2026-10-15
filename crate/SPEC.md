@@ -334,9 +334,13 @@ table only after it has an answer to "which use case asked for this?".
 
 ## Output contract
 
-**stdout is protocol. stderr is human. There is no `--json` flag** — one
-mode, nothing to misremember, and the human summary is a projection of
-the same report so the two cannot drift.
+**stdout is protocol. stderr is human. There is no `--json` flag.**
+When stdout is a pipe, a file or a subprocess, it carries every report.
+When it is a terminal it carries nothing, because the stderr summary
+already says everything a person reads there, and the same answer
+repeated as JSON on the same screen is noise. No script can tell the
+difference, since a script is never a terminal. The human summary is a
+projection of the same report so the two cannot drift.
 
 stdout carries one JSON report per line, one line per file examined —
 including a file that turned out to contain no paths, because silence
@@ -355,7 +359,7 @@ about it is indistinguishable from never having looked:
       "context": "JS import",
       "resolution": {
         "verdict": "missing",
-        "canonical": "/repo/src/utils/helper",
+        "canonical": "src/utils/helper",
         "symlink": null,
         "reason": "no such file or directory"
       }
@@ -368,6 +372,12 @@ about it is indistinguishable from never having looked:
 
 `resolution` is always present, so a consumer writes one reader. When
 resolution did not run it carries `verdict: "unresolved"` and the reason.
+
+**`canonical` is spelled relative to the root**, with `..` segments when
+it lands outside, so the report carries nothing about the machine that
+took it and two runs over the same tree diff clean. A path the document
+wrote absolute is reported absolute, because the source already tied it
+to one machine. The stderr summary names the root once, at the end.
 
 `diagnostics` carries what happened to the file rather than to a path —
 an unsupported format, or a file that could not be read at all. A
@@ -416,7 +426,8 @@ usage: paths-le [options] <file|dir>...
        paths-le --version | --help
 
 Finds every file and directory path in a document and reports whether it
-still points at anything. JSON reports on stdout, human summary on stderr.
+still points at anything. One JSON report per line on stdout when it
+is piped or redirected, human summary on stderr.
 
 Options:
   --resolve            check the paths a generic scan found against the
