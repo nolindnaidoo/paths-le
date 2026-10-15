@@ -217,7 +217,7 @@ escapes the audited tree, non-canonical, or a symlink with its target named.
 </p>
 
 ```bash
-paths-le .                    # audit a tree; JSON on stdout, summary on stderr
+paths-le .                    # audit a tree; summary on stderr, JSON on stdout when piped
 paths-le --strict .           # count sloppily-written paths too
 paths-le --no-resolve src/    # just list what is written, touch nothing
 paths-le mcp                  # the same audit over MCP on stdio
