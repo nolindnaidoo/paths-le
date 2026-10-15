@@ -122,6 +122,8 @@ fn every_reported_path_spells_its_separators_forward() {
     for report in &reports {
         let file = report["file"].as_str().expect("a file");
         assert!(!file.contains('\\'), "report path uses a backslash: {file}");
+        let root = report["root"].as_str().expect("a root");
+        assert!(!root.contains('\\'), "report root uses a backslash: {root}");
         saw_separator |= file.contains('/');
 
         for path in report["paths"].as_array().expect("paths") {

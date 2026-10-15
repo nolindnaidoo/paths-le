@@ -59,6 +59,9 @@ pub(crate) struct Summary {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub(crate) struct FileReport {
     pub(crate) file: String,
+    /// What every `resolution.canonical` in this report is relative to.
+    /// A consumer reading the report alone has to be able to place them.
+    pub(crate) root: String,
     pub(crate) format: String,
     pub(crate) paths: Vec<AuditedPath>,
     pub(crate) diagnostics: Vec<Diagnostic>,
@@ -121,6 +124,7 @@ pub(crate) fn audit_file(target: &Target, options: &AuditOptions) -> Option<File
 
     let skipped = |reason: String| FileReport {
         file: file.clone(),
+        root: resolve::display(&options.root),
         format: target.language_id.to_string(),
         paths: Vec::new(),
         diagnostics: vec![Diagnostic {
@@ -217,6 +221,7 @@ pub(crate) fn audit_content(content: &str, target: &Target, options: &AuditOptio
         // Separators forward on every platform: a report is a document
         // somebody diffs against the same report taken elsewhere.
         file: resolve::display(&target.path),
+        root: resolve::display(&options.root),
         format: target.language_id.to_string(),
         summary: Summary {
             paths: paths.len(),
