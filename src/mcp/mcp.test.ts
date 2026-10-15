@@ -95,6 +95,13 @@ describe('fileType: tolerant resolution', () => {
 		expect(resolveFormat(undefined, '.env')).toBe('dotenv');
 	});
 
+	it('reads every dotenv spelling as dotenv, and nothing else', () => {
+		for (const name of ['.env.local', '.ENV.production', 'app.env', 'env'])
+			expect(resolveFormat(undefined, name), name).toBe('dotenv');
+		expect(resolveFormat(undefined, 'env.ts')).toBe('typescript');
+		expect(resolveFormat(undefined, '.envrc')).toBe('unknown');
+	});
+
 	it('infers from a filename when no format is given', () => {
 		expect(resolveFormat(undefined, 'tsconfig.json')).toBe('json');
 		expect(resolveFormat(undefined, 'Cargo.toml')).toBe('toml');

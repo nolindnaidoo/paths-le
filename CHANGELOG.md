@@ -10,6 +10,20 @@ npm command line. The Rust CLI in `crate/` keeps its own
 [CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
 version and releases from one tag.
 
+## [2.5.1] - 2026-10-15
+
+### Fixed
+
+- **`.env.local`, `.env.production` and every other `.env.*` file read as
+  dotenv**, as the crate has read them since 0.3.1. The npm MCP server's
+  `extract_paths`, `paths-le mcp` and Extract Workspace split the name on
+  the last dot, asked `local` for a format and fell to the generic scan,
+  which breaks a value at whitespace: `LOG_DIR=./my logs/app.log` came back
+  as `./my` and `logs/app.log`. Extract Workspace also resolved the format
+  from the file's relative path rather than its name, so a dotenv file in a
+  subfolder missed the rule. The CLI parity check now sends `extract_paths`
+  a `.env.local`.
+
 ## [2.5.0] - 2026-10-15
 
 ### Changed

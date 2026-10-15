@@ -118,6 +118,11 @@ export function resolveFormat(
 		const whole = ALIASES.get(bare.startsWith('.') ? bare.slice(1) : bare);
 		if (whole) return whole;
 
+		// Split on the last dot, `.env.local` asks `local` for a format, falls to
+		// the generic scan, and a value with a space in it becomes two `missing`
+		// findings over a file that was correct. The crate's rule since 0.3.1.
+		if (isDotenv(filename.trim().toLowerCase())) return 'dotenv';
+
 		const extension = filename.includes('.')
 			? filename.slice(filename.lastIndexOf('.') + 1)
 			: '';
@@ -126,4 +131,18 @@ export function resolveFormat(
 	}
 
 	return FALLBACK_FORMAT;
+}
+
+/**
+ * `.env` and everything after it, plus `<name>.env`. The leading dot is the
+ * signal, so `env.ts` stays TypeScript, and `.envrc` is direnv's shell script
+ * rather than a dotenv file.
+ */
+function isDotenv(name: string): boolean {
+	return (
+		name === '.env' ||
+		name.startsWith('.env.') ||
+		name === 'env' ||
+		(name.endsWith('.env') && name.length > '.env'.length)
+	);
 }

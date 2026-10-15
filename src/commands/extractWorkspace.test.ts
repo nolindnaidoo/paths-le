@@ -113,6 +113,14 @@ describe('paths-le.extractWorkspace and paths-le.extractFolder', () => {
 		expect(report()).toMatch(/^- `\/w\/bad\.csv`: Invalid CSV: /m);
 	});
 
+	it('reads a dotenv file in a subfolder as dotenv, so a value with a space stays one path', async () => {
+		open({ '/w/config/.env.local': 'LOG_DIR=./my logs/app.log\n' });
+		await runCommand('paths-le.extractWorkspace');
+
+		expect(report()).toContain('| `./my logs/app.log` | 1 | 1 |');
+		expect(report()).not.toContain('| `./my` |');
+	});
+
 	it('places every occurrence when positions are on, and decides the copy separately', async () => {
 		open();
 		_setConfig('paths-le.showPositions', true);
