@@ -8,6 +8,13 @@ in this repository carries one version and releases from one tag.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.1] - 2026-10-15
+
+### Changed
+
+- No change to the crate. The version moves to 2.5.1 with the npm
+  surfaces, whose fix is in the [repository CHANGELOG](../CHANGELOG.md).
+
 ## [2.5.0] - 2026-10-15
 
 ### Changed

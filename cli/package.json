@@ -1,6 +1,6 @@
 {
 	"name": "paths-le",
-	"version": "2.5.0",
+	"version": "2.5.1",
 	"description": "Find every path in a codebase and report whether it still points at anything.",
 	"keywords": [
 		"paths",
