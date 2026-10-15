@@ -454,6 +454,16 @@ Options:
   --no-ignore          walk files that .gitignore excludes
 ```
 
+**Held equal: this surface and the npm one.** The npm package
+`paths-le` installs a command of the same name, built from the
+extension's `src/cli/` over the extension's engine, and nobody running
+`paths-le` can tell which one they have. It is held to everything in
+this section byte for byte — flags, walk, root, verdicts, exit codes,
+stdout, stderr, and both tools `paths-le mcp` serves — by
+`scripts/check-cli-parity.ts`. A change to this surface changes
+`src/cli/` in the same commit. That includes `--version`: every surface
+in the repository carries one version.
+
 Rendering the report for a human on stderr is a projection: the file, the
 path, its position, and its verdict — never prose that says something the
 JSON does not.

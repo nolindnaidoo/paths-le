@@ -4,6 +4,8 @@ Technical source of truth for this repo. README.md is the user-facing doc; this 
 
 This repo hosts **two products**: the extension at the root (this document's scope) and the Rust CLI in `crate/` (its own `AGENTS.md` + `SPEC.md`). The shared extraction corpus lives at `crate/fixtures/`; `scripts/check-extraction-parity.ts` fails CI when this extension drifts from it.
 
+The Rust CLI also ships **a second way, through npm**: `src/cli/` is its terminal surface rebuilt over this extension's extraction engine, bundled to `cli/cli.js` as the npm package `paths-le`. Both install a command named `paths-le`, so the npm one is held to the crate's surface byte for byte, which is a different contract from the extraction parity above. `src/cli/` follows `crate/src/cli.rs`, `audit.rs`, `resolve.rs`, `walk.rs` and `mcp/mod.rs`, not the extension's commands, and `scripts/check-cli-parity.ts` runs both binaries over one generated tree and fails on any difference in stdout, stderr or exit code, and in what `paths-le mcp` answers. A change to the crate's surface changes `src/cli/` in the same commit.
+
 ## What this is
 
 A VS Code extension that extracts file paths from the active document — JS/TS, JSON/JSONC, YAML, HTML, CSS/SCSS/LESS, TOML, CSV and dotenv through a parser, every other language through a text scan — into a results editor, with dedupe/sort post-processing. No network access, no filesystem writes outside optional opt-in canonical path resolution (reads only).
@@ -25,6 +27,10 @@ utils/                  errors (sanitizeErrorMessage), safety (size guards),
                         pathResolver (normalize + opt-in canonical resolution)
 config/config.ts        getConfiguration() snapshot; CONFIG_DEFAULTS table
 types.ts                shared types only — no logic
+cli/                    the npm command line: args, walk + ignoreRules
+                        (ripgrep's precedence), rustPath (std::path
+                        arithmetic), resolve, root, audit, run, and
+                        auditTool for `paths-le mcp`. No `vscode`, ever
 ```
 
 Conventions: factory functions + `Object.freeze` (no classes), guard clauses, dependency bags typed inline at the consumer — see **Code style** below. Both the manifest and the runtime strings are localized into 12 locales; see **Toolchain**.
@@ -230,6 +236,8 @@ most valuable line in the file, and it is what keeps the next person from
 - **Server memory:** `bun run check:mcp-memory` drives the built server through 3,000 tool calls over one stdio session and samples its resident memory, failing if the last sample is more than a tenth above the one a third of the way in. Hand-run, like `benchmark`; a memory figure from a shared runner is noise. On the pass that added it: 279 MB after 500 calls, 480 MB from 1,000 to 3,000, flat.
 - **npm package:** `bun run build:npm` assembles `mcp/` and writes its version from the root manifest, so the two can never claim the same version while carrying different code. `bun run check:npm-package` packs it, installs the tarball into a throwaway project and drives the *installed* binary through a handshake — which is what `npx` does, minus the registry. Run it before publishing: a version cannot be reused, and the unpublish window is 72 hours.
 
+- **npm command line:** `bun run build:cli` bundles `src/cli/main.ts` to `cli/cli.js` and writes `cli/package.json`'s version from the root manifest. `bun run check:cli-parity` needs that and a `cargo build` of the crate, and is what the `cli-parity` job in `ci-crate.yml` runs. `bun run check:cli-package` packs `cli/`, installs the tarball into a throwaway project and runs the installed `paths-le` over a real file and through `paths-le mcp`. It publishes from its own workflow, `release-cli.yml`, because `release.yml` is fleet-shared.
+
 ## Generated documentation
 
 Two README sections are generated. Do not hand-edit the content between their markers.
@@ -320,15 +328,20 @@ push are checked, so history predating the gate is left alone.
 after the version is spent — and a version can never be republished. That is why
 this is a gate rather than a convention.
 
-The crate version is deliberately **outside** this gate — `crate/Cargo.toml`
-moves on its own cadence, and crates sitting at 0.x while the extension family
-sits at 2.x is intended.
+**Every surface carries one version, since 2.5.0.** The crate and the npm
+command line join the three files above: `crate/Cargo.toml` (and its entry in
+`crate/Cargo.lock`) and `cli/package.json` must equal `package.json`, which
+the `versions` job in `ci-crate.yml` enforces. It used to be otherwise, with
+the crate at 0.x on its own cadence, and that stopped making sense once two
+binaries named `paths-le` could print different versions for the same
+behaviour. A release ships every surface, including one that did not change,
+because skipping one is how the numbers drift apart again.
 
-1. Bump `version` in package.json and write the CHANGELOG entry. The entry must describe what actually changed, including bug fixes — it ships inside the VSIX and renders on the listing page.
+1. Bump `version` in package.json, mcp/package.json, server.json (both fields), cli/package.json and crate/Cargo.toml, and run `cargo build` in `crate/` to update the lockfile. Write the entry in CHANGELOG.md and in crate/CHANGELOG.md. The root entry must describe what actually changed, including bug fixes — it ships inside the VSIX and renders on the listing page.
 2. Regenerate the README sections (`coverage:readme`, and `perf:readme` if behaviour changed) and commit them.
-3. CI green on all three OSes. That includes lint, typecheck, coverage, the bundle gate, packaging, integration tests, and the installed-VSIX e2e.
-4. Tag the commit being released, so the tag is the artifact rather than an approximation of it.
-5. Dispatch the `Release` workflow. It takes two independent opt-ins — `marketplace` (default **on**) and `openvsx` (default **off**) — because a version cannot be republished, so a run that publishes one registry and fails on the other is only recoverable by re-running with the failed target alone. It validates credentials before doing anything irreversible.
+3. CI green on all three OSes. That includes lint, typecheck, coverage, the bundle gate, packaging, integration tests, the installed-VSIX e2e, and in `ci-crate.yml` the crate, both parity checks and the version gate.
+4. Tag the commit being released `v<version>`, so the tag is the artifact rather than an approximation of it. One tag covers every surface. Releases before 2.5.0 carried a separate `crate-v*` tag.
+5. Dispatch the release workflows from the tag, one registry per authorization: `Release` for the VSIX registries and the MCP server, `Release (crate)` for crates.io, and `Release (npm CLI)` for `paths-le` on npm. The last two dry-run unless their `publish` input is set. `Release` takes two independent opt-ins — `marketplace` (default **on**) and `openvsx` (default **off**) — because a version cannot be republished, so a run that publishes one registry and fails on the other is only recoverable by re-running with the failed target alone. It validates credentials before doing anything irreversible.
 
 **Open VSX defaults off deliberately.** `ovsx publish` takes no namespace argument; it derives the namespace from `publisher` in the VSIX. Enabling it publishes to whatever `package.json` currently names, with no confirmation.
 

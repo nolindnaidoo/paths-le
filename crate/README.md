@@ -103,9 +103,11 @@ does not get made.
 |---|---|---|
 | **cargo** | `cargo install paths-le` | Any platform, needs **Rust 1.88+**. |
 | **From source** | `git clone https://github.com/nolindnaidoo/paths-le`<br>`cd paths-le/crate && cargo build --release` | The same build CI runs. |
+| **npm** | `npm install -g paths-le` or `npx paths-le` | Needs **Node 20+**. The same command, held to this one byte for byte. |
 
-No runtime, no browser, no network — it reads files and asks the
-filesystem about them, and that is all it ever does.
+The cargo build needs no runtime. Neither one opens a browser or touches the
+network: each reads files and asks the filesystem about them, and that is all
+it ever does.
 
 ## What it reads
 
