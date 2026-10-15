@@ -7,7 +7,7 @@ this repository release on their own cadence.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - 2026-10-15
 
 ### Changed
 
@@ -405,6 +405,7 @@ inside `srcset` splitting on its own base64 commas. Each is listed in
 [SPEC.md](SPEC.md) and pinned in `fixtures/` on both sides, because
 fixing one on one side only is how two frontends stop agreeing.
 
+[0.4.0]: https://crates.io/crates/paths-le/0.4.0
 [0.3.6]: https://crates.io/crates/paths-le/0.3.6
 [0.3.5]: https://crates.io/crates/paths-le/0.3.5
 [0.3.4]: https://crates.io/crates/paths-le/0.3.4
