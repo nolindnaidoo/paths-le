@@ -22,6 +22,9 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **An `escapes-root` verdict carries no reason.** The reason repeated
   the root's absolute path on every line. The summary now names the root
   once: `23 paths in 3 files — 23 findings (root /repo)`.
+- **`--no-resolve` lists every path on stderr.** With stdout quiet at a
+  terminal, an unresolved run would otherwise show only a count, since
+  it has no findings to list.
 
 ## [0.3.6] - 2026-10-11
 

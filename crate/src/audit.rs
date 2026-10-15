@@ -242,6 +242,14 @@ pub(crate) fn exit_code(reports: &[FileReport], strict: bool) -> u8 {
     u8::from(reports.iter().any(|report| report.summary.findings > 0))
 }
 
+/// Where a path was written, and what was written there.
+pub(crate) fn position(report: &FileReport, audited: &AuditedPath) -> String {
+    format!(
+        "{}:{}:{}  {}",
+        report.file, audited.path.position.line, audited.path.position.column, audited.path.value
+    )
+}
+
 /// The one-line human projection of a single path. It says exactly what
 /// the JSON says — never prose the report does not carry.
 pub(crate) fn describe(report: &FileReport, audited: &AuditedPath) -> String {
@@ -259,10 +267,7 @@ pub(crate) fn describe(report: &FileReport, audited: &AuditedPath) -> String {
         .as_deref()
         .map(|reason| format!(" — {reason}"))
         .unwrap_or_default();
-    format!(
-        "{}:{}:{}  {}  [{verdict}{detail}]",
-        report.file, audited.path.position.line, audited.path.position.column, audited.path.value
-    )
+    format!("{}  [{verdict}{detail}]", position(report, audited))
 }
 
 #[cfg(test)]

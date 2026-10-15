@@ -121,7 +121,12 @@ fn execute(args: &[String]) -> Result<u8, String> {
     write_reports(&mut stdout.lock(), &reports, terminal)
         .map_err(|error| format!("could not write the report: {error}"))?;
 
-    summarise(&reports, options.resolve.then_some(root.as_path()), binary);
+    summarise(
+        &mut std::io::stderr().lock(),
+        &reports,
+        options.resolve.then_some(root.as_path()),
+        binary,
+    );
     Ok(audit::exit_code(&reports, options.strict))
 }
 
@@ -316,8 +321,11 @@ fn parse(args: &[String]) -> Result<Options, String> {
 /// JSON — a summary that says more than the report would be a second
 /// source of truth. The one addition is the root, named once, because
 /// every location in the report is spelled relative to it.
-fn summarise(reports: &[FileReport], root: Option<&Path>, binary: usize) {
-    let mut stderr = std::io::stderr().lock();
+///
+/// A resolved run lists its findings. An unresolved run can have none,
+/// so it lists every path instead: `--no-resolve` is how a person asks
+/// what a document mentions, and a bare count does not answer that.
+fn summarise(stderr: &mut impl Write, reports: &[FileReport], root: Option<&Path>, binary: usize) {
     let mut findings = 0;
     let mut paths = 0;
 
@@ -327,6 +335,10 @@ fn summarise(reports: &[FileReport], root: Option<&Path>, binary: usize) {
             let _ = writeln!(stderr, "{}: {}", report.file, diagnostic.message);
         }
         for audited in &report.paths {
+            if root.is_none() {
+                let _ = writeln!(stderr, "{}", audit::position(report, audited));
+                continue;
+            }
             if !audited.resolution.verdict.is_finding(true) {
                 continue;
             }
@@ -402,6 +414,31 @@ mod tests {
     }
 
     /// The summary on stderr already covers a person at a terminal.
+    #[test]
+    fn an_unresolved_run_lists_every_path() {
+        let tree = TempTree::new("cli-unresolved");
+        let reports = sample_reports(&tree);
+        let mut err = Vec::new();
+        summarise(&mut err, &reports, None, 0);
+        let text = String::from_utf8(err).expect("utf-8");
+        assert!(text.contains("a.ts:1:9  ./gone.ts\n"), "{text}");
+        assert!(
+            text.ends_with("1 path in 1 file — not resolved\n"),
+            "{text}"
+        );
+    }
+
+    #[test]
+    fn a_resolved_run_lists_findings_and_names_the_root_once() {
+        let tree = TempTree::new("cli-resolved");
+        let reports = sample_reports(&tree);
+        let mut err = Vec::new();
+        summarise(&mut err, &reports, Some(Path::new("/repo")), 0);
+        let text = String::from_utf8(err).expect("utf-8");
+        assert!(text.contains("./gone.ts  [missing"), "{text}");
+        assert_eq!(text.matches("/repo").count(), 1, "{text}");
+    }
+
     #[test]
     fn a_terminal_gets_no_json() {
         let tree = TempTree::new("cli-terminal");
