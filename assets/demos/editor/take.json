@@ -1,0 +1,16 @@
+{
+  "files": [
+    "deploy.yaml"
+  ],
+  "steps": [
+    {
+      "wait": 1500
+    },
+    {
+      "command": "Paths-LE: Extract Paths"
+    },
+    {
+      "wait": 5000
+    }
+  ]
+}
