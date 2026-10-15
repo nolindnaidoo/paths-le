@@ -1,11 +1,22 @@
 # Changelog
 
-The Rust CLI and MCP server. The VS Code extension has its own
-[CHANGELOG](../CHANGELOG.md) and its own version — the two products in
-this repository release on their own cadence.
+The Rust CLI and MCP server. The VS Code extension, the npm MCP server
+and the npm command line have their own [CHANGELOG](../CHANGELOG.md).
+Up to 0.4.0 the crate was versioned on its own. From 2.5.0 every surface
+in this repository carries one version and releases from one tag.
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.5.0] - 2026-10-15
+
+### Changed
+
+- **The version jumps from 0.4.0 to 2.5.0** to match the extension and
+  the npm command line `paths-le`, which installs the same command and
+  is held to this one byte for byte. Two binaries called `paths-le`
+  printing different versions for the same behaviour would mislead
+  anyone comparing them. Nothing else changes in this release.
 
 ## [0.4.0] - 2026-10-15
 

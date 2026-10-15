@@ -5,11 +5,28 @@ All notable changes to Paths-LE will be documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-This file covers the **VS Code extension**. The Rust CLI in `crate/` is a
-separate product on its own cadence and keeps its own
-[CHANGELOG](crate/CHANGELOG.md).
+This file covers the **VS Code extension**, the npm MCP server and the
+npm command line. The Rust CLI in `crate/` keeps its own
+[CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
+version and releases from one tag.
 
-## [Unreleased]
+## [2.5.0] - 2026-10-15
+
+### Changed
+
+- **One version for every surface.** The extension, the MCP server on
+  npm, the new npm command line and the Rust crate all release as 2.5.0
+  from the tag `v2.5.0`. The crate jumps from 0.4.0 to join them, and CI
+  now fails a commit where any of them disagree.
+
+### Added
+
+- An npm command line, `paths-le`, built in `cli/` from `src/cli/`. It is
+  the Rust CLI's surface over this extension's extraction engine: the same
+  flags, walk, root, verdicts, exit codes, JSON Lines and stderr summary,
+  and `paths-le mcp` serves the same two tools. `scripts/check-cli-parity.ts`
+  runs both binaries over one tree and fails on any byte of difference.
+  It is published as `paths-le` on npm, beside `paths-le-mcp`.
 
 ### Fixed
 

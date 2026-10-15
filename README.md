@@ -51,7 +51,7 @@ Open a file, run `Paths-LE: Extract Paths`, and every file path in the document 
 |---|---|---|
 | **VS Code** | The extraction, in your editor, on a keystroke | [Marketplace](https://marketplace.visualstudio.com/items?itemName=nolindnaidoo.paths-le) |
 | **Cursor, VSCodium, Windsurf** | The same extension | [Open VSX](https://open-vsx.org/extension/nolindnaidoo/paths-le) |
-| **A terminal or a CI step** | The same run over a whole tree, with exit codes | `cargo install paths-le` · [crates.io](https://crates.io/crates/paths-le) |
+| **A terminal or a CI step** | The same run over a whole tree, with exit codes | `npx paths-le` · [npm](https://www.npmjs.com/package/paths-le) or `cargo install paths-le` · [crates.io](https://crates.io/crates/paths-le) |
 | **Any MCP agent, via Node** | `extract_paths` over stdio — the same tool this binary offers | `npx paths-le-mcp` · [npm](https://www.npmjs.com/package/paths-le-mcp) |
 
 ## Use it from an AI agent
@@ -206,7 +206,9 @@ The settings that shape a scan are under [Settings](#settings).
 The same extraction runs from a terminal or an agent loop: a Rust CLI in
 [`crate/`](crate/) of this repository, sharing one corpus with the extension —
 [`crate/fixtures/`](crate/fixtures/) — so CI fails if the two ever read a
-document differently.
+document differently. Install it from npm with `npm install -g paths-le` (or
+run it with `npx paths-le`) or from crates.io with `cargo install paths-le`.
+Both install the same command and are held to the same output byte for byte.
 
 It also does the half an editor cannot: **resolve what it found against the
 filesystem it is standing in.** Every path gets a verdict — exists, missing,
@@ -339,12 +341,12 @@ a build only tells you how busy the runner was.
 <!-- coverage:start -->
 | Metric | Coverage |
 | --- | --- |
-| Statements | 95.53% |
-| Branches | 89.06% |
-| Functions | 98.75% |
-| Lines | 96.64% |
+| Statements | 91.63% |
+| Branches | 84.19% |
+| Functions | 94.90% |
+| Lines | 94.03% |
 
-484 test cases across 34 files, plus an integration suite that runs
+515 test cases across 35 files, plus an integration suite that runs
 in a real VS Code extension host and an end-to-end test that installs the
 built `.vsix` into a clean profile.
 
