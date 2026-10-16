@@ -31,8 +31,15 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const ROOT = join(import.meta.dir, '..');
-const RUST = process.env.PATHS_LE_BIN ?? join(ROOT, 'crate', 'target', 'debug', 'paths-le');
+const RUST =
+	process.env.PATHS_LE_BIN ??
+	join(ROOT, 'crate', 'target', 'debug', `paths-le${process.platform === 'win32' ? '.exe' : ''}`);
 const NODE_CLI = join(ROOT, 'cli', 'cli.js');
+/**
+ * Node, by name, not `process.execPath`: this script runs under Bun, and the
+ * package is run by Node wherever `npx` runs it. Bun's errors are not Node's.
+ */
+const NODE = process.env.NODE_BIN ?? 'node';
 
 interface Case {
 	readonly args: readonly string[];
@@ -70,7 +77,13 @@ function file(relative: string, content: string | Buffer): void {
 }
 
 function link(relative: string, target: string): void {
-	symlinkSync(target, join(tree, relative));
+	// Windows grants symlinks to administrators and developer mode only, and
+	// both binaries then see the same tree without the link.
+	try {
+		symlinkSync(target, join(tree, relative));
+	} catch {
+		return;
+	}
 	created.push(join(tree, relative));
 }
 
@@ -271,6 +284,7 @@ function cases(): readonly Case[] {
 		{ args: [join(tree, 'dead'), '--follow-symlinks'] },
 		{ args: [join(tree, 'closed')] },
 		{ args: [join(tree, 'missing')] },
+		{ args: [join(tree, 'no', 'such', 'place')] },
 		{ args: [repo, '--stict'] },
 		{ args: [repo, '--help'] },
 		{ args: [repo, '-'] },
@@ -309,7 +323,7 @@ function compareCli(): string[] {
 	const failures: string[] = [];
 	for (const testCase of cases()) {
 		const rust = runOne([RUST], testCase);
-		const node = runOne([process.execPath, NODE_CLI], testCase);
+		const node = runOne([NODE, NODE_CLI], testCase);
 		for (const field of ['status', 'stdout', 'stderr'] as const) {
 			if (rust[field] === node[field]) continue;
 			failures.push(
@@ -385,7 +399,7 @@ function compareMcp(): string[] {
 	const list = { jsonrpc: '2.0', id: 0, method: 'tools/list', params: {} };
 	const requests = [list, ...mcpRequests()];
 	const rust = serve([RUST], requests) as Record<string, unknown>[];
-	const node = serve([process.execPath, NODE_CLI], requests) as Record<string, unknown>[];
+	const node = serve([NODE, NODE_CLI], requests) as Record<string, unknown>[];
 	// By id, not by line: the npm server answers each call as it finishes,
 	// which JSON-RPC allows, so its replies need not arrive in request order.
 	const byId = (replies: Record<string, unknown>[], id: unknown) =>
