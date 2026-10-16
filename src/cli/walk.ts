@@ -8,7 +8,13 @@
  * the way Rust sorts a `PathBuf`, by component, so a report's lines are in the
  * same order from either binary and do not move between two runs.
  */
-import { type Dirent, readdirSync, type Stats, statSync } from 'node:fs';
+import {
+	type Dirent,
+	readdirSync,
+	realpathSync,
+	type Stats,
+	statSync,
+} from 'node:fs';
 import { dirname, resolve, sep } from 'node:path';
 import { resolveFormat } from '../mcp/fileType';
 import {
@@ -43,8 +49,7 @@ export interface Target {
 
 interface Ancestor {
 	readonly shown: string;
-	readonly dev: number;
-	readonly ino: number;
+	readonly key: string;
 }
 
 interface Walk {
@@ -97,7 +102,7 @@ function walkDirectory(root: string, options: WalkOptions): readonly string[] {
 		files: [],
 	};
 	const ancestors = options.followSymlinks
-		? [identity(root, statSync(absolute))]
+		? [identity(root, statSync(absolute), absolute)]
 		: [];
 	visit(walk, root, absolute, parentRules(absolute, options), ancestors);
 	return walk.files;
@@ -165,7 +170,10 @@ function visitEntry(
 		return;
 	}
 	const below = walk.options.followSymlinks
-		? [...ancestors, identity(shown, followed.stats ?? statSync(absolute))]
+		? [
+				...ancestors,
+				identity(shown, followed.stats ?? statSync(absolute), absolute),
+			]
 		: ancestors;
 	visit(walk, shown, absolute, chain, below);
 }
@@ -194,11 +202,10 @@ function followedKind(
 	}
 	if (stats.isFile()) return { kind: 'file', stats };
 	if (!stats.isDirectory()) return null;
+	const target = identity(shown, stats, absolute);
 	const loop = [...ancestors]
 		.reverse()
-		.find(
-			(ancestor) => ancestor.dev === stats.dev && ancestor.ino === stats.ino,
-		);
+		.find((ancestor) => ancestor.key === target.key);
 	if (loop) {
 		throw new Error(
 			`${walk.root}: File system loop found: ${shown} points to an ancestor ${loop.shown}`,
@@ -207,8 +214,18 @@ function followedKind(
 	return { kind: 'dir', stats };
 }
 
-function identity(shown: string, stats: Stats): Ancestor {
-	return Object.freeze({ shown, dev: stats.dev, ino: stats.ino });
+/**
+ * What walkdir compares to find a loop: the device and file number. Windows
+ * gives a directory a different `ino` reached directly than reached through
+ * a link to it, so a loop went unseen for a level there. Its resolved real
+ * path names the directory instead, case-insensitively as the volume does.
+ */
+function identity(shown: string, stats: Stats, absolute: string): Ancestor {
+	const key =
+		process.platform === 'win32'
+			? realpathSync.native(absolute).toLowerCase()
+			: `${stats.dev}:${stats.ino}`;
+	return Object.freeze({ shown, key });
 }
 
 function entriesOf(

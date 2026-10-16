@@ -63,10 +63,23 @@ export function isAbsolute(path: string): boolean {
 
 /** `base.join(value)`, then `.` and `..` resolved without touching the disk. */
 export function joinNormalised(base: string, value: string): string[] {
-	const joined = isAbsolute(value)
-		? components(value)
-		: [...components(base), ...components(value)];
-	return lexicalNormalise(joined);
+	return lexicalNormalise(joined(base, value));
+}
+
+/**
+ * `PathBuf::push`. On Windows a value can be half absolute: a drive with no
+ * root replaces the base outright, and a root with no drive keeps the base's
+ * drive and replaces the rest, so `/etc/hosts` lands at `C:\etc\hosts`.
+ */
+function joined(base: string, value: string): string[] {
+	const parts = components(value);
+	if (isAbsolute(value)) return parts;
+	if (WINDOWS && DRIVE.test(parts[0] ?? '')) return parts;
+	if (WINDOWS && parts[0] === ROOT_DIR) {
+		const drive = components(base)[0] ?? '';
+		return DRIVE.test(drive) ? [drive, ...parts] : parts;
+	}
+	return [...components(base), ...parts];
 }
 
 export function lexicalNormalise(parts: readonly string[]): string[] {
