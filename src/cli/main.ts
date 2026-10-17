@@ -6,7 +6,7 @@ import { name, version } from '../mcp/info';
 import { TOOLS } from '../mcp/tools';
 import { serve } from '../mcp/transport';
 import { AUDIT_TOOL } from './auditTool';
-import { exitWhenDrained } from './exit';
+import { crateOutput } from './output';
 import { run } from './run';
 
 async function readStdin(): Promise<Uint8Array> {
@@ -16,18 +16,21 @@ async function readStdin(): Promise<Uint8Array> {
 }
 
 function main(args: readonly string[]): void {
+	const output = crateOutput(name);
 	if (args[0] === 'mcp') {
+		// The crate's server stops at the first reply it cannot write.
+		process.stdout.once('error', () => output.exit(2, null));
 		serve({ name, version }, [...TOOLS, AUDIT_TOOL]);
 		return;
 	}
 	run(args, {
-		stdout: (text) => process.stdout.write(text),
-		stderr: (text) => process.stderr.write(text),
+		stdout: output.stdout,
+		stderr: output.stderr,
 		stdoutIsTerminal: process.stdout.isTTY === true,
 		readStdin,
 		cwd: process.cwd(),
 		version,
-	}).then(exitWhenDrained);
+	}).then((code) => output.exit(code, 'could not write the report'));
 }
 
 main(process.argv.slice(2));

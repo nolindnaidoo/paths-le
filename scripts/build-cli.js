@@ -16,12 +16,14 @@ const prod = process.argv.includes('--prod');
 const manifestPath = path.resolve('cli/package.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
-// The npm package installs the command the crate installs, under the same
-// name. A manifest naming anything else would publish a second
-// command nobody documented.
-if (manifest.name !== root.name || manifest.bin?.[root.name] !== 'cli.js') {
+// The npm package installs the command `paths-le`, the name the crate
+// installs too. A manifest naming anything else would publish a second
+// command nobody documented. The package name can differ, since npm decides
+// which names it accepts, and check-cli-package.js holds the READMEs to it.
+const commands = Object.keys(manifest.bin ?? {});
+if (commands.length !== 1 || manifest.bin[root.name] !== 'cli.js') {
 	console.error(
-		`FAIL: cli/package.json must be named "${root.name}" with bin "${root.name}": "cli.js"`,
+		`FAIL: cli/package.json must install exactly one command, "${root.name}": "cli.js"`,
 	);
 	process.exit(1);
 }
@@ -35,6 +37,11 @@ const args = [
 	'--target=node20',
 	'--main-fields=module,main',
 	'--banner:js=#!/usr/bin/env node',
+	// stderr is the crate's listing and summary and nothing else, so nothing
+	// the engine warns on the console is part of this build: console.warn is
+	// marked pure, and dropped by the syntax pass even in a development build.
+	'--pure:console.warn',
+	'--minify-syntax',
 	`--define:__MCP_NAME__=${JSON.stringify(root.name)}`,
 	`--define:__MCP_VERSION__=${JSON.stringify(root.version)}`,
 	...(prod ? ['--minify'] : []),

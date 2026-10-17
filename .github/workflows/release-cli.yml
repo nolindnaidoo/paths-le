@@ -1,7 +1,8 @@
-# Publishes the npm command line `paths-le` from cli/. Its own workflow
-# rather than a job in release.yml, because release.yml is byte-identical
-# across the *-le repos (letools-site's fleet check) and only this repo
-# and colors-le have a command line on npm so far.
+# Publishes the npm command line from cli/, under the package name in
+# cli/package.json, which installs the command `paths-le`.
+# Its own workflow rather than a job in release.yml, because release.yml
+# is byte-identical across the *-le repos (letools-site's fleet check)
+# and not every one of them has a command line on npm.
 #
 # Dispatch-only, like the other release workflows: a tag push must not be
 # able to spend a version by itself, because an npm version can never be
@@ -12,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: Publish paths-le to npm (off runs the full dry run only)
+        description: Publish the cli/ package to npm (off runs the full dry run only)
         type: boolean
         default: false
 
@@ -68,11 +69,12 @@ jobs:
         run: |
           set -euo pipefail
           version=$(node -p "require('./package.json').version")
-          if npm view "paths-le@$version" version >/dev/null 2>&1; then
-            echo "::error::paths-le@$version is already published; bump the version first."
+          package=$(node -p "require('./cli/package.json').name")
+          if npm view "$package@$version" version >/dev/null 2>&1; then
+            echo "::error::$package@$version is already published; bump the version first."
             exit 1
           fi
-          echo "paths-le@$version is unpublished"
+          echo "$package@$version is unpublished"
 
       - run: bun run typecheck
       - run: bun run test
@@ -84,6 +86,7 @@ jobs:
       - run: cargo build --locked
         working-directory: crate
       - run: bun run check:cli-parity
+      - run: bun run check:cli-pipes
 
   publish:
     needs: preflight
