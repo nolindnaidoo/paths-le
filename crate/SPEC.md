@@ -127,12 +127,11 @@ do this identically.
 
 #### YAML
 
-`saphyr` here, `js-yaml` in the extension. **Positions come from a
-forward-moving text search, not from either parser**, exactly as TOML's
-do — a position taken from `saphyr`'s markers would disagree with
-`js-yaml`, which has no equivalent, on every quoted, folded or anchored
-scalar. So the two parsers only have to agree on the values and their
-order, which is what the corpus checks.
+`saphyr` here, and in the extension a transcription of it
+(`src/parsers/yaml/`). **Positions come from a forward-moving text
+search, not from the parser**, exactly as TOML's do, so a value is
+placed the same way on both sides; the corpus checks the values, their
+order and their positions.
 
 Keys count as well as values, as TOML's do: a mapping keyed by path is
 ordinary in a config map or a compose file. An alias expands to its
@@ -199,7 +198,7 @@ These are the extension's current answers, pinned by
 - **dotenv emits twice** for a line whose key is itself path-like: once
   for the value, once for the key, value first.
 - **TOML positions come from a forward-moving text search**, not from the
-  parser, because `@iarna/toml` exposes no offsets. Repeated identical
+  parser, because `toml::Value` carries no offsets. Repeated identical
   values resolve to successive occurrences; a value that cannot be
   located falls back to 1:1.
 - **JavaScript extraction is regex over module specifiers**, not an AST
@@ -246,10 +245,9 @@ These are the extension's current answers, pinned by
   outcome this tool may never produce.
 
 - **A JSON, TOML or YAML document that does not parse is refused the same
-  way.** The parsers behind the three readers differ on each side
-  (`jsonc_parser` and `jsonc-parser`, `toml` and `@iarna/toml`, `saphyr`
-  and `js-yaml`), so the message names no position, which the two would
-  not agree on, and only the fact:
+  way.** Both sides read with the same parsers — `jsonc_parser`, `toml`
+  and `saphyr` here, transcriptions of them in the extension's
+  `src/parsers/` — and the message states only the fact:
 
   ```
   Invalid JSON: the document does not parse
@@ -258,13 +256,10 @@ These are the extension's current answers, pinned by
   ```
 
   A JSON document holding comments and nothing else has no value and is
-  empty, not broken, on both sides. What the parsers *accept* differs in
-  two known places and is recorded rather than pinned: `@iarna/toml` reads
-  TOML 0.5 and refuses a mixed-type array that `toml` (1.0) reads, and
-  `js-yaml` refuses a duplicate key, a complex key and an invalid
-  `!!binary` payload that `saphyr` reads. A document in one of those
-  shapes is refused by the extension and read by this crate until the
-  parsers agree.
+  empty, not broken, on both sides. What the parsers accept is the same
+  on both sides too: a mixed-type TOML array, a repeated or complex YAML
+  key and an invalid `!!binary` payload, once refused by the extension's
+  npm parsers, are read by both.
 
 - **A document nested deeper than its parser can follow is refused
   before it is parsed.** Every parser here recurses; a document nested

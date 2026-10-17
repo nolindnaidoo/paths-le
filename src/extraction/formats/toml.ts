@@ -1,4 +1,4 @@
-import { parse } from '@iarna/toml';
+import { loadToml, type TomlValue } from '../../parsers/toml/load';
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
@@ -21,10 +21,9 @@ export function extractFromToml(content: string): Extracted {
 	if (content.trim().length === 0) return { paths: [] };
 	if (nestsTooDeep(content, 'TOML')) return { refusal: tooDeep('TOML') };
 
-	let parsed: unknown;
-	try {
-		parsed = parse(content);
-	} catch (_error) {
+	// toml 1.1 at preserve_order, as the crate reads it.
+	const parsed = loadToml(content);
+	if (typeof parsed === 'string') {
 		return { refusal: 'Invalid TOML: the document does not parse' };
 	}
 
@@ -35,41 +34,36 @@ export function extractFromToml(content: string): Extracted {
 }
 
 function walk(
-	obj: unknown,
+	value: TomlValue,
 	paths: Path[],
 	locate: (value: string) => { line: number; column: number },
 ): void {
-	if (typeof obj === 'string') {
-		if (isPathLike(obj)) {
+	if (value.type === 'string') {
+		if (isPathLike(value.text)) {
 			paths.push({
-				value: obj,
-				type: classifyPathType(obj),
-				position: locate(obj),
+				value: value.text,
+				type: classifyPathType(value.text),
+				position: locate(value.text),
 				context: 'TOML value',
 			});
 		}
 		return;
 	}
-
-	if (Array.isArray(obj)) {
-		for (const item of obj) {
-			walk(item, paths, locate);
-		}
+	if (value.type === 'array') {
+		for (const item of value.items) walk(item, paths, locate);
 		return;
 	}
-
-	if (obj && typeof obj === 'object') {
-		for (const [key, value] of Object.entries(obj)) {
-			if (isPathLike(key)) {
-				paths.push({
-					value: key,
-					type: classifyPathType(key),
-					position: locate(key),
-					context: 'TOML key',
-				});
-			}
-			walk(value, paths, locate);
+	if (value.type !== 'table') return;
+	for (const [key, item] of value.entries) {
+		if (isPathLike(key)) {
+			paths.push({
+				value: key,
+				type: classifyPathType(key),
+				position: locate(key),
+				context: 'TOML key',
+			});
 		}
+		walk(item, paths, locate);
 	}
 }
 

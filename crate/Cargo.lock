@@ -212,7 +212,7 @@ dependencies = [
 
 [[package]]
 name = "paths-le"
-version = "2.5.4"
+version = "2.6.0"
 dependencies = [
  "fancy-regex",
  "ignore",

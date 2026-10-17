@@ -153,6 +153,11 @@ function build(): void {
 	file('repo/style.css', '.a{background:url("./logo.png")}\n.b{background:url(../gone.png)}\n');
 	file('repo/bad.json', '{ "a": "./src/index.ts", \n');
 	file('repo/bad.toml', 'a = \n');
+	// Shapes the extension's npm parsers once refused and the crate's read.
+	file('repo/dup.yaml', 'a: ./one.ts\na: ./two.ts\n1: ./three.ts\n');
+	file('repo/complex.yaml', '? [k]\n: ./complex.ts\n');
+	file('repo/binary.yaml', 'a: !!binary "@@"\nb: ./after.ts\n');
+	file('repo/mixed.toml', 'a = ["./mixed.ts", 1, 2.5]\n');
 	file('repo/bad.csv', 'a,"b\n');
 	file('repo/logo.png', Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x1a, 0x0a]));
 	file('repo/latin1.json', Buffer.from([0x7b, 0x22, 0xe9, 0x22, 0x7d, 0x0a]));

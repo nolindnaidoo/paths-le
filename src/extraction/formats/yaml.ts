@@ -1,4 +1,4 @@
-import * as yaml from 'js-yaml';
+import { loadYaml, type YamlNode } from '../../parsers/yaml/load';
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
@@ -29,12 +29,9 @@ import { nestsTooDeep, tooDeep } from './nesting';
 export function extractFromYaml(content: string): Extracted {
 	if (nestsTooDeep(content, 'YAML')) return { refusal: tooDeep('YAML') };
 
-	let documents: readonly unknown[];
-	try {
-		// loadAll handles both a single document and a `---`-separated stream;
-		// load() rejects the latter outright.
-		documents = yaml.loadAll(content);
-	} catch (_error) {
+	// saphyr 0.1, every document of a stream, as the crate reads it.
+	const documents = loadYaml(content);
+	if (typeof documents === 'string') {
 		return { refusal: 'Invalid YAML: the document does not parse' };
 	}
 
@@ -46,29 +43,23 @@ export function extractFromYaml(content: string): Extracted {
 	return { paths };
 }
 
+/** A string scalar is a candidate, and so is a mapping's string key. */
 function walk(
-	node: unknown,
+	node: YamlNode,
 	paths: Path[],
 	locate: (value: string) => { line: number; column: number },
 ): void {
-	if (typeof node === 'string') {
-		claim(node, 'YAML value', paths, locate);
+	if (node.k === 'str') {
+		claim(node.v, 'YAML value', paths, locate);
 		return;
 	}
-
-	if (Array.isArray(node)) {
-		for (const item of node) {
-			walk(item, paths, locate);
-		}
+	if (node.k === 'seq') {
+		for (const item of node.items) walk(item, paths, locate);
 		return;
 	}
-
-	// Numbers, booleans, nulls and dates are not strings, so there is no path
-	// in them.
-	if (!node || typeof node !== 'object') return;
-
-	for (const [key, value] of Object.entries(node)) {
-		claim(key, 'YAML key', paths, locate);
+	if (node.k !== 'map') return;
+	for (const { key, value } of node.entries.values()) {
+		if (key.k === 'str') claim(key.v, 'YAML key', paths, locate);
 		walk(value, paths, locate);
 	}
 }

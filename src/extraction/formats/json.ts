@@ -1,10 +1,4 @@
-import {
-	type Node,
-	type ParseError,
-	ParseErrorCode,
-	parseTree,
-	stripComments,
-} from 'jsonc-parser';
+import { JsoncError, type JsonValue, parseJsonc } from '../../parsers/jsonc';
 import type { Extracted, Path } from '../../types';
 import { classifyPathType, isPathLike } from '../heuristics';
 import { createPositionIndex, type PositionIndex } from '../position';
@@ -28,27 +22,16 @@ export function extractFromJson(content: string): Extracted {
 	if (content.trim().length === 0) return { paths: [] };
 	if (nestsTooDeep(content, 'JSON')) return { refusal: tooDeep('JSON') };
 
-	const errors: ParseError[] = [];
-	const root = parseTree(content, errors, {
-		allowTrailingComma: true,
-		disallowComments: false,
-	});
-	// Comments and nothing else is a document with no value in it, not a
-	// broken one: the crate's parser answers "no value" and this one reports
-	// the value it expected. Both read it as empty. A stray `}` also reports
-	// a value expected, so the text has to be comments and whitespace as well;
-	// an unterminated comment reports more than that and stays refused.
-	if (
-		!root &&
-		stripComments(content).trim().length === 0 &&
-		errors.every((e) => e.error === ParseErrorCode.ValueExpected)
-	) {
-		return { paths: [] };
-	}
-	if (errors.length > 0) {
+	// jsonc-parser 0.33 with comments and trailing commas, as the crate reads
+	// it: a document of comments alone has no value, and is empty.
+	let root: JsonValue | undefined;
+	try {
+		root = parseJsonc(content, true);
+	} catch (error) {
+		if (!(error instanceof JsoncError)) throw error;
 		return { refusal: 'Invalid JSON: the document does not parse' };
 	}
-	if (!root) return { paths: [] };
+	if (root === undefined) return { paths: [] };
 
 	const toPosition = createPositionIndex(content);
 	const paths: Path[] = [];
@@ -57,19 +40,19 @@ export function extractFromJson(content: string): Extracted {
 }
 
 function visitNode(
-	node: Node,
+	node: JsonValue,
 	keyPath: string[],
 	paths: Path[],
 	toPosition: PositionIndex,
 ): void {
-	if (node.type === 'string' && typeof node.value === 'string') {
+	if (node.type === 'string') {
 		const value = node.value;
 		if (isPathLike(value)) {
 			paths.push({
 				value,
 				type: classifyPathType(value),
 				// +1 skips the opening quote so the position points at the path
-				position: toPosition(node.offset + 1),
+				position: toPosition(node.start + 1),
 				context: `JSON ${keyPath.length > 0 ? keyPath.join('.') : 'value'}`,
 			});
 		}
@@ -77,18 +60,15 @@ function visitNode(
 	}
 
 	if (node.type === 'array') {
-		node.children?.forEach((child, index) => {
+		node.elements.forEach((child, index) => {
 			visitNode(child, [...keyPath, `[${index}]`], paths, toPosition);
 		});
 		return;
 	}
 
 	if (node.type === 'object') {
-		for (const property of node.children ?? []) {
-			const [keyNode, valueNode] = property.children ?? [];
-			if (!keyNode || !valueNode) continue;
-			const key = typeof keyNode.value === 'string' ? keyNode.value : '';
-			visitNode(valueNode, [...keyPath, key], paths, toPosition);
+		for (const property of node.properties) {
+			visitNode(property.value, [...keyPath, property.name], paths, toPosition);
 		}
 	}
 }
