@@ -17,6 +17,9 @@
   <a href="https://www.npmjs.com/package/paths-le-mcp">
     <img src="https://img.shields.io/npm/v/paths-le-mcp?style=for-the-badge&label=MCP%20server&color=blue&logo=npm" alt="paths-le-mcp on npm" />
   </a>
+  <a href="https://www.npmjs.com/package/paths-le">
+    <img src="https://img.shields.io/npm/v/paths-le?style=for-the-badge&label=npm%20CLI&color=blue&logo=npm" alt="paths-le on npm" />
+  </a>
   <a href="https://crates.io/crates/paths-le">
     <img src="https://img.shields.io/crates/v/paths-le?style=for-the-badge&label=Rust%20CLI&color=blue&logo=rust" alt="paths-le on crates.io" />
   </a>
@@ -217,6 +220,22 @@ escapes the audited tree, non-canonical, or a symlink with its target named.
 <p align="center">
   <img src="assets/demos/cli.gif" alt="paths-le in a terminal" style="max-width: 100%; height: auto;" />
 </p>
+
+**Install it from npm** ([`paths-le`](https://www.npmjs.com/package/paths-le)) **or from crates.io** ([`paths-le`](https://crates.io/crates/paths-le)). Both install the same `paths-le` command.
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/paths-le">
+    <img src="https://img.shields.io/npm/v/paths-le?style=for-the-badge&label=npm%20CLI&color=blue&logo=npm" alt="paths-le on npm" />
+  </a>
+  <a href="https://crates.io/crates/paths-le">
+    <img src="https://img.shields.io/crates/v/paths-le?style=for-the-badge&label=Rust%20CLI&color=blue&logo=rust" alt="paths-le on crates.io" />
+  </a>
+</p>
+
+```bash
+npm install -g paths-le   # or run it once: npx paths-le
+cargo install paths-le
+```
 
 ```bash
 paths-le .                    # audit a tree; summary on stderr, JSON on stdout when piped
