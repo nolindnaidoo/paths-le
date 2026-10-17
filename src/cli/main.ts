@@ -6,20 +6,13 @@ import { name, version } from '../mcp/info';
 import { TOOLS } from '../mcp/tools';
 import { serve } from '../mcp/transport';
 import { AUDIT_TOOL } from './auditTool';
+import { exitWhenDrained } from './exit';
 import { run } from './run';
 
 async function readStdin(): Promise<Uint8Array> {
 	const chunks: Buffer[] = [];
 	for await (const chunk of process.stdin) chunks.push(Buffer.from(chunk));
 	return Buffer.concat(chunks);
-}
-
-/**
- * Waits for stdout to drain before exiting: `process.exit` on a pipe can cut
- * off the reports still buffered, and a truncated JSON line is worse than none.
- */
-function exitWith(code: number): void {
-	process.stdout.write('', () => process.exit(code));
 }
 
 function main(args: readonly string[]): void {
@@ -34,7 +27,7 @@ function main(args: readonly string[]): void {
 		readStdin,
 		cwd: process.cwd(),
 		version,
-	}).then(exitWith);
+	}).then(exitWhenDrained);
 }
 
 main(process.argv.slice(2));
