@@ -3,7 +3,7 @@
 	"publisher": "nolindnaidoo",
 	"displayName": "Paths-LE",
 	"description": "Extract every file path in a codebase, and say whether it still points at anything",
-	"version": "2.5.4",
+	"version": "2.6.0",
 	"license": "MIT",
 	"author": {
 		"name": "nolindnaidoo",
@@ -391,9 +391,5 @@
 		"typescript": "^7.0.2",
 		"vitest": "^4.1.11"
 	},
-	"dependencies": {
-		"@iarna/toml": "^2.2.5",
-		"js-yaml": "^5.4.2",
-		"jsonc-parser": "^3.3.1"
-	}
+	"dependencies": {}
 }

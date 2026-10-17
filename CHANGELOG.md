@@ -10,6 +10,23 @@ npm command line. The Rust CLI in `crate/` keeps its own
 [CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
 version and releases from one tag.
 
+## [2.6.0] - 2026-10-17
+
+### Fixed
+
+- **JSON, YAML and TOML now parse exactly as the Rust crate does.** The
+  extension, the npm MCP server and the npm command line read them with
+  npm's `jsonc-parser`, js-yaml and `@iarna/toml`, which refuse documents
+  the crate reads. They now read with transcriptions of the crate's own
+  parsers in `src/parsers/`, shared with units-le. Documents that used to
+  be refused and now yield their paths, as the crate's always did:
+  - a YAML file indented with a tab before a sequence entry,
+  - a YAML mapping with a repeated or a complex key, or an invalid
+    `!!binary` payload,
+  - a TOML array that mixes types.
+- The CLI parity tree holds each of those shapes, so the two parsers are
+  compared on them from now on.
+
 ## [2.5.4] - 2026-10-17
 
 ### Fixed

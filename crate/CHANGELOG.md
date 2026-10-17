@@ -8,6 +8,14 @@ in this repository carries one version and releases from one tag.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-10-17
+
+### Changed
+
+- SPEC.md no longer records parsers that accept different documents: the
+  extension now reads JSON, YAML and TOML with transcriptions of this
+  crate's parsers. No behaviour of this crate changed.
+
 ## [2.5.4] - 2026-10-17
 
 ### Changed
