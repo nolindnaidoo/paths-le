@@ -10,11 +10,19 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.6.0] - 2026-10-17
 
+### Fixed
+
+- **An MCP frame that is not UTF-8 is dropped, and the server reads on.**
+  `mcp` ended the session with exit 2 on one, so a client lost every
+  request after it. It is now treated like a frame that is not JSON: it
+  carries no id to answer, so nothing is sent and the next frame is
+  served.
+
 ### Changed
 
 - SPEC.md no longer records parsers that accept different documents: the
   extension now reads JSON, YAML and TOML with transcriptions of this
-  crate's parsers. No behaviour of this crate changed.
+  crate's parsers. Nothing this crate extracts changed.
 
 ## [2.5.4] - 2026-10-17
 
