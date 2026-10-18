@@ -10,6 +10,18 @@ npm command line. The Rust CLI in `crate/` keeps its own
 [CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
 version and releases from one tag.
 
+## [Unreleased]
+
+### Changed
+
+- **The listing carries the words people search for.** Open VSX ranks a
+  match in the name five times a match in the description, and "Paths-LE"
+  holds "paths" but not "path", which Open VSX does not match to it, so a
+  search for "path" put it 41st on 2026-10-18. The name is "Paths-LE: File
+  Path Checker", the description opens with "File path checker", where a
+  card has room for about forty characters, and the keywords are cut from 34
+  to 9 phrases someone would search for.
+
 ## [2.6.0] - 2026-10-17
 
 ### Fixed
