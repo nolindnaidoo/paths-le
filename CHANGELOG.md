@@ -10,6 +10,17 @@ npm command line. The Rust CLI in `crate/` keeps its own
 [CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
 version and releases from one tag.
 
+## [Unreleased]
+
+### Changed
+
+- **Activates once the window has started, instead of on 28 language
+  IDs.** vsce publishes every `onLanguage:` activation event as a marketplace
+  tag, and Open VSX scores tags, so 28 language names diluted the
+  keywords people search for. Paths-LE, its status bar item and its MCP server
+  are now ready in every window shortly after startup, rather than when the
+  first file in one of those languages opens.
+
 ## [2.6.1] - 2026-10-18
 
 ### Changed
