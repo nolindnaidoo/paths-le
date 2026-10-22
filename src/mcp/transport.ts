@@ -64,10 +64,10 @@ const SUPPORTED_PROTOCOL = '2025-06-18';
  *
  * Input is held until a newline arrives, and without a ceiling a client that
  * streamed bytes with no newline grew the process without bound: 64 MiB of
- * such input held the server at 737 MB resident, and no error was ever
- * written. Counted in UTF-16 code units, which is never more than the bytes.
- * Sixteen MiB is far past any message a tool here can use; `maxResults`
- * caps the answer at a few thousand rows.
+ * such input held a server in this family near a gigabyte resident, and no
+ * error was ever written. Counted in UTF-16 code units, which is never more
+ * than the bytes. Sixteen MiB is far past any message a tool here can use;
+ * `maxResults` caps the answer at a few thousand rows.
  */
 export const MAX_FRAME_BYTES = 16 * 1024 * 1024;
 
@@ -223,6 +223,15 @@ export function serve(
 		output.write(`${JSON.stringify(message)}\n`);
 	};
 
+	const frameRefusal = () => ({
+		jsonrpc: '2.0' as const,
+		id: null,
+		error: {
+			code: PARSE_ERROR,
+			message: `Message exceeds the ${MAX_FRAME_BYTES} byte frame limit`,
+		},
+	});
+
 	input.setEncoding?.('utf8');
 	input.on('data', (received: string) => {
 		let chunk = received;
@@ -241,6 +250,13 @@ export function serve(
 			buffer = buffer.slice(newline + 1);
 			newline = buffer.indexOf('\n');
 			if (!line) continue;
+			if (line.length > MAX_FRAME_BYTES) {
+				// The newline arrived in the chunk that took the frame over the
+				// limit, so the check below never saw it. The limit is on the
+				// line, not on when its end happened to arrive.
+				write(frameRefusal());
+				continue;
+			}
 
 			let parsed: unknown;
 			try {
@@ -271,14 +287,7 @@ export function serve(
 		if (buffer.length > MAX_FRAME_BYTES) {
 			buffer = '';
 			discarding = true;
-			write({
-				jsonrpc: '2.0',
-				id: null,
-				error: {
-					code: PARSE_ERROR,
-					message: `Message exceeds the ${MAX_FRAME_BYTES} byte frame limit`,
-				},
-			});
+			write(frameRefusal());
 		}
 	});
 }

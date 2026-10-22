@@ -472,6 +472,21 @@ describe('serve: the stdio loop', () => {
 		expect(replies()).toHaveLength(1);
 	});
 
+	it('refuses a frame over the limit whose newline arrives in the same chunk', async () => {
+		// The over-limit check on the leftover buffer never sees a line that
+		// arrives whole; the limit is on the line, not on its framing.
+		const { input, replies } = harness();
+		input.emit(
+			'data',
+			`${'x'.repeat(MAX_FRAME_BYTES + 1)}\n{"jsonrpc":"2.0","id":8,"method":"ping"}\n`,
+		);
+		await settle();
+		expect(replies().map((r) => r.error?.message ?? r.id)).toEqual([
+			`Message exceeds the ${MAX_FRAME_BYTES} byte frame limit`,
+			8,
+		]);
+	});
+
 	it('refuses a line over the frame limit and keeps serving', async () => {
 		// The buffer grew with every chunk until a newline arrived, with no
 		// ceiling: 64 MiB of newline-free input held the real server at 737 MB
