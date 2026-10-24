@@ -10,6 +10,14 @@ npm command line. The Rust CLI in `crate/` keeps its own
 [CHANGELOG](crate/CHANGELOG.md). From 2.5.0 every surface carries one
 version and releases from one tag.
 
+## [Unreleased]
+
+### Fixed
+
+- The MCP server parsed a frame over the 16 MiB limit whole when its newline
+  arrived in the same chunk that took it over, and answered "Invalid JSON"
+  instead of the frame refusal. The limit is applied to the line itself.
+
 ## [2.6.2] - 2026-10-18
 
 ### Changed
